@@ -1,0 +1,29 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Reasonable Planning AI Extension",
+	"Description": "Dual Utility Reasoning to select Goals that initiate a Goal Oriented Action Plan",
+	"Category": "AI",
+	"CreatedBy": "Martin Hollstein (Troll Purse)",
+	"CreatedByURL": "https://hollstein.dev",
+	"DocsURL": "https://github.com/hollsteinm/UE4-Utility-GOAP-AI-Plugin",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/hollsteinm/UE4-Utility-GOAP-AI-Plugin/issues",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "ReasonablePlanningAI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ReasonablePlanningAITestSuite",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		}
+	]
+}
