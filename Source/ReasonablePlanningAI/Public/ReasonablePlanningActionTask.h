@@ -11,7 +11,7 @@
 /**
  * Data driven action task with data values pulled from the state interface. Supports Gameplay Tasks
  */
-UCLASS(Blueprintable, BlueprintType)
+UCLASS(Blueprintable, BlueprintType, Abstract)
 class REASONABLEPLANNINGAI_API UReasonablePlanningActionTask : public UReasonablePlanningActionTaskBase
 {
 	GENERATED_BODY()
