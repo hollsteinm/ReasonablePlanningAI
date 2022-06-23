@@ -1,7 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "ReasonablePlanningDistance.h"
-#include "State_Map.h"
+#include "Composer/ReasonablePlanningDistance.h"
+#include "States/State_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceSpec, "ReasonablePlanningAI.Distance", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UReasonablePlanningDistance* ClassUnderTest;

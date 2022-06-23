@@ -9,12 +9,18 @@ public class ReasonablePlanningAI : ModuleRules
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange(
-			new string[] { }
+			new string[]
+            {
+                "ReasonablePlanningAI/Public"
+            }
 			);
 				
 		
 		PrivateIncludePaths.AddRange(
-			new string[] { }
+			new string[]
+            {
+                "ReasonablePlanningAI/Private"
+            }
 			);
 			
 		

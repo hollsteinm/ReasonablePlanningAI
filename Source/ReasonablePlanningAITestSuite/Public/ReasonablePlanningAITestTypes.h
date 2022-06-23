@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ReasonablePlanningState.h"
+#include "Core/ReasonablePlanningState.h"
 #include "ReasonablePlanningAITestTypes.generated.h"
 
 UENUM()

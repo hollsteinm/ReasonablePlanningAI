@@ -1,6 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "State_Map.h"
+#include "States/State_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UState_Map* ClassUnderTest;

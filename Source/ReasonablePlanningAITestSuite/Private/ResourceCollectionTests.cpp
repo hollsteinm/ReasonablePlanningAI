@@ -1,6 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "ReasonablePlanningResourceCollection.h"
+#include "Core/ReasonablePlanningResourceCollection.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningResourceCollectionSpec, "ReasonablePlanningAI.ResourceCollection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UReasonablePlanningResourceCollection* ClassUnderTest;

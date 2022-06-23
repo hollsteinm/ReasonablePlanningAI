@@ -1,9 +1,9 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "ReasonablePlanningWeightBase.h"
-#include "Weight_Float.h"
-#include "Weight_CurveFloat.h"
-#include "Weight_ConstantFloat.h"
+#include "Composer/ReasonablePlanningWeightBase.h"
+#include "Composer/Weights/Weight_Float.h"
+#include "Composer/Weights/Weight_CurveFloat.h"
+#include "Composer/Weights/Weight_ConstantFloat.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningWeightSpec, "ReasonablePlanningAI.Weight", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UReasonablePlanningWeight* ClassUnderTest;
