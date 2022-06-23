@@ -31,6 +31,6 @@ public:
      * for instances of invalid state properties, missing state values, or other such conditions.
      */
     UFUNCTION(BlueprintPure, Category = "RPAI")
-    virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const  PURE_VIRTUAL(UReasonablePlanningStateQuery::Query, return EStateQueryResult::Invalid;);
+    virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const PURE_VIRTUAL(UReasonablePlanningStateQuery::Query, return EStateQueryResult::Invalid;);
     
 };
