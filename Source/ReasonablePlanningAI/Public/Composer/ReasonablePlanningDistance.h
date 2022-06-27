@@ -38,14 +38,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "RPAI", meta=(DisplayName="Left Hand Side State Reference Key"))
 	FStateKeyValueReference LHS;
 
-	/**
-	* Right hand state key reference to use
-	*/
-	UPROPERTY(EditDefaultsOnly, Category = "RPAI", meta = (DisplayName = "Right Hand Side State Reference Key"))
-	FStateKeyValueReference RHS;
-
 public:
 	FORCEINLINE void SetLHS(FName Key, EStatePropertyType ExpectedType) { LHS.StateKeyName = Key; LHS.ExpectedValueType = ExpectedType; }
-	FORCEINLINE void SetRHS(FName Key, EStatePropertyType ExpectedType) { RHS.StateKeyName = Key; RHS.ExpectedValueType = ExpectedType; }
 	
 };

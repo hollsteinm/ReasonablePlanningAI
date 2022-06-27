@@ -1,10 +1,11 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
 #include "Composer/ReasonablePlanningDistance.h"
+#include "Composer/Distances/Distance_State.h"
 #include "States/State_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceSpec, "ReasonablePlanningAI.Distance", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UReasonablePlanningDistance* ClassUnderTest;
+    UDistance_State* ClassUnderTest;
 	UReasonablePlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceSpec)
 void ReasonablePlanningDistanceSpec::Define()
@@ -16,7 +17,7 @@ void ReasonablePlanningDistanceSpec::Define()
 					auto MapState = NewObject<UState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UReasonablePlanningDistance>();
+					ClassUnderTest = NewObject<UDistance_State>();
 					GivenState = MapState;
 				});
 
@@ -93,7 +94,7 @@ void ReasonablePlanningDistanceSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					ClassUnderTest = NewObject<UReasonablePlanningDistance>();
+					ClassUnderTest = NewObject<UDistance_State>();
 					GivenState = NewObject<UTestPlanningState>();
 				});
 

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Composer/ReasonablePlanningDistance.h"
-#include "Distance_Integer.generated.h"
+#include "Distance_Rotator.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class REASONABLEPLANNINGAI_API UDistance_Integer : public UReasonablePlanningDistance
+class REASONABLEPLANNINGAI_API UDistance_Rotator : public UReasonablePlanningDistance
 {
 	GENERATED_BODY()
 	
@@ -21,5 +21,5 @@ protected:
     * Right hand value to use for comparison to the state value (LHS)
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
-    int32 RHS;
+    FRotator RHS;
 };

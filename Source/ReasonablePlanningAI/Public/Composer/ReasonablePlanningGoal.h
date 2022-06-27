@@ -36,11 +36,11 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RPAI")
     UReasonablePlanningWeightBase* Weight;
     
-    /** The queries to execute to determine if this goal is applicable to the given state. All queries must succeed to for the goal to be considered for the given state permutation. Used for planning as well as runtime.*/
+    /** The queries to execute to determine if this goal is applicable to the given state. All queries must succeed to for the goal to be considered for the given state permutation. Used for planning as well as runtime. The empty list implies always applicable. */
     UPROPERTY(EditAnywhere, Category = "RPAI", Instanced)
     TArray<UReasonablePlanningStateQuery*> IsApplicableQueries;
     
-    /** The queries to execute to determine if this goal is satisfied by the given state. All queries must succeed to for the goal to be considered satisfied given state permutation. Used for planning as well as runtime.*/
+    /** The queries to execute to determine if this goal is satisfied by the given state. All queries must succeed to for the goal to be considered satisfied given state permutation. Used for planning as well as runtime. The empty list implies always true.*/
     UPROPERTY(EditAnywhere, Category = "RPAI", Instanced)
     TArray<UReasonablePlanningStateQuery*> IsInDesiredStateQueries;
     
