@@ -96,16 +96,13 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 		return GoalDistribution[0].TheGoal;
 	}
 
-	if (GoalDistribution.Num() > 2)
-	{
-		for (auto& Action : GoalDistribution)
-		{
-			Action.Probability = Action.UtilityScore / TotalWeightInHighestCategory;
-		}
+    for (auto& Action : GoalDistribution)
+    {
+        Action.Probability = Action.UtilityScore / TotalWeightInHighestCategory;
+    }
 
-		//TODO: Sort across a normal/gaussian distribution (bell curve)
-		GoalDistribution.Sort(ProbabilitySort);
-	}
+    //TODO: Sort across a normal/gaussian distribution (bell curve)
+    GoalDistribution.Sort(ProbabilitySort);
 
 	float RandomValue = FMath::RandRange(0.f, TotalWeightInHighestCategory);
 	int32 Idx = 0;

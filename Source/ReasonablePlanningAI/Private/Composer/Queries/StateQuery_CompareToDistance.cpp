@@ -5,7 +5,7 @@
 #include "Composer/ReasonablePlanningDistance.h"
 #include "Core/ReasonablePlanningState.h"
 
-EStateQueryResult UStateQuery_CompareToFloat::Query(const UReasonablePlanningState* StateToQuery) const
+EStateQueryResult UStateQuery_CompareToDistance::Query(const UReasonablePlanningState* StateToQuery) const
 {
     if (QueriedState.ExpectedValueType != EStatePropertyType::Float)
     {

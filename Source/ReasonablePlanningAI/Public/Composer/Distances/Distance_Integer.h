@@ -7,7 +7,7 @@
 #include "Distance_Integer.generated.h"
 
 /**
- * 
+ * Determines the distance from the float state value to an integer by using the difference of the two values.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_Integer : public UReasonablePlanningDistance
@@ -22,4 +22,7 @@ protected:
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
     int32 RHS;
+    
+public:
+    FORCEINLINE void SetRHS(int32 NewRHS) { RHS = NewRHS; }
 };

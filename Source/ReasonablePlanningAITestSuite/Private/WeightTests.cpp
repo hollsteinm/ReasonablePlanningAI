@@ -5,33 +5,6 @@
 #include "Composer/Weights/Weight_CurveFloat.h"
 #include "Composer/Weights/Weight_ConstantFloat.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningWeightSpec, "ReasonablePlanningAI.Weight", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UReasonablePlanningWeight* ClassUnderTest;
-	UTestPlanningState* GivenState;
-END_DEFINE_SPEC(ReasonablePlanningWeightSpec)
-void ReasonablePlanningWeightSpec::Define()
-{
-	BeforeEach([this]()
-		{
-			ClassUnderTest = NewObject<UReasonablePlanningWeight>();
-			GivenState = NewObject<UTestPlanningState>();
-		});
-
-	Describe("Base Weight Behavior Defaults", [this]()
-	{
-			It("Should return an insignificant weight", [this]()
-				{
-					TestEqual("ExecutionWeight", ClassUnderTest->ExecutionWeight(GivenState), 0.f);
-				});
-	});
-
-	AfterEach([this]()
-		{
-			ClassUnderTest->ConditionalBeginDestroy();
-			GivenState->ConditionalBeginDestroy();
-		});
-}
-
 BEGIN_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec, "ReasonablePlanningAI.WeightConstantFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UWeight_ConstantFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;

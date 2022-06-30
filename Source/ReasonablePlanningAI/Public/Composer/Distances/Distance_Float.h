@@ -7,7 +7,7 @@
 #include "Distance_Float.generated.h"
 
 /**
- * 
+ * Returns the difference of the LHS side float value to the RHS float value provided.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_Float : public UReasonablePlanningDistance
@@ -22,4 +22,7 @@ protected:
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
     float RHS;
+    
+public:
+    FORCEINLINE void SetRHS(float NewRHS) { RHS = NewRHS; }
 };

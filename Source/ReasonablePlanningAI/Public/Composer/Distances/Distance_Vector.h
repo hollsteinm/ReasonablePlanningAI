@@ -7,7 +7,7 @@
 #include "Distance_Vector.generated.h"
 
 /**
- * 
+ * Determines the distance between the state defined vector value and a defined vector. Will return the distance squared between the two vectors from the state value to the RHS property value.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_Vector : public UReasonablePlanningDistance
@@ -22,4 +22,7 @@ protected:
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
     FVector RHS;
+    
+public:
+    FORCEINLINE void SetRHS(FVector NewRHS) { RHS = NewRHS; }
 };

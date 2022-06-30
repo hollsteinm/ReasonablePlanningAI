@@ -7,7 +7,7 @@
 #include "Distance_Rotator.generated.h"
 
 /**
- * 
+ * Determines the distance between to rotators, with the state value being the left hand side value and the property RHS being the right hand side. Distance returned is the Manhattan distance.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_Rotator : public UReasonablePlanningDistance
@@ -22,4 +22,7 @@ protected:
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
     FRotator RHS;
+    
+public:
+    FORCEINLINE void SetRHS(FRotator NewRHS) { RHS = NewRHS; }
 };

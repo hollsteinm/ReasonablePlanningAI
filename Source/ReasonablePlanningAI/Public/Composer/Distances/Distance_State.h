@@ -7,7 +7,7 @@
 #include "Distance_State.generated.h"
 
 /**
- * 
+ * Determines the distance between two defined state values of the same type.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_State : public UReasonablePlanningDistance

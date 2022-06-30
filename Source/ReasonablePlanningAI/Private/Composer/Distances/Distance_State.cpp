@@ -10,13 +10,13 @@ float UDistance_State::ReceiveCalculateDistance_Implementation(const UReasonable
     if (LHS.ExpectedValueType != RHS.ExpectedValueType)
     {
         UE_LOG(LogRPAI, Verbose, TEXT("Different expected types, returning 0"));
-        return 0.f;
+        return TNumericLimits<float>::Max();
     }
 
     if (LHS.StateKeyName == RHS.StateKeyName)
     {
         UE_LOG(LogRPAI, Verbose, TEXT("Same State Key referenced, returning 0"));
-        return 0.f;
+        return TNumericLimits<float>::Max();
     }
 
     if (!(GivenState->HasReferencedState(LHS) && GivenState->HasReferencedState(RHS)))
@@ -107,5 +107,5 @@ float UDistance_State::ReceiveCalculateDistance_Implementation(const UReasonable
         break;
     }
 
-    return 0.f;
+    return TNumericLimits<float>::Max();
 }

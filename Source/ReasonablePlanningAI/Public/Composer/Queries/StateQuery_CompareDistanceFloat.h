@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Composer/ReasonablePlanningStateQuery.h"
+#include "Composer/Queries/StateQuery_CompareTo.h"
 #include "StateQuery_CompareDistanceFloat.generated.h"
 
 class UReasonablePlanningDistance;
@@ -20,6 +21,9 @@ public:
     virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const override;
     
 protected:
+    UPROPERTY(EditAnywhere, Category = "RPAI")
+    EStateQueryCompareToOperation ComparisonOperation;
+
     UPROPERTY(EditAnywhere, Category="RPAI")
     UReasonablePlanningDistance* Distance;
     
@@ -29,5 +33,5 @@ protected:
 public:
     FORCEINLINE void SetDistance(UReasonablePlanningDistance* NewDistance) { Distance = NewDistance; }
     FORCEINLINE void SetRHS(float NewRHS) { RHS = NewRHS; }
-
+    FORCEINLINE void SetComparisonOperation(EStateQueryCompareToOperation NewComparisonOperation) { ComparisonOperation = NewComparisonOperation; }
 };

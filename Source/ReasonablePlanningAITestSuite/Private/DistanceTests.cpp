@@ -4,11 +4,63 @@
 #include "Composer/Distances/Distance_State.h"
 #include "States/State_Map.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceSpec, "ReasonablePlanningAI.Distance", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec, "ReasonablePlanningAI.Distance", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+    UDistance_Bool* ClassUnderTest;
+    UReasonablePlanningState* GivenState;
+END_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec)
+void ReasonablePlanningDistanceBoolSpec::Define()
+{
+    Describe("Calculating Distance for bool type", [this]()
+        {
+            BeforeEach([this]()
+                {
+                    auto MapState = NewObject<UState_Map>();
+                    MapState->SetAsDynamic(true);
+                    
+                    ClassUnderTest = NewObject<UDistance_Bool>();
+                    GivenState = MapState;
+                });
+        
+            It("Should return a 0 or 1 as the difference between two bools", [this]()
+               {
+                    ClassUnderTest->SetLHS("LHS", EStatePropertyType::Bool);
+
+                    GivenState->SetBool("LHS", true);
+                    ClassUnderTest->SetRHS(true)
+                    TestEqual("UDistance_Bool::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+
+                    GivenState->SetBool("LHS", true);
+                    ClassUnderTest->SetRHS(true);
+                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+
+                    GivenState->SetBool("LHS", false);
+                    ClassUnderTest->SetRHS(false);
+                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+
+                    GivenState->SetBool("LHS", false);
+                    ClassUnderTest->SetRHS(true);
+                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+                });
+        
+            It("Should return max value if the state value is a float", [this]()
+                {
+                    ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
+                TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+                });
+        
+            AfterEach([this]()
+                {
+                    ClassUnderTest->ConditionalBeginDestroy();
+                    GivenState->ConditionalBeginDestroy();
+                });
+        });
+}
+
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec, "ReasonablePlanningAI.Distance", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
     UDistance_State* ClassUnderTest;
 	UReasonablePlanningState* GivenState;
-END_DEFINE_SPEC(ReasonablePlanningDistanceSpec)
-void ReasonablePlanningDistanceSpec::Define()
+END_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec)
+void ReasonablePlanningDistanceStateSpec::Define()
 {
 	Describe("Calculating Distance for Specific Types", [this]()
 		{
@@ -29,7 +81,7 @@ void ReasonablePlanningDistanceSpec::Define()
 					GivenState->SetVector("RHS", RHS);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Vector);
-					TestEqual("CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FVector::DistSquared(LHS, RHS));
+					TestEqual("UDistance_State::CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FVector::DistSquared(LHS, RHS));
 				});
 
 			It("Should return the difference between two floats", [this]()
@@ -38,7 +90,7 @@ void ReasonablePlanningDistanceSpec::Define()
 					GivenState->SetFloat("RHS", 10.f);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Float);
-					TestEqual("CalculateDistance - Float", ClassUnderTest->CalculateDistance(GivenState), 90.3f);
+					TestEqual("UDistance_State::CalculateDistance - Float", ClassUnderTest->CalculateDistance(GivenState), 90.3f);
 				});
 
 			It("Should return the difference between two integers", [this]()
@@ -47,7 +99,7 @@ void ReasonablePlanningDistanceSpec::Define()
 					GivenState->SetInt("RHS", 30);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Int);
-					TestEqual("CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 55.f);
+					TestEqual("UDistance_State::CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 55.f);
 				});
 
 			It("Should return a 0 or 1 as the difference between two bools", [this]()
@@ -57,19 +109,19 @@ void ReasonablePlanningDistanceSpec::Define()
 
 					GivenState->SetBool("LHS", true);
 					GivenState->SetBool("RHS", false);
-					TestEqual("CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
 
 					GivenState->SetBool("LHS", true);
 					GivenState->SetBool("RHS", true);
-					TestEqual("CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
 					GivenState->SetBool("LHS", false);
 					GivenState->SetBool("RHS", false);
-					TestEqual("CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
 					GivenState->SetBool("LHS", false);
 					GivenState->SetBool("RHS", true);
-					TestEqual("CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
 				});
 
 			It("Should return the Manhattan distance between two rotators", [this]()
@@ -140,27 +192,29 @@ void ReasonablePlanningDistanceSpec::Define()
 					TestEqual("CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 				});
 
-			It("Should return 0 when invalid types are used", [this]()
+			It("Should return max distance when invalid types are used", [this]()
 				{
+                    const float ExpectedValue = TNumericLimits<float>::Max();
+                
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Class);
 					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Class);
-					TestEqual("CalculateDistance - Class", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("CalculateDistance - Class", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Enum);
 					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Enum);
-					TestEqual("CalculateDistance - Enum", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("CalculateDistance - Enum", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Name);
 					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Name);
-					TestEqual("CalculateDistance - Name", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("CalculateDistance - Name", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::String);
 					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::String);
-					TestEqual("CalculateDistance - String", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("CalculateDistance - String", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Invalid);
 					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Invalid);
-					TestEqual("CalculateDistance - Invalid", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("CalculateDistance - Invalid", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 				});
 
 			AfterEach([this]()

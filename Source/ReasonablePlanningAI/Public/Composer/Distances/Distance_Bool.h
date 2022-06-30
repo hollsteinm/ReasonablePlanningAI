@@ -7,7 +7,7 @@
 #include "Distance_Bool.generated.h"
 
 /**
- * 
+ * Compares a state boolean value to the given boolean value, returns 1.0 if they are the same, 0.0 if they are different.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UDistance_Bool : public UReasonablePlanningDistance
@@ -22,4 +22,7 @@ protected:
     */
     UPROPERTY(EditDefaultsOnly, Category = "RPAI")
     bool bRHS;
+    
+public:
+    FORCEINLINE void SetRHS(bool bNewRHS) { bRHS = bNewRHS; }
 };
