@@ -2,8 +2,9 @@
 
 
 #include "Reasoners/Reasoner_AbsoluteUtility.h"
+#include "Core/ReasonablePlanningGoalBase.h"
 
-UReasoner_AbsoluteUtility::Reasoner_AbsoluteUtility()
+UReasoner_AbsoluteUtility::UReasoner_AbsoluteUtility()
     : bUseWeight(true)
 {
     
@@ -36,7 +37,7 @@ UReasonablePlanningGoalBase* UReasoner_AbsoluteUtility::ReceiveReasonNextGoal_Im
         {
             if(Goal->IsApplicable(CurrentState))
             {
-                float CategoryAsFloat = float(Goal->GetCateogry());
+                float CategoryAsFloat = float(Goal->GetCategory());
                 if(CategoryAsFloat > HighestWeight)
                 {
                     HighestWeight = CategoryAsFloat;

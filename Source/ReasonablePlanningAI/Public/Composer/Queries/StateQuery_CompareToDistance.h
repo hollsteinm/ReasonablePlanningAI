@@ -19,4 +19,7 @@ public:
 protected:
     UPROPERTY(EditAnywhere,Category="RPAI")
     UReasonablePlanningDistance* Distance;
+
+public:
+	FORCEINLINE void SetComparisonValue(UReasonablePlanningDistance* NewDistance) { Distance = NewDistance; }
 };

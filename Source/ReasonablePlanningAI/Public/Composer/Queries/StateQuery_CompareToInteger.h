@@ -20,4 +20,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "RPAI")
 	int32 ValueToCompare;
+
+public:
+	FORCEINLINE void SetComparisonValue(int32 NewValueToCompare) { ValueToCompare = NewValueToCompare; }
 };

@@ -22,7 +22,7 @@ float UReasonablePlanningDistance::CalculateDistance(const UReasonablePlanningSt
         );
         return TNumericLimits<float>::Max();
     }
-	return ReceiveCalculateDistance(GivenState);
+	return FMath::Abs(ReceiveCalculateDistance(GivenState));
 }
 
 //Return distance as the difference between the left hand property and the right hand property.
