@@ -13,7 +13,7 @@ float UDistance_Vector::ReceiveCalculateDistance_Implementation(const UReasonabl
         return TNumericLimits<float>::Max();
     }
     FVector fLHS;
-    if (GivenState->GetVector(LHS.StateKeyName, fLHS))
+    if (GivenState->GetValueOfType(LHS.StateKeyName, fLHS))
     {
         return FVector::DistSquared(fLHS, RHS);
     }

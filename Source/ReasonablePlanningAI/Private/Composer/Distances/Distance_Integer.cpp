@@ -14,11 +14,11 @@ float UDistance_Integer::ReceiveCalculateDistance_Implementation(const UReasonab
     }
     int32 iLHS;
     float fLHS;
-    if (GivenState->GetInt(LHS.StateKeyName, iLHS))
+    if (GivenState->GetValueOfType(LHS.StateKeyName, iLHS))
     {
         return float(iLHS - RHS);
     }
-    else if(GivenState->GetFloat(LHS.StateKeyName, fLHS))
+    else if(GivenState->GetValueOfType(LHS.StateKeyName, fLHS))
     {
         return fLHS - float(RHS);
     }

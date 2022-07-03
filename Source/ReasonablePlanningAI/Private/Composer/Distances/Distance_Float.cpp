@@ -12,13 +12,14 @@ float UDistance_Float::ReceiveCalculateDistance_Implementation(const UReasonable
         UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not Float."));
         return TNumericLimits<float>::Max();
     }
+
     float fLHS;
     int32 iLHS;
-    if (GivenState->GetFloat(LHS.StateKeyName, fLHS))
+    if (GivenState->GetValueOfType(LHS.StateKeyName, fLHS))
     {
         return fLHS - RHS;
     }
-    else if (GivenState->GetInt(LHS.StateKeyName, iLHS))
+    else if (GivenState->GetValueOfType(LHS.StateKeyName, iLHS))
     {
         return iLHS - FMath::FloorToInt(RHS);
     }

@@ -6,7 +6,7 @@
 
 EStateQueryResult UStateQuery_CompareToFloat::Query(const UReasonablePlanningState* StateToQuery) const
 {
-	if (QueriedState.ExpectedValueType != EStatePropertyType::Float || QueriedState.ExpectedValueType != EStatePropertyType::Int)
+	if (QueriedState.ExpectedValueType != EStatePropertyType::Float && QueriedState.ExpectedValueType != EStatePropertyType::Int)
 	{
 		return EStateQueryResult::Invalid;
 	}

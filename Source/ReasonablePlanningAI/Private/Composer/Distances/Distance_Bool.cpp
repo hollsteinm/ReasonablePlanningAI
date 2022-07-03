@@ -12,8 +12,9 @@ float UDistance_Bool::ReceiveCalculateDistance_Implementation(const UReasonableP
         UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not Bool."));
         return TNumericLimits<float>::Max();
     }
+
     bool bLHS = false;
-    if (GivenState->GetBool(LHS.StateKeyName, bLHS))
+    if (GivenState->GetValueOfType(LHS.StateKeyName, bLHS))
     {
         return (bLHS == bRHS) ? 0.f : 1.f;
     }

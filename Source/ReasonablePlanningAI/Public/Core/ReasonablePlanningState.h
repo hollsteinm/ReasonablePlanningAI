@@ -187,45 +187,128 @@ public:
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool GetVector(FName ValueName, FVector& OutValue) const PURE_VIRTUAL(UReasonablePlanningState::GetVector, return false;);
 
+    /**
+    * Check to verify the state has a boolean with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasBool(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasBool, return false;);
 
+    /**
+    * Check to verify the state has a class with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasClass(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasClass, return false;);
 
+    /**
+    * Check to verify the state has a enum with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasEnum(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasEnum, return false;);
 
+    /**
+    * Check to verify the state has a float with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasFloat(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasFloat, return false;);
 
+    /**
+    * Check to verify the state has a integer with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasInt(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasInt, return false;);
 
+    /**
+    * Check to verify the state has a name with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasName(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasName, return false;);
 
+    /**
+    * Check to verify the state has a object with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasObject(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasObject, return false;);
 
+    /**
+    * Check to verify the state has a rotator with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasRotator(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasRotator, return false;);
 
+    /**
+    * Check to verify the state has a string with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasString(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasString, return false;);
 
+    /**
+    * Check to verify the state has a vector with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasVector(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasVector, return false;);
 
+    /**
+    * Check to verify the state has a any type of value with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual bool HasValueWithName(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::HasValueWithName, return false;);
 
+    /**
+    * Check to verify the state has a boolean with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	virtual EStatePropertyType GetTypeFromName(FName ValueName) const PURE_VIRTUAL(UReasonablePlanningState::GetTypeFromName, return EStatePropertyType::Invalid;);
 
+    /**
+    * Check to verify the state has a boolean with the given name
+    *
+    * @Param ValueName the key name of the value in the state to verify
+    * @Returns true if the value was with the given name of this type was found
+    */
 	UFUNCTION(BlueprintPure, Category = "RPAI")
 	bool HasReferencedState(const FStateKeyValueReference & StatePropertyReference) const;
 
+    /**
+    * Takes all state properties needed for planning and prediction and copies them to the given state.
+    *
+    * @Param OtherState the state to copy values to
+    */
 	UFUNCTION(BlueprintCallable, Category = "RPAI")
 	virtual void CopyStateForPredictionTo(UReasonablePlanningState* OtherState) const PURE_VIRTUAL(UReasonablePlanningState::CopyStateForPreditionTo,);
 
@@ -261,4 +344,105 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "ResonablePlanningAI")
 	virtual bool UnlockResource(FName ExactName, UObject* OptionalLockingObject = nullptr) PURE_VIRTUAL(UReasonablePlanningState::UnlockResource, return false;);
+
+    // C++ Template Helpers
+
+    template<typename T>
+    FORCEINLINE bool HasValueOfType(FName ValueName) const { return false; }
+
+    template<typename T>
+    FORCEINLINE bool GetValueOfType(FName ValueName, T& OutValue) const { return false; }
+
+    template<typename T>
+    FORCEINLINE void SetValueOfType(FName ValueName, T NewValue) { }
+
+
+    // Helper Specializations
+
+    // Has
+
+    template<>
+    FORCEINLINE bool HasValueOfType<float>(FName ValueName) const { return HasFloat(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<bool>(FName ValueName) const { return HasBool(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<int32>(FName ValueName) const { return HasInt(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<UClass>(FName ValueName) const { return HasClass(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<FName>(FName ValueName) const { return HasName(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<FString>(FName ValueName) const { return HasString(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<FVector>(FName ValueName) const { return HasVector(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<FRotator>(FName ValueName) const { return HasRotator(ValueName); }
+
+    template<>
+    FORCEINLINE bool HasValueOfType<UObject>(FName ValueName) const { return HasObject(ValueName); }
+
+    // Get
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, float& OutValue) const { return GetFloat(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, bool& OutValue) const { return GetBool(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, int32& OutValue) const { return GetInt(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, UClass*& OutValue) const { return GetClassValue(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, FName& OutValue) const { return GetNameValue(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, FString& OutValue) const { return GetString(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, FVector& OutValue) const { return GetVector(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, FRotator& OutValue) const { return GetRotator(ValueName, OutValue); }
+
+    template<>
+    FORCEINLINE bool GetValueOfType(FName ValueName, UObject*& OutValue) const { return GetObject(ValueName, OutValue); }
+
+    // Set
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, float NewValue) { SetFloat(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, bool NewValue) { SetBool(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, int32 NewValue) { SetInt(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, UClass* NewValue) { SetClassValue(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, FName NewValue) { SetNameValue(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, FString NewValue) { SetString(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, FVector NewValue) { SetVector(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, FRotator NewValue) { SetRotator(ValueName, NewValue); }
+
+    template<>
+    FORCEINLINE void SetValueOfType(FName ValueName, UObject* NewValue) { SetObject(ValueName, NewValue); }
 };

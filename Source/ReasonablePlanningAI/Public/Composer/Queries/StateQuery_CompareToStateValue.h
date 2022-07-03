@@ -19,9 +19,9 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RPAI")
     FStateKeyValueReference ComparedToState;
     
-    virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const override;
-    
 public:
+    virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const override;
+
     FORCEINLINE void SetComparedToState(FName Key, EStatePropertyType ExpectedType) { ComparedToState.StateKeyName = Key; ComparedToState.ExpectedValueType = ExpectedType; }
 	
 };

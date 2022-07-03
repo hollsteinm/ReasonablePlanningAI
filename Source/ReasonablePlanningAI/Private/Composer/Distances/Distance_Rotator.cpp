@@ -13,7 +13,7 @@ float UDistance_Rotator::ReceiveCalculateDistance_Implementation(const UReasonab
         return TNumericLimits<float>::Max();
     }
     FRotator rLHS;
-    if (GivenState->GetRotator(LHS.StateKeyName, rLHS))
+    if (GivenState->GetValueOfType(LHS.StateKeyName, rLHS))
     {
         return rLHS.GetManhattanDistance(RHS);
     }
