@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/ReasonablePlanningState.h"
+#include "Core/ReasonablePlanningActionBase.h"
+#include "Core/ReasonablePlanningGoalBase.h"
 #include "ReasonablePlanningAITestTypes.generated.h"
 
 UENUM()
@@ -72,4 +74,43 @@ public:
 	virtual bool HasValueWithName(FName ValueName) const override;
 	virtual EStatePropertyType GetTypeFromName(FName ValueName) const override;
 	virtual void CopyStateForPredictionTo(UReasonablePlanningState * OtherState) const override;
+};
+
+UCLASS()
+class UTestAction : public UReasonablePlanningActionBase
+{
+	GENERATED_BODY()
+
+public:
+	float Weight;
+	FName KeyToApply;
+	int32 ValueToApply;
+	bool IsApplicable;
+
+	UTestAction();
+
+protected:
+	//Only implement the planning heuristic functions
+
+	virtual void ReceiveApplyToState_Implementation(UReasonablePlanningState* GivenState) const override;
+	virtual bool ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual float ReceiveExecutionWeight_Implementation(const UReasonablePlanningState* GivenState) const override;
+};
+
+UCLASS()
+class UTestGoal : public UReasonablePlanningGoalBase
+{
+	GENERATED_BODY()
+
+public:
+
+	static const int32 ConditionAValue = 2;
+	static const int32 ConditionBValue = 1;
+	static const int32 ConditionCValue = 3;
+	static const FName ConditionAKey;
+	static const FName ConditionBKey;
+	static const FName ConditionCKey;
+
+	virtual bool ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual float ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
 };

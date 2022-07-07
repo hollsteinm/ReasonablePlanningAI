@@ -20,4 +20,7 @@ protected:
 
     virtual void ReceiveMutate_Implementation(UReasonablePlanningState* StateToMutate) const override;
     virtual bool CanApply_Implementation(const UReasonablePlanningState* StateToMutate) const override;
+
+public:
+    FORCEINLINE void SetValueToSet(FString NewValueToSet) { ValueToSet = NewValueToSet; }
 };

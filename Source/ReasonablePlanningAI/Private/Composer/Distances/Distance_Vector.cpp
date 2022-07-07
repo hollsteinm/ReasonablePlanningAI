@@ -9,7 +9,6 @@ float UDistance_Vector::ReceiveCalculateDistance_Implementation(const UReasonabl
 {
     if(LHS.ExpectedValueType != EStatePropertyType::Vector)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not vector."));
         return TNumericLimits<float>::Max();
     }
     FVector fLHS;

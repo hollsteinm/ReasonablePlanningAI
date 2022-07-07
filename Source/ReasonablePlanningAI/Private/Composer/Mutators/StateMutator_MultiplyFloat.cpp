@@ -22,7 +22,7 @@ void UStateMutator_MultiplyFloat::ReceiveMutate_Implementation(UReasonablePlanni
             int32 Value;
             if(StateToMutate->GetInt(StatePropertyToMutate.StateKeyName, Value))
             {
-                Value *= FMath::FloorToInt(MultiplierValue);
+                Value = FMath::FloorToInt(float(Value) * MultiplierValue);
                 StateToMutate->SetInt(StatePropertyToMutate.StateKeyName, Value);
             }
             break;

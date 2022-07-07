@@ -9,7 +9,6 @@ float UDistance_Rotator::ReceiveCalculateDistance_Implementation(const UReasonab
 {
     if(LHS.ExpectedValueType != EStatePropertyType::Rotator)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not rotator."));
         return TNumericLimits<float>::Max();
     }
     FRotator rLHS;

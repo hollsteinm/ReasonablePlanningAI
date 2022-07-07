@@ -41,4 +41,7 @@ protected:
     UFUNCTION(BlueprintNativeEvent, Category = "RPAI")
     bool CanApply(const UReasonablePlanningState* StateToChange) const;
     virtual bool CanApply_Implementation(const UReasonablePlanningState* StateToChange) const;
+
+public:
+    FORCEINLINE void SetMutatedStateValue(FName StateKeyName, EStatePropertyType ExpectedValueType) { StatePropertyToMutate.StateKeyName = StateKeyName; StatePropertyToMutate.ExpectedValueType = ExpectedValueType; }
 };

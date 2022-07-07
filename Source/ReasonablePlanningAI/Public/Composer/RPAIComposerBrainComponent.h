@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BrainComponent.h"
-#include "ReasonablePlanningActorComponent.generated.h"
+#include "RPAIComposerBrainComponent.generated.h"
 
 class UReasonablePlanningGoalBase;
 class UReasonablePlanningActionBase;
@@ -13,13 +13,13 @@ class UReasonablePlanningAIBehavior;
 class UReasonablePlanningState;
 
 UCLASS(ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
-class REASONABLEPLANNINGAI_API UReasonablePlanningActorComponent : public UBrainComponent
+class REASONABLEPLANNINGAI_API URPAIComposerBrainComponent : public UBrainComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UReasonablePlanningActorComponent();
+	URPAIComposerBrainComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "RPAI")
 	void SetReasonablePlanningBehavior(UReasonablePlanningAIBehavior* NewBehavior);

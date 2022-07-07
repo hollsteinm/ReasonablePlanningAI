@@ -11,7 +11,7 @@ void UReasonablePlanningActionBase::ApplyToState(UReasonablePlanningState* Given
 
 bool UReasonablePlanningActionBase::IsApplicable(const UReasonablePlanningState* GivenState) const
 {
-	return false;
+	return ReceiveIsApplicable(GivenState);
 }
 
 float UReasonablePlanningActionBase::ExecutionWeight(const UReasonablePlanningState* GivenState) const

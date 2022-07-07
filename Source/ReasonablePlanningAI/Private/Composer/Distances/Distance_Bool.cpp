@@ -9,7 +9,6 @@ float UDistance_Bool::ReceiveCalculateDistance_Implementation(const UReasonableP
 {
     if(LHS.ExpectedValueType != EStatePropertyType::Bool)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not Bool."));
         return TNumericLimits<float>::Max();
     }
 

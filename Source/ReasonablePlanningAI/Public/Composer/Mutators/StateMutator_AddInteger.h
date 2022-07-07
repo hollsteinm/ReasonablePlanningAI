@@ -23,5 +23,4 @@ protected:
     
 public:
     FORCEINLINE void SetIntegerValueToAdd(int32 NewIntegerValueToAdd) { ValueToAdd = NewIntegerValueToAdd; }
-	
 };

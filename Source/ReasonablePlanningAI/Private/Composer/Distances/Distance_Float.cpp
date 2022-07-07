@@ -9,7 +9,6 @@ float UDistance_Float::ReceiveCalculateDistance_Implementation(const UReasonable
 {
     if(LHS.ExpectedValueType != EStatePropertyType::Float && LHS.ExpectedValueType != EStatePropertyType::Int)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("ExpectedValueType for LHS was not Float."));
         return TNumericLimits<float>::Max();
     }
 

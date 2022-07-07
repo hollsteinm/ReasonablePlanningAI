@@ -16,7 +16,7 @@ float UDistance_State::ReceiveCalculateDistance_Implementation(const UReasonable
     if (LHS.StateKeyName == RHS.StateKeyName)
     {
         UE_LOG(LogRPAI, Warning, TEXT("Same State Key referenced, returning 0"));
-        return 0;
+        return 0.f;
     }
 
     if (!(GivenState->HasReferencedState(LHS) && GivenState->HasReferencedState(RHS)))
@@ -28,7 +28,7 @@ float UDistance_State::ReceiveCalculateDistance_Implementation(const UReasonable
             *UEnum::GetValueAsName(RHS.ExpectedValueType).ToString(),
             *GivenState->GetName()
         );
-        return 0.f;
+        return TNumericLimits<float>::Max();
     }
 
     switch (LHS.ExpectedValueType)
