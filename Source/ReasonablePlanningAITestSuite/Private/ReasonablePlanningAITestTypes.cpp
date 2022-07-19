@@ -320,6 +320,20 @@ float UTestAction::ReceiveExecutionWeight_Implementation(const UReasonablePlanni
 	return Weight;
 }
 
+UTestGoal::UTestGoal()
+	: ConditionAValue(2)
+	, ConditionBValue(1)
+	, ConditionCValue(3)
+	, Weight(0.f)
+{
+
+}
+
+bool UTestGoal::ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const
+{
+	return true;
+}
+
 bool UTestGoal::ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
 {
 	int32 StateAValue = 0;
@@ -332,7 +346,7 @@ bool UTestGoal::ReceiveIsInDesiredState_Implementation(const UReasonablePlanning
 	return false;
 }
 
-//Unordered distance
+//Unordered planning distance
 float UTestGoal::ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
 {
 	int32 StateAValue = 0;
@@ -343,6 +357,11 @@ float UTestGoal::ReceiveGetDistanceToDesiredState_Implementation(const UReasonab
 		return FMath::Min(0, ConditionAValue - StateAValue) + FMath::Min(0, ConditionBValue - StateCValue) + FMath::Min(0, ConditionCValue - StateCValue);
 	}
 	return TNumericLimits<float>::Max();
+}
+
+float UTestGoal::ReceiveGetWeight_Implementation(const UReasonablePlanningState* GivenState) const
+{
+	return Weight;
 }
 
 const FName UTestGoal::ConditionAKey = "TestA";

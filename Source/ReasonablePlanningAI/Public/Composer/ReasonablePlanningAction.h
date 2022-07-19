@@ -45,9 +45,12 @@ protected:
     
     /** The queries to execute to determine if this action is actionable upon the given state. All queries must succeed to for the action to be considered for the given state. Used for planning as well as runtime.*/
     UPROPERTY(EditAnywhere, Instanced,Category = "RPAI")
-    TArray<UReasonablePlanningStateQuery*> IsApplicableQueries;
+    UReasonablePlanningStateQuery* IsApplicableQuery;
 
 	/** If set to anything other than None, will attempt to lock a resource on start, cancelling if unable to lock the resource */
 	UPROPERTY(Category = "RPAI", EditAnywhere)
 	FName LockResourceOnStart;
+
+public:
+	FORCEINLINE void SetIsApplicableQuery(UReasonablePlanningStateQuery* NewIsApplicableQuery) { IsApplicableQuery = NewIsApplicableQuery; }
 };

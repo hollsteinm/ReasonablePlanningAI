@@ -18,6 +18,11 @@ UReasonablePlanningGoalBase* UReasonablePlanningReasonerBase::ReasonNextGoal(con
 		return nullptr;
 	}
 
+	if (Goals.Num() == 1)
+	{
+		return Goals[0];
+	}
+
 	return ReceiveReasonNextGoal(Goals, CurrentState);
 }
 

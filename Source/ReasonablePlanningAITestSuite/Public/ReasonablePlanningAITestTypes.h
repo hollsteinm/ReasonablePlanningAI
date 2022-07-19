@@ -103,14 +103,19 @@ class UTestGoal : public UReasonablePlanningGoalBase
 	GENERATED_BODY()
 
 public:
+	UTestGoal();
 
-	static const int32 ConditionAValue = 2;
-	static const int32 ConditionBValue = 1;
-	static const int32 ConditionCValue = 3;
+	int32 ConditionAValue;
+	int32 ConditionBValue;
+	int32 ConditionCValue;
 	static const FName ConditionAKey;
 	static const FName ConditionBKey;
 	static const FName ConditionCKey;
 
+	float Weight;
+
 	virtual bool ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
 	virtual float ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual float ReceiveGetWeight_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual bool ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const override;
 };

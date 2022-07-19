@@ -37,19 +37,19 @@ protected:
     UReasonablePlanningWeightBase* Weight;
     
     /** The queries to execute to determine if this goal is applicable to the given state. All queries must succeed to for the goal to be considered for the given state permutation. Used for planning as well as runtime. The empty list implies always applicable. */
-    UPROPERTY(EditAnywhere, Category = "RPAI", Instanced)
-    TArray<UReasonablePlanningStateQuery*> IsApplicableQueries;
+    UPROPERTY(EditAnywhere, Category = "RPAI")
+    UReasonablePlanningStateQuery* IsApplicableQuery;
     
     /** The queries to execute to determine if this goal is satisfied by the given state. All queries must succeed to for the goal to be considered satisfied given state permutation. Used for planning as well as runtime. The empty list implies always true.*/
-    UPROPERTY(EditAnywhere, Category = "RPAI", Instanced)
-    TArray<UReasonablePlanningStateQuery*> IsInDesiredStateQueries;
+    UPROPERTY(EditAnywhere, Category = "RPAI")
+    UReasonablePlanningStateQuery* IsInDesiredStateQuery;
     
 public:
     FORCEINLINE void SetDistanceCalculator(UReasonablePlanningDistance* NewDistanceCalculator) { DistanceCalculator = NewDistanceCalculator; }
     
     FORCEINLINE void SetWeight(UReasonablePlanningWeightBase* NewWeight) { Weight = NewWeight; }
     
-    FORCEINLINE void SetIsApplicableQueries(TArray<UReasonablePlanningStateQuery*>&& NewIsApplicableQueries) { IsApplicableQueries = NewIsApplicableQueries; }
+    FORCEINLINE void SetIsApplicableQuery(UReasonablePlanningStateQuery* NewIsApplicableQuery) { IsApplicableQuery = NewIsApplicableQuery; }
     
-    FORCEINLINE void SetIsInDesiredStateQueries(TArray<UReasonablePlanningStateQuery*>&& NewIsInDesiredStateQueries) { IsInDesiredStateQueries = NewIsInDesiredStateQueries; }
+    FORCEINLINE void SetIsInDesiredStateQuery(UReasonablePlanningStateQuery* IsInDesiredStateQuery) { IsInDesiredStateQuery = NewIsInDesiredStateQuery; }
 };

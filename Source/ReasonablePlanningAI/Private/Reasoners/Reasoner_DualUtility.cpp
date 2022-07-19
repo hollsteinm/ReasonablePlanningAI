@@ -26,16 +26,6 @@ static TFunction<bool(const FScoringContainer&, const FScoringContainer&)> Proba
 //Algorithm implmented based on: https://www.gameaipro.com/GameAIPro2/GameAIPro2_Chapter03_Dual-Utility_Reasoning.pdf
 UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implementation(const TArray<UReasonablePlanningGoalBase*>& Goals, const UReasonablePlanningState* CurrentState) const
 {
-	if (Goals.Num() <= 0)
-	{
-		return nullptr;
-	}
-
-	if (Goals.Num() == 1)
-	{
-		return Goals[0];
-	}
-
 	TArray<FScoringContainer> GoalDistribution;
 	GoalDistribution.Reserve(Goals.Num());
 
@@ -57,14 +47,25 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 	}
 
 	float TotalWeightInHighestCategory = 0.f;
-	int32 Top = GoalDistribution[0].CategoryScore;
 	TArray<int32> ZeroScoresToRemove;
+	int32 Total = GoalDistribution.Num();
+	auto& First = GoalDistribution[0];
 
-	for (int32 Idx = 0; Idx < GoalDistribution.Num(); ++Idx)
+	First.UtilityScore = First.TheGoal->GetWeight(CurrentState);
+	if (FMath::IsNearlyZero(First.UtilityScore))
 	{
-		if (GoalDistribution[Idx].CategoryScore != Top)
+		ZeroScoresToRemove.Push(0);
+	}
+	else
+	{
+		TotalWeightInHighestCategory += First.UtilityScore;
+	}
+
+	for (int32 Idx = 1; Idx < Total; ++Idx)
+	{
+		if (GoalDistribution[Idx].CategoryScore > First.CategoryScore)
 		{
-			Top = Idx; //reuse top to indicate end of array
+			GoalDistribution.RemoveAt(Idx, Total - Idx, true);
 			break;
 		}
 
@@ -80,7 +81,6 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 	}
 
 	//Trim away fat and remove low scoring options within best category
-	GoalDistribution.RemoveAt(Top, GoalDistribution.Num() - Top, true);
 	for (const auto IndexToRemove : ZeroScoresToRemove)
 	{
 		GoalDistribution.RemoveAt(IndexToRemove);
@@ -106,10 +106,11 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 
 	float RandomValue = FMath::RandRange(0.f, TotalWeightInHighestCategory);
 	int32 Idx = 0;
+	int32 Max = GoalDistribution.Num();
 	do
 	{
 		RandomValue -= GoalDistribution[Idx++].UtilityScore;
-	} while (!FMath::IsNearlyZero(RandomValue) && Idx < Top);
+	} while (!FMath::IsNearlyZero(RandomValue) && Idx < Max);
 
 	return GoalDistribution[Idx - 1].TheGoal;
 }

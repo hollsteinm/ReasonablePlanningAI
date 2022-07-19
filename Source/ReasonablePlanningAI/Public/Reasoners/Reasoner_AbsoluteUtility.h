@@ -13,14 +13,6 @@ UCLASS()
 class REASONABLEPLANNINGAI_API UReasoner_AbsoluteUtility : public UReasonablePlanningReasonerBase
 {
 	GENERATED_BODY()
-    
-    UReasoner_AbsoluteUtility();
-    
-public:
-    /** If true, will use the weight calculation to determine utility, if false it will use the category to determine weight (fastest). */
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="RPAI")
-    bool bUseWeight;
-	
 protected:
     virtual UReasonablePlanningGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<UReasonablePlanningGoalBase*>& Goals, const UReasonablePlanningState* CurrentState) const override;
 };

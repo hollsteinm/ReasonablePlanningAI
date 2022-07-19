@@ -96,6 +96,7 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 
 					It("should return an ordered plan based on weights if conditions are satisfied wholly", [this]()
 						{
+							auto TestGoal = Cast<UTestGoal>(GivenGoal);
 							auto TestActionA = Cast<UTestAction>(GivenActions[0]);
 							auto TestActionB = Cast<UTestAction>(GivenActions[1]);
 							auto TestActionC = Cast<UTestAction>(GivenActions[2]);
@@ -103,17 +104,17 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 
 							TestActionA->Weight = 4.f;
 							TestActionA->KeyToApply = UTestGoal::ConditionAKey;
-							TestActionA->ValueToApply = UTestGoal::ConditionAValue;
+							TestActionA->ValueToApply = TestGoal->ConditionAValue;
 
 							TestActionB->Weight = 8.f;
 							TestActionB->KeyToApply = UTestGoal::ConditionAKey;
-							TestActionB->ValueToApply = UTestGoal::ConditionAValue + 1;
+							TestActionB->ValueToApply = TestGoal->ConditionAValue + 1;
 
 							TestActionC->KeyToApply = UTestGoal::ConditionBKey;
-							TestActionC->ValueToApply = UTestGoal::ConditionBValue;
+							TestActionC->ValueToApply = TestGoal->ConditionBValue;
 
 							TestActionD->KeyToApply = UTestGoal::ConditionCKey;
-							TestActionD->ValueToApply = UTestGoal::ConditionCValue;
+							TestActionD->ValueToApply = TestGoal->ConditionCValue;
 
 							TArray<UReasonablePlanningActionBase*> Expected({ GivenActions[0], GivenActions[2], GivenActions[3] });
 							TArray<UReasonablePlanningActionBase*> Actual;
@@ -124,6 +125,7 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 
 					It("should return a plan that incrementally satisfies with ordered defined as per the distance algorithm", [this]()
 						{
+							auto TestGoal = Cast<UTestGoal>(GivenGoal);
 							auto TestActionA = Cast<UTestAction>(GivenActions[0]);
 							auto TestActionB = Cast<UTestAction>(GivenActions[1]);
 							auto TestActionC = Cast<UTestAction>(GivenActions[2]);
@@ -135,10 +137,10 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 
 							TestActionB->Weight = 2.f;
 							TestActionB->KeyToApply = UTestGoal::ConditionAKey;
-							TestActionB->ValueToApply = UTestGoal::ConditionAValue;
+							TestActionB->ValueToApply = TestGoal->ConditionAValue;
 
 							TestActionC->KeyToApply = UTestGoal::ConditionBKey;
-							TestActionC->ValueToApply = UTestGoal::ConditionBValue;
+							TestActionC->ValueToApply = TestGoal->ConditionBValue;
 
 							TestActionD->Weight = 6.f;
 							TestActionD->KeyToApply = UTestGoal::ConditionCKey;
