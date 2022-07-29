@@ -65,7 +65,7 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 	{
 		if (GoalDistribution[Idx].CategoryScore > First.CategoryScore)
 		{
-			GoalDistribution.RemoveAt(Idx, Total - Idx, true);
+			GoalDistribution.RemoveAt(Idx, Total - Idx, false);
 			break;
 		}
 
@@ -83,8 +83,10 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 	//Trim away fat and remove low scoring options within best category
 	for (const auto IndexToRemove : ZeroScoresToRemove)
 	{
-		GoalDistribution.RemoveAt(IndexToRemove);
+		GoalDistribution.RemoveAt(IndexToRemove, 1, false);
 	}
+
+	GoalDistribution.Shrink();
 
 	if (GoalDistribution.Num() <= 0)
 	{
@@ -110,7 +112,7 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 	do
 	{
 		RandomValue -= GoalDistribution[Idx++].UtilityScore;
-	} while (!FMath::IsNearlyZero(RandomValue) && Idx < Max);
+	} while (RandomValue > 0.f && Idx < Max);
 
 	return GoalDistribution[Idx - 1].TheGoal;
 }

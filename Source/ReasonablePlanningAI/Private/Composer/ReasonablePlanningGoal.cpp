@@ -9,14 +9,8 @@
 bool UReasonablePlanningGoal::ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
 {
     check(GivenState != nullptr);
-    bool bSuccess = true;
-    auto Current = 0;
-    const auto End = IsInDesiredStateQueries.Num();
-    while(bSuccess && Current != End)
-    {
-        bSuccess &= IsInDesiredStateQueries[Current++]->Query(GivenState) == EStateQueryResult::Succeeded;
-    }
-    return bSuccess;
+    check(IsInDesiredStateQuery != nullptr);
+    return IsInDesiredStateQuery->Query(GivenState) == EStateQueryResult::Succeeded;
 }
 
 float UReasonablePlanningGoal::ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
@@ -29,14 +23,8 @@ float UReasonablePlanningGoal::ReceiveGetDistanceToDesiredState_Implementation(c
 bool UReasonablePlanningGoal::ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const
 {
     check(GivenState != nullptr);
-    bool bSuccess = true;
-    auto Current = 0;
-    const auto End = IsApplicableQueries.Num();
-    while(bSuccess && Current != End)
-    {
-        bSuccess &= IsApplicableQueries[Current++]->Query(GivenState) == EStateQueryResult::Succeeded;
-    }
-    return bSuccess;
+    check(IsApplicableQuery != nullptr);
+    return IsApplicableQuery->Query(GivenState) == EStateQueryResult::Succeeded;
 }
 
 float UReasonablePlanningGoal::ReceiveGetWeight_Implementation(const UReasonablePlanningState* GivenState) const

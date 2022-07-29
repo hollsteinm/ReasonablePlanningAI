@@ -4,6 +4,8 @@
 #include "Composer/ReasonablePlanningAction.h"
 #include "Composer/ReasonablePlanningWeightBase.h"
 #include "Composer/ReasonablePlanningActionTaskBase.h"
+#include "Composer/ReasonablePlanningStateMutator.h"
+#include "Composer/ReasonablePlanningStateQuery.h"
 #include "Core/ReasonablePlanningState.h"
 
 float UReasonablePlanningAction::ReceiveExecutionWeight_Implementation(const UReasonablePlanningState* GivenState) const
@@ -68,12 +70,7 @@ void UReasonablePlanningAction::ReceiveApplyToState_Implementation(UReasonablePl
 
 bool UReasonablePlanningAction::ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const
 {
-    bool bSuccess = true;
-    auto Current = 0;
-    const auto End = IsApplicableQueries.Num();
-    while(bSuccess && Current != End)
-    {
-        bSuccess &= IsApplicableQueries[Current++]->Query(GivenState) == EStateQueryResult::Succeeded;
-    }
-    return bSuccess;
+	check(GivenState != nullptr);
+	check(IsApplicableQuery != nullptr);
+	return IsApplicableQuery->Query(GivenState) == EStateQueryResult::Succeeded;
 }

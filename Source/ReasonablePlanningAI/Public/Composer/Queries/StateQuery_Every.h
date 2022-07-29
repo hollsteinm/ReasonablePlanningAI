@@ -21,5 +21,5 @@ protected:
 public:
 	virtual EStateQueryResult Query(const UReasonablePlanningState* StateToQuery) const override;
 
-	FORCEINLINE void SetSubQueries(TArray<UReasonablePlanningStateQuery*> NewSubQueries) { SubQueries = NewSubQueries; }
+	FORCEINLINE void SetSubQueries(TArray<UReasonablePlanningStateQuery*>&& NewSubQueries) { SubQueries = NewSubQueries; }
 };

@@ -101,4 +101,6 @@ private:
 public:
     UFUNCTION(BlueprintPure, Category = "RPAI")
     FString GetGoalName() const;
+
+	FORCEINLINE void SetCategory(int32 NewCategory) { Category = NewCategory; }
 };

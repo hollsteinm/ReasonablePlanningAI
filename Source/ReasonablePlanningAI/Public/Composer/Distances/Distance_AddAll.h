@@ -21,5 +21,5 @@ protected:
 	virtual float ReceiveCalculateDistance_Implementation(const UReasonablePlanningState* GivenState) const override;
 
 public:
-	FORCEINLINE void SetSubDistances(TArray<UReasonablePlanningDistance*>&& NewSetSubDistances) { SetSubDistances = NewSetSubDistances; }
+	FORCEINLINE void SetSubDistances(TArray<UReasonablePlanningDistance*>&& NewSetSubDistances) { SubDistances = NewSetSubDistances; }
 };

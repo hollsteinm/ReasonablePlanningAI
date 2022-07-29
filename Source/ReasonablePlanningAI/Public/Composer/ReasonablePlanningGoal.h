@@ -51,5 +51,5 @@ public:
     
     FORCEINLINE void SetIsApplicableQuery(UReasonablePlanningStateQuery* NewIsApplicableQuery) { IsApplicableQuery = NewIsApplicableQuery; }
     
-    FORCEINLINE void SetIsInDesiredStateQuery(UReasonablePlanningStateQuery* IsInDesiredStateQuery) { IsInDesiredStateQuery = NewIsInDesiredStateQuery; }
+    FORCEINLINE void SetIsInDesiredStateQuery(UReasonablePlanningStateQuery* NewIsInDesiredStateQuery) { IsInDesiredStateQuery = NewIsInDesiredStateQuery; }
 };
