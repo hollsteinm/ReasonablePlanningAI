@@ -1,5 +1,6 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
+#include "States/State_Map.h"
 #include "Composer/Mutators/StateMutator_AddFloat.h"
 #include "Composer/Mutators/StateMutator_AddInteger.h"
 #include "Composer/Mutators/StateMutator_MultiplyFloat.h"
@@ -12,6 +13,7 @@
 #include "Composer/Mutators/StateMutator_SetValueRotator.h"
 #include "Composer/Mutators/StateMutator_SetValueString.h"
 #include "Composer/Mutators/StateMutator_SetValueVector.h"
+#include "Composer/Mutators/StateMutator_CopyState.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec, "ReasonablePlanningAI.Mutators.AddFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UStateMutator_AddFloat* ClassUnderTest;
@@ -495,6 +497,90 @@ void ReasonablePlanningMutatorSetVectorSpec::Define()
 					FVector ActualValue;
 					TestTrue("Getting Value", GivenState->GetValueOfType(UTestPlanningState::NAME_TheVectorValue, ActualValue));
 					TestEqual("State Mutated", ActualValue, ExpectedValue);
+				});
+
+		});
+
+	AfterEach([this]()
+		{
+			ClassUnderTest->ConditionalBeginDestroy();
+			GivenState->ConditionalBeginDestroy();
+		});
+}
+
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+	UStateMutator_CopyState* ClassUnderTest;
+	UReasonablePlanningState* GivenState;
+END_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec)
+void ReasonablePlanningMutatorSetBoolSpec::Define()
+{
+	BeforeEach([this]()
+		{
+			ClassUnderTest = NewObject<UStateMutator_CopyState>();
+			UState_Map* TestMap = NewObject<UState_Map>();
+			GivenState = TestMap;
+
+			TestMap->SetAsDynamic(true);
+			TestMap->SetValueOfType("FA", 1.f);
+			TestMap->SetValueOfType("FB", 0.f);
+			TestMap->SetValueOfType("BA", true);
+			TestMap->SetValueOfType("BB", false);
+			TestMap->SetValueOfType("IA", 23);
+			TestMap->SetValueOfType("IB", 0);
+			TestMap->SetAsDynamic(false);
+		});
+
+	Describe("Copying State", [this]()
+		{
+			It("Should copy the float values", [this]()
+				{
+					ClassUnderTest->SetMutatedStateValue("FB", EStatePropertyType::Float);
+					ClassUnderTest->SetCopiedFromStateValue("FA", EStatePropertyType::Float);
+
+					ClassUnderTest->Mutate(GivenState);
+
+					float A = 0.f;
+					float B = 0.f;
+
+					GivenState->GetValueOfType("FA", A);
+					GivenState->GetValueOfType("FB", B);
+
+					TestEqual("Initial value unchanged", A, 1.f);
+					TestEqual("Target value changed", B, A);
+				});
+
+			It("Should copy the boolean values", [this]()
+				{
+					ClassUnderTest->SetMutatedStateValue("BB", EStatePropertyType::Bool);
+					ClassUnderTest->SetCopiedFromStateValue("BA", EStatePropertyType::Bool);
+
+					ClassUnderTest->Mutate(GivenState);
+
+					bool bA = false;
+					bool bB = false;
+
+					GivenState->GetValueOfType("BA", bA);
+					GivenState->GetValueOfType("BB", bB);
+
+					TestEqual("Initial value unchanged", bA, true);
+					TestEqual("Target value changed", bB, bA);
+				});
+
+			It("Should copy the boolean values", [this]()
+				{
+					ClassUnderTest->SetMutatedStateValue("IB", EStatePropertyType::Int);
+					ClassUnderTest->SetCopiedFromStateValue("IA", EStatePropertyType::Int);
+
+					ClassUnderTest->Mutate(GivenState);
+
+					int32 A = 0;
+					int32 B = 0;
+
+					GivenState->GetValueOfType("IA", A);
+					GivenState->GetValueOfType("IB", B);
+
+					TestEqual("Initial value unchanged", A, 23);
+					TestEqual("Target value changed", B, A);
 				});
 
 		});

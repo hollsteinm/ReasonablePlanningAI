@@ -52,5 +52,15 @@ protected:
 	FName LockResourceOnStart;
 
 public:
+	FORCEINLINE void SetWeightAlgorithm(UReasonablePlanningWeightBase* NewWeightAlgorithm) { WeightAlgorithm = NewWeightAlgorithm; }
+
 	FORCEINLINE void SetIsApplicableQuery(UReasonablePlanningStateQuery* NewIsApplicableQuery) { IsApplicableQuery = NewIsApplicableQuery; }
+
+	FORCEINLINE void SetStateMutators(TArray<UReasonablePlanningStateMutator*>&& NewMutators) { ApplyToStateMutators = NewMutators; }
+
+	FORCEINLINE void SetAutoLockResourceName(FName NewLockResourceOnStart) { LockResourceOnStart = NewLockResourceOnStart; }
+
+	FORCEINLINE void SetActionTask(UReasonablePlanningActionTaskBase* NewActionTask) { ActionTask = NewActionTask; }
+
+	
 };

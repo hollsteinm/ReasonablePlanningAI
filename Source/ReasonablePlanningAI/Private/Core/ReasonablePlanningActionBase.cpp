@@ -2,25 +2,37 @@
 
 
 #include "Core/ReasonablePlanningActionBase.h"
+#include "Core/ReasonablePlanningTypes.h"
+#include "VisualLogger/VisualLoggerTypes.h"
+#include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
 
 void UReasonablePlanningActionBase::ApplyToState(UReasonablePlanningState* GivenState) const
 {
+	check(GivenState != nullptr);
 	return ReceiveApplyToState(GivenState);
 }
 
 bool UReasonablePlanningActionBase::IsApplicable(const UReasonablePlanningState* GivenState) const
 {
+	check(GivenState != nullptr);
 	return ReceiveIsApplicable(GivenState);
 }
 
 float UReasonablePlanningActionBase::ExecutionWeight(const UReasonablePlanningState* GivenState) const
 {
+	check(GivenState != nullptr);
 	return ReceiveExecutionWeight(GivenState);
 }
 
 void UReasonablePlanningActionBase::StartAction(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	check(ActionInstigator != nullptr);
+	check(CurrentState != nullptr);
+	check(ActionTargetActor != nullptr);
+	check(ActionWorld != nullptr);
+
+	UE_VLOG(ActionInstigator->GetPawn(), LogRPAI, Log, TEXT("Start Action: %s"), *ActionName);
 	ReceiveStartAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionStarted.IsBound())
 	{
@@ -30,6 +42,11 @@ void UReasonablePlanningActionBase::StartAction(AAIController* ActionInstigator,
 
 void UReasonablePlanningActionBase::UpdateAction(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	check(ActionInstigator != nullptr);
+	check(CurrentState != nullptr);
+	check(ActionTargetActor != nullptr);
+	check(ActionWorld != nullptr);
+
 	ReceiveUpdateAction(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionUpdated.IsBound())
 	{
@@ -39,6 +56,12 @@ void UReasonablePlanningActionBase::UpdateAction(AAIController* ActionInstigator
 
 void UReasonablePlanningActionBase::CancelAction(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	check(ActionInstigator != nullptr);
+	check(CurrentState != nullptr);
+	check(ActionTargetActor != nullptr);
+	check(ActionWorld != nullptr);
+
+	UE_VLOG(ActionInstigator->GetPawn(), LogRPAI, Log, TEXT("Cancel Action: %s"), *ActionName);
 	ReceiveCancelAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionCancelled.IsBound())
 	{
@@ -48,6 +71,12 @@ void UReasonablePlanningActionBase::CancelAction(AAIController* ActionInstigator
 
 void UReasonablePlanningActionBase::CompleteAction(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	check(ActionInstigator != nullptr);
+	check(CurrentState != nullptr);
+	check(ActionTargetActor != nullptr);
+	check(ActionWorld != nullptr);
+
+	UE_VLOG(ActionInstigator->GetPawn(), LogRPAI, Log, TEXT("Complete Action: %s"), *ActionName);
 	ReceiveCompleteAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionComplete.IsBound())
 	{
@@ -57,6 +86,11 @@ void UReasonablePlanningActionBase::CompleteAction(AAIController* ActionInstigat
 
 bool UReasonablePlanningActionBase::IsActionComplete(const AAIController* ActionInstigator, const UReasonablePlanningState* CurrentState, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
 {
+	check(ActionInstigator != nullptr);
+	check(CurrentState != nullptr);
+	check(ActionTargetActor != nullptr);
+	check(ActionWorld != nullptr);
+
 	return ReceiveIsActionComplete(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 }
 
@@ -102,5 +136,5 @@ bool UReasonablePlanningActionBase::ReceiveIsActionComplete_Implementation(const
 
 FString UReasonablePlanningActionBase::GetActionName() const
 {
-    return ActionName;
+	return ActionName.IsEmpty() ? GetNameSafe(this) : ActionName;
 }

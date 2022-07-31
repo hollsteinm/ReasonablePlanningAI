@@ -48,13 +48,14 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 
 	float TotalWeightInHighestCategory = 0.f;
 	TArray<int32> ZeroScoresToRemove;
+	const auto RemovalSort = TGreater<int32>();
 	int32 Total = GoalDistribution.Num();
 	auto& First = GoalDistribution[0];
 
 	First.UtilityScore = First.TheGoal->GetWeight(CurrentState);
 	if (FMath::IsNearlyZero(First.UtilityScore))
 	{
-		ZeroScoresToRemove.Push(0);
+		ZeroScoresToRemove.HeapPush(0, RemovalSort);
 	}
 	else
 	{
@@ -72,7 +73,7 @@ UReasonablePlanningGoalBase* UReasoner_DualUtility::ReceiveReasonNextGoal_Implem
 		GoalDistribution[Idx].UtilityScore = GoalDistribution[Idx].TheGoal->GetWeight(CurrentState);
 		if (FMath::IsNearlyZero(GoalDistribution[Idx].UtilityScore))
 		{
-			ZeroScoresToRemove.Push(Idx);
+			ZeroScoresToRemove.HeapPush(Idx, RemovalSort);
 		}
 		else
 		{

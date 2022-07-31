@@ -6,10 +6,15 @@
 
 float UWeight_CurveFloat::ReceiveExecutionWeight_Implementation(const UReasonablePlanningState* GivenState) const
 {
-	float ReturnValue = 0.f;
-	if (GivenState->GetFloat(WeightStateKeyValueReference.StateKeyName, ReturnValue))
+	float FloatInput = 0.f;
+	int32 IntegerInput = 0;
+	if (GivenState->GetFloat(WeightStateKeyValueReference.StateKeyName, FloatInput))
 	{
-		return WeightFloatCurve->GetFloatValue(ReturnValue);
+		return WeightFloatCurve->GetFloatValue(FloatInput);
 	}
-	return ReturnValue;
+	else if (GivenState->GetInt(WeightStateKeyValueReference.StateKeyName, IntegerInput))
+	{
+		return WeightFloatCurve->GetFloatValue(static_cast<float>(IntegerInput));
+	}
+	return 0.f;
 }

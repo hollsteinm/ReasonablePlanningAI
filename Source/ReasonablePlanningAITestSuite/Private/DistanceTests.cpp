@@ -626,23 +626,23 @@ void ReasonablePlanningDistanceStateSpec::Define()
                     const float ExpectedValue = TNumericLimits<float>::Max();
                 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Class);
-					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Class);
+					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Class);
 					TestEqual("CalculateDistance - Class", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Enum);
-					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Enum);
+					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Enum);
 					TestEqual("CalculateDistance - Enum", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Name);
-					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Name);
+					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Name);
 					TestEqual("CalculateDistance - Name", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::String);
-					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::String);
+					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::String);
 					TestEqual("CalculateDistance - String", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 
 					ClassUnderTest->SetLHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Invalid);
-					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Invalid);
+					ClassUnderTest->SetRHS(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Invalid);
 					TestEqual("CalculateDistance - Invalid", ClassUnderTest->CalculateDistance(GivenState), ExpectedValue);
 				});
 

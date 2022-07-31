@@ -25,6 +25,7 @@
 #include "Composer/Mutators/StateMutator_SetValueRotator.h"
 #include "Composer/Mutators/StateMutator_SetValueString.h"
 #include "Composer/Mutators/StateMutator_SetValueVector.h"
+#include "Composer/Mutators/StateMutator_CopyState.h"
 #include "Composer/Queries/StateQuery_CompareDistanceFloat.h"
 #include "Composer/Queries/StateQuery_CompareToBool.h"
 #include "Composer/Queries/StateQuery_CompareToDistance.h"
@@ -139,6 +140,8 @@ void ReasonablePlanningComposerSpec::Define()
 
 					// Weight: What is the value (utility) of pursuing this goal right now
 					UWeight_CurveFloat* GatherWoodWeight = NewObject<UWeight_CurveFloat>();
+					GatherWoodWeight->SetWeightStateKeyAndType("TreesInTheForest", EStatePropertyType::Int);
+
 					UCurveFloat* GatherWoodWeightCurve = NewObject<UCurveFloat>();
 					GatherWoodWeightCurve->CreateCurveFromCSVString("0,0.0\r\n19,0.1\r\n100,1.0\r\n");
 					GatherWoodWeight->SetCurve(GatherWoodWeightCurve);
@@ -258,6 +261,8 @@ void ReasonablePlanningComposerSpec::Define()
 					//Weight: Distance to having no trees
 					// Weight: What is the value (utility) of pursuing this goal right now
 					UWeight_CurveFloat* PreserveWeight = NewObject<UWeight_CurveFloat>();
+					PreserveWeight->SetWeightStateKeyAndType("TreesInTheForest", EStatePropertyType::Int);
+
 					UCurveFloat* PreserveWeightCurve = NewObject<UCurveFloat>();
 					PreserveWeightCurve->CreateCurveFromCSVString("0,1.0\r\n21,0.1\r\n100,0.0\r\n");
 					PreserveWeight->SetCurve(PreserveWeightCurve);
@@ -271,6 +276,89 @@ void ReasonablePlanningComposerSpec::Define()
 						GatherWood,
 						SustainSelf,
 						PreserveForest
+					};
+
+					//Every granular action the agent can be tasked to execute, each drives a goal closer to completion
+					//We are only testing the planning here so we do not need to assign specific ActionTasks
+
+					//Start: Go To Tree
+					UReasonablePlanningAction* GoToTree = NewObject<UReasonablePlanningAction>();
+
+					// Is Applicable: We can only go to a tree a tree if we are not chopping one already, we are not carrying wood, and there are trees in the forest
+					UStateQuery_Every* GoToTreeIsApplicable = NewObject<UStateQuery_Every>();
+					GoToTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotChoppingWoodQuery, IsNotCarryingWoodQuery });
+					
+					GoToTree->SetIsApplicableQuery(GoToTreeIsApplicable);
+
+					// Weight: Distance from the tree, further is a higher weight
+					UWeight_Distance* DistanceToTreeWeight = NewObject<UWeight_Distance>();
+					DistanceToTreeWeight->SetDistance(DistanceNextTree);
+					GoToTree->SetWeightAlgorithm(DistanceToTreeWeight);
+
+					// Mutator: We will be near the tree if we execute this action, for simplicity we are also chopping a tree if we are near it
+					UStateMutator_CopyState* CopyNextTreeToCurrentLocation = NewObject<UStateMutator_CopyState>();
+					CopyNextTreeToCurrentLocation->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
+					CopyNextTreeToCurrentLocation->SetCopiedFromStateValue("NextTreeLocation", EStatePropertyType::Vector);
+
+					GoToTree->SetStateMutators({ CopyNextTreeToCurrentLocation });
+
+					//End: Go To Tree
+					//Start: Chop Tree
+					UReasonablePlanningAction* ChopTree = NewObject<UReasonablePlanningAction>();
+
+					// Is Applicable: We can only chop a tree we are near, if we do not have wood already, are not already in the action of chopping, and there is a tree to chop
+					UStateQuery_CompareDistanceFloat* IsNearTreeQuery = NewObject<UStateQuery_CompareDistanceFloat>();
+					IsNearTreeQuery->SetDistance(DistanceNextTree);
+					IsNearTreeQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
+					IsNearTreeQuery->SetRHS(300.f);
+
+					UStateQuery_Every* ChopTreeIsApplicable = NewObject<UStateQuery_Every>();
+					ChopTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotCarryingWoodQuery, IsNotChoppingWoodQuery, IsNearTreeQuery });
+
+					ChopTree->SetIsApplicableQuery(HasTreesInTheForestQuery);
+
+					// Weight: Whether we are chopping or not
+					UDistance_Bool* ChopActionDistance = NewObject<UDistance_Bool>();
+					ChopActionDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
+
+					UWeight_Distance* ChopWeight = NewObject<UWeight_Distance>();
+					ChopWeight->SetDistance(ChopActionDistance);
+
+					ChopTree->SetWeightAlgorithm(ChopWeight);
+
+					// Mutators: We are now chopping
+					UStateMutator_SetValueBool* StartChopping = NewObject<UStateMutator_SetValueBool>();
+					StartChopping->SetMutatedStateValue("IsChopppingWood", EStatePropertyType::Bool);
+					StartChopping->SetValueToSet(true);
+
+					ChopTree->SetStateMutators({ StartChopping });
+					//End: Chop Tree
+					//Start: PickUpWood
+					UReasonablePlanningAction* PickUpWood = NewObject<UReasonablePlanningAction>();
+					PickUpWood->SetIsApplicableQuery(HasTreesInTheForestQuery);
+
+					UReasonablePlanningAction* TakeWoodToPile = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* DropWood = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* GoToFood = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* GoToSeed = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* EatFood = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* GoToPlantingSite = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* GoToBed = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* Sleep = NewObject<UReasonablePlanningAction>();
+					UReasonablePlanningAction* PlantSeed = NewObject<UReasonablePlanningAction>();
+
+					GivenActions = {
+						GoToTree,
+						GoToFood,
+						GoToSeed,
+						GoToBed,
+						ChopTree,
+						PickUpWood,
+						TakeWoodToPile,
+						DropWood,
+						EatFood,
+						Sleep,
+						PlantSeed
 					};
 
 				});
@@ -301,13 +389,12 @@ void ReasonablePlanningComposerSpec::Define()
 				{
 					It("should have a goal to gather wood", [this]()
 						{
-							GivenState->SetInt("TreesInTheForest", 100);
-
 							int32 PreserveCount = 0;
 							int32 HarvestCount = 0;
 
-							for (int32 Idx = 0; Idx < 100; ++Idx)
+							for (int32 Idx = 0; Idx < 50; ++Idx)
 							{
+								GivenState->SetInt("TreesInTheForest", 100 - Idx);
 								UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 								if (ActualGoal == GivenGoals[2])
 								{
@@ -331,13 +418,12 @@ void ReasonablePlanningComposerSpec::Define()
 				{
 					It("should have a goal to preserve the forest", [this]()
 						{
-							GivenState->SetInt("TreesInTheForest", 5);
-
 							int32 PreserveCount = 0;
 							int32 HarvestCount = 0;
 
-							for (int32 Idx = 0; Idx < 100; ++Idx)
+							for (int32 Idx = 0; Idx < 20; ++Idx)
 							{
+								GivenState->SetInt("TreesInTheForest", Idx);
 								UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 								if (ActualGoal == GivenGoals[2])
 								{
