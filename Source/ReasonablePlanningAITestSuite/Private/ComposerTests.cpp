@@ -13,6 +13,7 @@
 #include "Composer/Distances/Distance_Rotator.h"
 #include "Composer/Distances/Distance_Vector.h"
 #include "Composer/Distances/Distance_AddAll.h"
+#include "Composer/Distances/Distance_Select.h"
 #include "Composer/Mutators/StateMutator_AddFloat.h"
 #include "Composer/Mutators/StateMutator_AddInteger.h"
 #include "Composer/Mutators/StateMutator_MultiplyFloat.h"
@@ -39,6 +40,7 @@
 #include "Composer/Weights/Weight_ConstantFloat.h"
 #include "Composer/Weights/Weight_AddAll.h"
 #include "Composer/Weights/Weight_Distance.h"
+#include "Composer/Weights/Weight_Select.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningComposerSpec, "ReasonablePlanningAI.Composer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UReasonablePlanningPlannerBase* GivenPlanner;
@@ -59,6 +61,7 @@ void ReasonablePlanningComposerSpec::Define()
 					UState_Map* LumberjackState = NewObject<UState_Map>();
 					LumberjackState->SetAsDynamic(true);
 					LumberjackState->SetInt("TreesInTheForest", 100);
+					LumberjackState->SetInt("LogsLeftToCarry", 0);
 					LumberjackState->SetInt("Seeds", 500);
 					LumberjackState->SetInt("Food", 100);
 					LumberjackState->SetInt("Beds", 1);
@@ -72,6 +75,7 @@ void ReasonablePlanningComposerSpec::Define()
 					LumberjackState->SetVector("TargetFoodOrRest", FVector::ZeroVector);
 					LumberjackState->SetVector("NextTreeLocation", FVector::ZeroVector);
 					LumberjackState->SetVector("WoodStoreLocation", FVector::ZeroVector);
+					LumberjackState->SetVector("NextLogLocation", FVector::ZeroVector);
 					LumberjackState->SetVector("CurrentLocation", FVector::ZeroVector);
 					LumberjackState->SetAsDynamic(false);
 					GivenState = LumberjackState;
@@ -109,7 +113,7 @@ void ReasonablePlanningComposerSpec::Define()
 					UStateQuery_CompareDistanceFloat* CloseToWoodStoreQuery = NewObject<UStateQuery_CompareDistanceFloat>();
 					CloseToWoodStoreQuery->SetDistance(WoodStoreDistance);
 					CloseToWoodStoreQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
-					CloseToWoodStoreQuery->SetRHS(90000.f);
+					CloseToWoodStoreQuery->SetRHS(300.f);
 
 					UStateQuery_Every* IsInDesiredStateQuery = NewObject<UStateQuery_Every>();
 					IsInDesiredStateQuery->SetSubQueries({ IsNotCarryingWoodQuery, IsNotChoppingWoodQuery, CloseToWoodStoreQuery });
@@ -117,9 +121,16 @@ void ReasonablePlanningComposerSpec::Define()
 					GatherWood->SetIsInDesiredStateQuery(IsInDesiredStateQuery);
 
 					// Distance: Based on whether we have any wood, we need to chop down a tree, and if we are actively chopping, as well as were wood is dropped off
+					// This is complex distance requiring UDistance_Select. We do not care about the distance to the next tree to cut if we are carrying wood, we only
+					// care about the distance to the wood store location if we are carrying wood, so on and so forth
 					UDistance_Bool* IsCarryingWoodDistance = NewObject<UDistance_Bool>();
 					IsCarryingWoodDistance->SetLHS("IsCarryingWood", EStatePropertyType::Bool);
 					IsCarryingWoodDistance->SetRHS(true);
+
+					UStateQuery_CompareToBool* IsCarryingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					IsCarryingWoodQuery->SetQueriedState("IsCarryingWood", EStatePropertyType::Bool);
+					IsCarryingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::EqualTo);
+					IsCarryingWoodQuery->SetComparisonValue(true);
 
 					UDistance_Bool* IsChoppingWoodDistance = NewObject<UDistance_Bool>();
 					IsChoppingWoodDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
@@ -133,8 +144,19 @@ void ReasonablePlanningComposerSpec::Define()
 					DistanceWoodPile->SetLHS("NextTreeLocation", EStatePropertyType::Vector);
 					DistanceWoodPile->SetRHS("WoodStoreLocation", EStatePropertyType::Vector);
 
-					UDistance_AddAll* GatherWoodDistance = NewObject<UDistance_AddAll>();
-					GatherWoodDistance->SetSubDistances({ IsCarryingWoodDistance, IsChoppingWoodDistance, DistanceNextTree, DistanceWoodPile });
+					FDistanceSelectStateQueryPair AlreadyCarryingWood;
+					AlreadyCarryingWood.SelectionQuery = IsCarryingWoodQuery;
+					AlreadyCarryingWood.SelectionDistance = DistanceWoodPile;
+
+					UDistance_Select* GatherWoodDistance = NewObject<UDistance_Select>();
+					GatherWoodDistance->SetSelections({
+						AlreadyCarryingWood,
+					});
+
+					UDistance_AddAll* GatherWoodDistanceDefault = NewObject<UDistance_AddAll>();
+					GatherWoodDistanceDefault->SetSubDistances({ IsChoppingWoodDistance, DistanceNextTree, DistanceWoodPile });
+
+					GatherWoodDistance->SetDefault(DistanceNextTree);
 
 					GatherWood->SetDistanceCalculator(GatherWoodDistance);
 
@@ -278,6 +300,8 @@ void ReasonablePlanningComposerSpec::Define()
 						PreserveForest
 					};
 
+					/////////////////////////////////////////////////////// ACTIONS //////////////////////////////////////////////////////////////////////////////////////
+
 					//Every granular action the agent can be tasked to execute, each drives a goal closer to completion
 					//We are only testing the planning here so we do not need to assign specific ActionTasks
 
@@ -300,65 +324,120 @@ void ReasonablePlanningComposerSpec::Define()
 					CopyNextTreeToCurrentLocation->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
 					CopyNextTreeToCurrentLocation->SetCopiedFromStateValue("NextTreeLocation", EStatePropertyType::Vector);
 
-					GoToTree->SetStateMutators({ CopyNextTreeToCurrentLocation });
+					UStateMutator_SetValueBool* StartChopping = NewObject<UStateMutator_SetValueBool>();
+					StartChopping->SetMutatedStateValue("IsChoppingWood", EStatePropertyType::Bool);
+					StartChopping->SetValueToSet(true);
+
+					GoToTree->SetStateMutators({ CopyNextTreeToCurrentLocation, StartChopping });
 
 					//End: Go To Tree
 					//Start: Chop Tree
 					UReasonablePlanningAction* ChopTree = NewObject<UReasonablePlanningAction>();
 
-					// Is Applicable: We can only chop a tree we are near, if we do not have wood already, are not already in the action of chopping, and there is a tree to chop
-					UStateQuery_CompareDistanceFloat* IsNearTreeQuery = NewObject<UStateQuery_CompareDistanceFloat>();
-					IsNearTreeQuery->SetDistance(DistanceNextTree);
-					IsNearTreeQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
-					IsNearTreeQuery->SetRHS(300.f);
+					// Is Applicable: Two conditions make this applicable: agent is near a tree in a forest that has trees, or agent is already chopping.
+					UStateQuery_CompareToBool* IsAlreadyChoppingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					IsAlreadyChoppingWoodQuery->SetQueriedState("IsChoppingWood", EStatePropertyType::Bool);
+					IsAlreadyChoppingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::EqualTo);
+					IsAlreadyChoppingWoodQuery->SetComparisonValue(true);
 
-					UStateQuery_Every* ChopTreeIsApplicable = NewObject<UStateQuery_Every>();
-					ChopTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotCarryingWoodQuery, IsNotChoppingWoodQuery, IsNearTreeQuery });
+					UStateQuery_Any* ChopTreeIsApplicable = NewObject<UStateQuery_Any>();
+					ChopTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsAlreadyChoppingWoodQuery });
 
-					ChopTree->SetIsApplicableQuery(HasTreesInTheForestQuery);
+					ChopTree->SetIsApplicableQuery(ChopTreeIsApplicable);
 
-					// Weight: Whether we are chopping or not
+					// Weight: Whether we are chopping or not, how far from even chopping
 					UDistance_Bool* ChopActionDistance = NewObject<UDistance_Bool>();
 					ChopActionDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
 
-					UWeight_Distance* ChopWeight = NewObject<UWeight_Distance>();
-					ChopWeight->SetDistance(ChopActionDistance);
+					UWeight_Distance* ChopActionWeight = NewObject<UWeight_Distance>();
+					ChopActionWeight->SetDistance(ChopActionDistance);
+
+					UWeight_AddAll* ChopWeight = NewObject<UWeight_AddAll>();
+					ChopWeight->SetSubWeights({ DistanceToTreeWeight, ChopActionWeight }); //by including the same query as go to tree and the addition of a bool, we can always assert this is executed after going to a tree
 
 					ChopTree->SetWeightAlgorithm(ChopWeight);
 
-					// Mutators: We are now chopping
-					UStateMutator_SetValueBool* StartChopping = NewObject<UStateMutator_SetValueBool>();
-					StartChopping->SetMutatedStateValue("IsChopppingWood", EStatePropertyType::Bool);
-					StartChopping->SetValueToSet(true);
+					// Mutators: Mutators should try to only reflect state after the action is completed.
+					UStateMutator_CopyState* ChoppedWoodLocation = NewObject<UStateMutator_CopyState>();
+					ChoppedWoodLocation->SetMutatedStateValue("NextLogLocation", EStatePropertyType::Vector);
+					ChoppedWoodLocation->SetCopiedFromStateValue("CurrentLocation", EStatePropertyType::Vector);
 
-					ChopTree->SetStateMutators({ StartChopping });
+					UStateMutator_AddInteger* AddLogsToCarry = NewObject<UStateMutator_AddInteger>();
+					AddLogsToCarry->SetMutatedStateValue("LogsLeftToCarry", EStatePropertyType::Int);
+					AddLogsToCarry->SetIntegerValueToAdd(4);
+
+					UStateMutator_AddInteger* RemoveTreeFromForest = NewObject<UStateMutator_AddInteger>();
+					RemoveTreeFromForest->SetMutatedStateValue("TreesInTheForest", EStatePropertyType::Int);
+					RemoveTreeFromForest->SetIntegerValueToAdd(-1);
+
+					UStateMutator_SetValueBool* NoLongerChoppingWood = NewObject<UStateMutator_SetValueBool>();
+					NoLongerChoppingWood->SetMutatedStateValue("IsChoppingWood", EStatePropertyType::Bool);
+					NoLongerChoppingWood->SetValueToSet(false);
+
+					ChopTree->SetStateMutators({ AddLogsToCarry, ChoppedWoodLocation, RemoveTreeFromForest, NoLongerChoppingWood });
 					//End: Chop Tree
-					//Start: PickUpWood
-					UReasonablePlanningAction* PickUpWood = NewObject<UReasonablePlanningAction>();
-					PickUpWood->SetIsApplicableQuery(HasTreesInTheForestQuery);
+					//Start: GoToLogToCarry
+					UReasonablePlanningAction* GoToLogToCarry = NewObject<UReasonablePlanningAction>();
+					
+					// Is Applicable: are there logs to carry
+					UStateQuery_CompareToInteger* HasLogsToCarryQuery = NewObject<UStateQuery_CompareToInteger>();
+					HasLogsToCarryQuery->SetQueriedState("LogsLeftToCarry", EStatePropertyType::Int);
+					HasLogsToCarryQuery->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
+					HasLogsToCarryQuery->SetComparisonValue(0);
 
+					GoToLogToCarry->SetIsApplicableQuery(HasLogsToCarryQuery);
+
+					// Weight: How far to the log
+					UDistance_State* DistanceToNextLog = NewObject<UDistance_State>();
+					DistanceToNextLog->SetLHS("CurrentLocation", EStatePropertyType::Vector);
+					DistanceToNextLog->SetRHS("NextLogLocation", EStatePropertyType::Vector);
+
+					UWeight_Distance* GoToLogToCarryWeight = NewObject<UWeight_Distance>();
+					GoToLogToCarryWeight->SetDistance(DistanceToNextLog);
+
+					GoToLogToCarry->SetWeightAlgorithm(GoToLogToCarryWeight);
+
+					// Mutators: agent is now carrying a log
+					UStateMutator_CopyState* AtLogMutator = NewObject<UStateMutator_CopyState>();
+					AtLogMutator->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
+					AtLogMutator->SetCopiedFromStateValue("NextLogLocation", EStatePropertyType::Vector);
+
+					UStateMutator_SetValueBool* CarryingLogMutator = NewObject<UStateMutator_SetValueBool>();
+					CarryingLogMutator->SetMutatedStateValue("IsCarryingWood", EStatePropertyType::Bool);
+					CarryingLogMutator->SetValueToSet(true);
+
+					GoToLogToCarry->SetStateMutators({ AtLogMutator, CarryingLogMutator });
+
+					//End: GoToLogToCarry
+					//Start: TakeWoodToPile
 					UReasonablePlanningAction* TakeWoodToPile = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* DropWood = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* GoToFood = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* GoToSeed = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* EatFood = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* GoToPlantingSite = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* GoToBed = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* Sleep = NewObject<UReasonablePlanningAction>();
-					UReasonablePlanningAction* PlantSeed = NewObject<UReasonablePlanningAction>();
+
+					// IsApplicable: We are carrying wood
+					TakeWoodToPile->SetIsApplicableQuery(IsCarryingWoodQuery);
+
+					// Weight: Distance to the wood pile
+					UWeight_Distance* TakeWoodToPileWeight = NewObject<UWeight_Distance>();
+					TakeWoodToPileWeight->SetDistance(DistanceWoodPile);
+
+					TakeWoodToPile->SetWeightAlgorithm(TakeWoodToPileWeight);
+
+					// Mutator: no longer carrying wood and our location is now at the wood pile
+					UStateMutator_CopyState* AtWoodPileMutator = NewObject<UStateMutator_CopyState>();
+					AtWoodPileMutator->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
+					AtWoodPileMutator->SetCopiedFromStateValue("WoodStoreLocation", EStatePropertyType::Vector);
+
+					UStateMutator_SetValueBool* NotCarryingWoodMutator = NewObject<UStateMutator_SetValueBool>();
+					NotCarryingWoodMutator->SetMutatedStateValue("IsCarryingWood", EStatePropertyType::Bool);
+					NotCarryingWoodMutator->SetValueToSet(false);
+
+					TakeWoodToPile->SetStateMutators({ AtWoodPileMutator, NotCarryingWoodMutator });
+					//End: TakeWoodToPile
 
 					GivenActions = {
 						GoToTree,
-						GoToFood,
-						GoToSeed,
-						GoToBed,
 						ChopTree,
-						PickUpWood,
+						GoToLogToCarry,
 						TakeWoodToPile,
-						DropWood,
-						EatFood,
-						Sleep,
-						PlantSeed
 					};
 
 				});
@@ -441,6 +520,33 @@ void ReasonablePlanningComposerSpec::Define()
 
 							TestTrue("We are most likely to preserve, but it is acceptable to cut", PreserveCount > HarvestCount);
 						});
+				});
+
+			Describe("planning actions", [this]()
+				{
+					Describe("chopping wood goal", [this]
+						{
+							It("should have a plan to go to a tree, chop it, grab the wood, take it to the pile", [this]()
+								{
+									//Put us away from the desired end state
+									GivenState->SetValueOfType("WoodStoreLocation", FVector(9000.0f, 90000.f, 10000.f));
+
+									auto ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
+									TestEqual("Selected Goal", ActualGoal, GivenGoals[0]);
+
+									TArray<UReasonablePlanningActionBase*> ActualActions;
+									bool bSuccess = GivenPlanner->PlanChosenGoal(ActualGoal, GivenState, GivenActions, ActualActions);
+
+									TestTrue("Success", bSuccess);
+
+									TestEqual("Number of Actions", ActualActions.Num(), 4);
+									TestEqual("Go To Tree", ActualActions[0], GivenActions[0]);
+									TestEqual("Chop Wood", ActualActions[1], GivenActions[1]);
+									TestEqual("Go To Wood Pile", ActualActions[2], GivenActions[2]);
+									TestEqual("Drop Off Wood", ActualActions[3], GivenActions[3]);
+								});
+						});
+
 				});
 
 			AfterEach([this]()

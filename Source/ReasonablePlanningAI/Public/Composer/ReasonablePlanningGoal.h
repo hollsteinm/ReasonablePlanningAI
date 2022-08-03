@@ -6,7 +6,7 @@
 #include "Core/ReasonablePlanningGoalBase.h"
 #include "ReasonablePlanningGoal.generated.h"
 
-class UReasonablePlanningDistance;
+class UReasonablePlanningDistanceBase;
 class UReasonablePlanningWeightBase;
 class UReasonablePlanningStateQuery;
 
@@ -30,7 +30,7 @@ protected:
     
     /** Determines the amount of effort left to accomplish this goal.*/
     UPROPERTY(EditAnywhere, Category = "RPAI")
-    UReasonablePlanningDistance* DistanceCalculator;
+    UReasonablePlanningDistanceBase* DistanceCalculator;
     
     /** Determines the utility (value) of persuing this goal*/
     UPROPERTY(EditAnywhere, Category = "RPAI")
@@ -45,7 +45,7 @@ protected:
     UReasonablePlanningStateQuery* IsInDesiredStateQuery;
     
 public:
-    FORCEINLINE void SetDistanceCalculator(UReasonablePlanningDistance* NewDistanceCalculator) { DistanceCalculator = NewDistanceCalculator; }
+    FORCEINLINE void SetDistanceCalculator(UReasonablePlanningDistanceBase* NewDistanceCalculator) { DistanceCalculator = NewDistanceCalculator; }
     
     FORCEINLINE void SetWeight(UReasonablePlanningWeightBase* NewWeight) { Weight = NewWeight; }
     

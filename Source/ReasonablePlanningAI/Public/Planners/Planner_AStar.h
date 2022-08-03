@@ -15,6 +15,12 @@ class REASONABLEPLANNINGAI_API UPlanner_AStar : public UReasonablePlanningPlanne
 {
 	GENERATED_BODY()
 
+	UPlanner_AStar();
+
 protected:
+	// Used as a method to control planning so we don't go on an exhaustive journey
+	UPROPERTY(EditAnywhere, Category = RPAI)
+	int32 MaxIterations;
+
 	virtual bool ReceivePlanChosenGoal_Implementation(const UReasonablePlanningGoalBase* TargetGoal, const UReasonablePlanningState* CurrentState, const TArray<UReasonablePlanningActionBase*>& GivenActions, TArray<UReasonablePlanningActionBase*>& OutActions) const override;
 };

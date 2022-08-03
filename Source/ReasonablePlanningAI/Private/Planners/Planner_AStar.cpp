@@ -38,6 +38,12 @@ bool operator<(const FVisitedState& LHS, const FVisitedState& RHS)
     return LHS.Cost + LHS.Remaining < RHS.Cost + RHS.Remaining;
 }
 
+UPlanner_AStar::UPlanner_AStar()
+    : MaxIterations(100)
+{
+
+}
+
 bool UPlanner_AStar::ReceivePlanChosenGoal_Implementation(const UReasonablePlanningGoalBase* TargetGoal, const UReasonablePlanningState* CurrentState, const TArray<UReasonablePlanningActionBase*>& GivenActions, TArray<UReasonablePlanningActionBase*>& OutActions) const
 {
     if (TargetGoal->IsInDesiredState(CurrentState))
@@ -59,8 +65,9 @@ bool UPlanner_AStar::ReceivePlanChosenGoal_Implementation(const UReasonablePlann
     CurrentState->CopyStateForPredictionTo(Start.State);
 
     OpenActions.HeapPush(Start);
+    int32 Iterations = 0;
 
-    while (OpenActions.Num() > 0)
+    while (OpenActions.Num() > 0 && ++Iterations < MaxIterations)
     {
         FVisitedState Current;
         OpenActions.HeapPop(Current);
@@ -81,12 +88,11 @@ bool UPlanner_AStar::ReceivePlanChosenGoal_Implementation(const UReasonablePlann
             return true;
         }
 
+        UReasonablePlanningState* FutureState = NewObject<UReasonablePlanningState>(GetTransientPackage(), CurrentState->GetClass());
         for (const auto& Action : GivenActions)
         {
             if (Action->IsApplicable(Current.State))
             {
-                //TODO: lots of construction here, perhaps cache this without invalidating pointers?
-                UReasonablePlanningState* FutureState = NewObject<UReasonablePlanningState>(GetTransientPackage(), CurrentState->GetClass());
                 Current.State->CopyStateForPredictionTo(FutureState);
                 Action->ApplyToState(FutureState);
 
@@ -107,7 +113,8 @@ bool UPlanner_AStar::ReceivePlanChosenGoal_Implementation(const UReasonablePlann
                     NewNode.Cost = NewCost;
                     NewNode.Remaining = NewRemaining;
                     NewNode.ParentId = Current.Id;
-                    NewNode.State = FutureState;
+                    NewNode.State = NewObject<UReasonablePlanningState>(GetTransientPackage(), CurrentState->GetClass());
+                    FutureState->CopyStateForPredictionTo(NewNode.State);
 
                     OpenActions.HeapPush(NewNode);
                 }

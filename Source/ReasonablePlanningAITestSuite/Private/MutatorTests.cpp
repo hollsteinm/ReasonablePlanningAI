@@ -508,11 +508,11 @@ void ReasonablePlanningMutatorSetVectorSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	UStateMutator_CopyState* ClassUnderTest;
 	UReasonablePlanningState* GivenState;
-END_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec)
-void ReasonablePlanningMutatorSetBoolSpec::Define()
+END_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec)
+void ReasonablePlanningMutatorCopyStateSpec::Define()
 {
 	BeforeEach([this]()
 		{

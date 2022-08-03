@@ -1,7 +1,7 @@
 // Troll Purse. All rights reserved.
 
-#include "Core/ReasonablePlanningState.h"
 #include "Composer/ReasonablePlanningDistanceBase.h"
+#include "Core/ReasonablePlanningState.h"
 
 DECLARE_CYCLE_STAT(TEXT("Calculate Distance"), STAT_CalculateDistance, STATGROUP_RPAI);
 
