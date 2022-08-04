@@ -39,7 +39,7 @@ bool operator<(const FVisitedState& LHS, const FVisitedState& RHS)
 }
 
 UPlanner_AStar::UPlanner_AStar()
-    : MaxIterations(100)
+    : MaxIterations(1000)
 {
 
 }

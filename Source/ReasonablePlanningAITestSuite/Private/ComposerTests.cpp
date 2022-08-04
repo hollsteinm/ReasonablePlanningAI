@@ -141,7 +141,7 @@ void ReasonablePlanningComposerSpec::Define()
 					DistanceNextTree->SetRHS("NextTreeLocation", EStatePropertyType::Vector);
 
 					UDistance_State* DistanceWoodPile = NewObject<UDistance_State>();
-					DistanceWoodPile->SetLHS("NextTreeLocation", EStatePropertyType::Vector);
+					DistanceWoodPile->SetLHS("CurrentLocation", EStatePropertyType::Vector);
 					DistanceWoodPile->SetRHS("WoodStoreLocation", EStatePropertyType::Vector);
 
 					FDistanceSelectStateQueryPair AlreadyCarryingWood;
@@ -154,7 +154,7 @@ void ReasonablePlanningComposerSpec::Define()
 					});
 
 					UDistance_AddAll* GatherWoodDistanceDefault = NewObject<UDistance_AddAll>();
-					GatherWoodDistanceDefault->SetSubDistances({ IsChoppingWoodDistance, DistanceNextTree, DistanceWoodPile });
+					GatherWoodDistanceDefault->SetSubDistances({ IsChoppingWoodDistance, DistanceNextTree });
 
 					GatherWoodDistance->SetDefault(DistanceNextTree);
 
@@ -309,8 +309,14 @@ void ReasonablePlanningComposerSpec::Define()
 					UReasonablePlanningAction* GoToTree = NewObject<UReasonablePlanningAction>();
 
 					// Is Applicable: We can only go to a tree a tree if we are not chopping one already, we are not carrying wood, and there are trees in the forest
+					// Using the query of NoLogsToCarry to force all logs to be picked up before cutting more trees
+					UStateQuery_CompareToInteger* NoLogsToCarry = NewObject<UStateQuery_CompareToInteger>();
+					NoLogsToCarry->SetQueriedState("LogsLeftToCarry", EStatePropertyType::Int);
+					NoLogsToCarry->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
+					NoLogsToCarry->SetComparisonValue(0);
+
 					UStateQuery_Every* GoToTreeIsApplicable = NewObject<UStateQuery_Every>();
-					GoToTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotChoppingWoodQuery, IsNotCarryingWoodQuery });
+					GoToTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotChoppingWoodQuery, IsNotCarryingWoodQuery, NoLogsToCarry });
 					
 					GoToTree->SetIsApplicableQuery(GoToTreeIsApplicable);
 
@@ -340,20 +346,32 @@ void ReasonablePlanningComposerSpec::Define()
 					IsAlreadyChoppingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::EqualTo);
 					IsAlreadyChoppingWoodQuery->SetComparisonValue(true);
 
+					UStateQuery_CompareDistanceFloat* CloseToTreeQuery = NewObject<UStateQuery_CompareDistanceFloat>();
+					CloseToTreeQuery->SetDistance(DistanceNextTree);
+					CloseToTreeQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
+					CloseToTreeQuery->SetRHS(300.f);
+
+					UStateQuery_Every* ChopTreeIsApplicableTreesInForest = NewObject<UStateQuery_Every>();
+					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, NoLogsToCarry });
+
+					UStateQuery_Every* ChopTreeIsApplicableChopping = NewObject<UStateQuery_Every>();
+					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, CloseToTreeQuery });
+
 					UStateQuery_Any* ChopTreeIsApplicable = NewObject<UStateQuery_Any>();
-					ChopTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsAlreadyChoppingWoodQuery });
+					ChopTreeIsApplicable->SetSubQueries({ ChopTreeIsApplicableTreesInForest, ChopTreeIsApplicableChopping });
 
 					ChopTree->SetIsApplicableQuery(ChopTreeIsApplicable);
 
 					// Weight: Whether we are chopping or not, how far from even chopping
 					UDistance_Bool* ChopActionDistance = NewObject<UDistance_Bool>();
 					ChopActionDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
+					ChopActionDistance->SetRHS(true);
 
 					UWeight_Distance* ChopActionWeight = NewObject<UWeight_Distance>();
 					ChopActionWeight->SetDistance(ChopActionDistance);
 
 					UWeight_AddAll* ChopWeight = NewObject<UWeight_AddAll>();
-					ChopWeight->SetSubWeights({ DistanceToTreeWeight, ChopActionWeight }); //by including the same query as go to tree and the addition of a bool, we can always assert this is executed after going to a tree
+					ChopWeight->SetSubWeights({ DistanceToTreeWeight, ChopActionWeight });
 
 					ChopTree->SetWeightAlgorithm(ChopWeight);
 
@@ -364,11 +382,11 @@ void ReasonablePlanningComposerSpec::Define()
 
 					UStateMutator_AddInteger* AddLogsToCarry = NewObject<UStateMutator_AddInteger>();
 					AddLogsToCarry->SetMutatedStateValue("LogsLeftToCarry", EStatePropertyType::Int);
-					AddLogsToCarry->SetIntegerValueToAdd(4);
+					AddLogsToCarry->SetIntegerValueToAdd(1);
 
 					UStateMutator_AddInteger* RemoveTreeFromForest = NewObject<UStateMutator_AddInteger>();
 					RemoveTreeFromForest->SetMutatedStateValue("TreesInTheForest", EStatePropertyType::Int);
-					RemoveTreeFromForest->SetIntegerValueToAdd(-1);
+					RemoveTreeFromForest->SetIntegerValueToAdd(-100); //For test purposes we will chop down all trees in this one iteration, this is so we can fudge it and avoid goal selection of planting seeds
 
 					UStateMutator_SetValueBool* NoLongerChoppingWood = NewObject<UStateMutator_SetValueBool>();
 					NoLongerChoppingWood->SetMutatedStateValue("IsChoppingWood", EStatePropertyType::Bool);
@@ -406,7 +424,11 @@ void ReasonablePlanningComposerSpec::Define()
 					CarryingLogMutator->SetMutatedStateValue("IsCarryingWood", EStatePropertyType::Bool);
 					CarryingLogMutator->SetValueToSet(true);
 
-					GoToLogToCarry->SetStateMutators({ AtLogMutator, CarryingLogMutator });
+					UStateMutator_AddInteger* OneLessLogToCarry = NewObject<UStateMutator_AddInteger>();
+					OneLessLogToCarry->SetMutatedStateValue("LogsLeftToCarry", EStatePropertyType::Int);
+					OneLessLogToCarry->SetIntegerValueToAdd(-1);
+
+					GoToLogToCarry->SetStateMutators({ AtLogMutator, CarryingLogMutator, OneLessLogToCarry });
 
 					//End: GoToLogToCarry
 					//Start: TakeWoodToPile
@@ -530,6 +552,7 @@ void ReasonablePlanningComposerSpec::Define()
 								{
 									//Put us away from the desired end state
 									GivenState->SetValueOfType("WoodStoreLocation", FVector(9000.0f, 90000.f, 10000.f));
+									GivenState->SetValueOfType("CurrentLocation", FVector(-9000.0f, -90000.f, -10000.f));
 
 									auto ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 									TestEqual("Selected Goal", ActualGoal, GivenGoals[0]);
