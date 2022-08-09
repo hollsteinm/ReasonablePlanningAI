@@ -8,6 +8,7 @@
 #include "Core/ReasonablePlanningGoalBase.h"
 #include "Core/ReasonablePlanningReasonerBase.h"
 #include "Core/ReasonablePlanningPlannerBase.h"
+#include "Core/ReasonablePlanningState.h"
 #include "VisualLogger/VisualLoggerTypes.h"
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
@@ -17,7 +18,7 @@ URPAIComposerBrainComponent::URPAIComposerBrainComponent()
 	, CurrentAction(nullptr)
 	, PlannedActions({})
 	, CurrentGoal(nullptr)
-	, CurrentState(nullptr)
+	, CachedStateInstance(nullptr)
 {
 }
 
@@ -51,7 +52,7 @@ void URPAIComposerBrainComponent::PopNextAction()
 		CurrentAction = PlannedActions.Pop();
 		check(CurrentAction != nullptr);
 		RegisterNewAction(CurrentAction);
-		CurrentAction->StartAction(AIOwner, CurrentState, AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->StartAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
         UE_VLOG(GetOwner(), LogRPAI, Log, TEXT("Action Started %s"), *CurrentAction->GetActionName());
 	}
 	else
@@ -62,7 +63,7 @@ void URPAIComposerBrainComponent::PopNextAction()
 
 void URPAIComposerBrainComponent::OnActionCompleted(UReasonablePlanningActionBase* CompletedAction, AAIController* ActionInstigator, UReasonablePlanningState* CompletedOnState)
 {
-	if (CompletedOnState != CurrentState)
+	if (CompletedOnState != LoadOrCreateStateFromAi())
 	{
 		//log
 		return;
@@ -86,7 +87,7 @@ void URPAIComposerBrainComponent::OnActionCompleted(UReasonablePlanningActionBas
 
 void URPAIComposerBrainComponent::OnActionCancelled(UReasonablePlanningActionBase* CancelledAction, AAIController* ActionInstigator, UReasonablePlanningState* CompletedOnState)
 {
-	if (CompletedOnState != CurrentState)
+	if (CompletedOnState != LoadOrCreateStateFromAi())
 	{
 		//log
 		return;
@@ -117,7 +118,11 @@ void URPAIComposerBrainComponent::TickComponent(float DeltaTime, enum ELevelTick
 
 	if (CurrentAction != nullptr)
 	{
-		CurrentAction->UpdateAction(AIOwner, CurrentState, DeltaTime, AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, AIOwner->GetPawn(), AIOwner->GetWorld());
+	}
+	else
+	{
+		StartLogic();
 	}
 }
 
@@ -151,11 +156,15 @@ void URPAIComposerBrainComponent::StartLogic()
 	check(Reasoner != nullptr);
 	check(Planner != nullptr);
 
-	CurrentGoal = Reasoner->ReasonNextGoal(Goals, CurrentState);
-	if (CurrentGoal != nullptr && Planner->PlanChosenGoal(CurrentGoal, CurrentState, Actions, PlannedActions))
+	CurrentGoal = Reasoner->ReasonNextGoal(Goals, LoadOrCreateStateFromAi());
+	if (CurrentGoal != nullptr && Planner->PlanChosenGoal(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions))
 	{
         UE_VLOG(GetOwner(), LogRPAI, Log, TEXT("Goal Planned %s"), *CurrentGoal->GetGoalName());
 		PopNextAction();
+	}
+	else
+	{
+		StopLogic("No Plan");
 	}
 }
 
@@ -172,7 +181,7 @@ void URPAIComposerBrainComponent::StopLogic(const FString& Reason)
 	PlannedActions.Empty();
 	if (CurrentAction != nullptr)
 	{
-		CurrentAction->CancelAction(AIOwner, CurrentState, AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	CurrentAction = nullptr;
 	CurrentGoal = nullptr;
@@ -201,4 +210,19 @@ EAILogicResuming::Type URPAIComposerBrainComponent::ResumeLogic(const FString& R
 		return EAILogicResuming::RestartedInstead;
 	}
 	return EAILogicResuming::Continue;
+}
+
+UReasonablePlanningState* URPAIComposerBrainComponent::LoadOrCreateStateFromAi()
+{
+	if (CachedStateInstance == nullptr)
+	{
+		CachedStateInstance = NewObject<UReasonablePlanningState>(GetAIOwner(), *ReasonablePlanningBehavior->GetConstructedStateType());
+	}
+	SetStateFromAi(CachedStateInstance);
+	return CachedStateInstance;
+}
+
+void URPAIComposerBrainComponent::SetStateFromAi_Implementation(UReasonablePlanningState* StateToModify) const
+{
+
 }

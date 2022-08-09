@@ -9,25 +9,16 @@ float UDistance_State::ReceiveCalculateDistance_Implementation(const UReasonable
 {
     if (LHS.ExpectedValueType != RHS.ExpectedValueType)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("Different expected types, returning max value"));
         return TNumericLimits<float>::Max();
     }
 
     if (LHS.StateKeyName == RHS.StateKeyName)
     {
-        UE_LOG(LogRPAI, Warning, TEXT("Same State Key referenced, returning 0"));
         return 0.f;
     }
 
     if (!(GivenState->HasReferencedState(LHS) && GivenState->HasReferencedState(RHS)))
     {
-        UE_LOG(LogRPAI, Warning, TEXT("Unable to calculate distance from %s to %s, state does not have both referenced keys. Types for LHS %s and RHS %s. For state %s"),
-            *LHS.StateKeyName.ToString(),
-            *RHS.StateKeyName.ToString(),
-            *UEnum::GetValueAsName(LHS.ExpectedValueType).ToString(),
-            *UEnum::GetValueAsName(RHS.ExpectedValueType).ToString(),
-            *GivenState->GetName()
-        );
         return TNumericLimits<float>::Max();
     }
 

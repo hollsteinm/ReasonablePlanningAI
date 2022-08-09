@@ -35,7 +35,7 @@ FORCEINLINE void TrySetMaybeAdd(TMap<FName, TValue>& Source, const FName& Key, T
 }
 
 UState_Map::UState_Map()
-	: bDynamicMapPairs(false)
+	: bDynamicMapPairs(true)
 	, Resources(CreateDefaultSubobject<UReasonablePlanningResourceCollection>(TEXT("ResourceLocker")))
 {
 

@@ -12,7 +12,7 @@ class UReasonablePlanningActionBase;
 class UReasonablePlanningAIBehavior;
 class UReasonablePlanningState;
 
-UCLASS(ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
+UCLASS(Blueprintable, BlueprintType, ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
 class REASONABLEPLANNINGAI_API URPAIComposerBrainComponent : public UBrainComponent
 {
 	GENERATED_BODY()
@@ -35,6 +35,9 @@ public:
 	// Actor Component
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, Category = "RPAI")
+	UReasonablePlanningState* LoadOrCreateStateFromAi();
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "RPAI")
 	virtual void OnActionCompleted(UReasonablePlanningActionBase* CompletedAction, AAIController* ActionInstigator, UReasonablePlanningState* CompletedOnState);
@@ -51,6 +54,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "RPAI")
 	void PopNextAction();
 
+	UFUNCTION(BlueprintNativeEvent, Category = "RPAI")
+	void SetStateFromAi(UReasonablePlanningState* StateToModify) const;
+	virtual void SetStateFromAi_Implementation(UReasonablePlanningState* StateToModify) const;
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "RPAI")
 	UReasonablePlanningAIBehavior* ReasonablePlanningBehavior;
@@ -65,7 +72,7 @@ private:
 	UReasonablePlanningGoalBase* CurrentGoal;
 
 	UPROPERTY(Transient)
-	UReasonablePlanningState* CurrentState;
+	UReasonablePlanningState* CachedStateInstance;
 
 	UPROPERTY()
 	bool bIsPaused;

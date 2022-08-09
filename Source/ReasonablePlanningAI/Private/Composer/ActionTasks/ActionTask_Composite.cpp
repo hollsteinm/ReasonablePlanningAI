@@ -24,31 +24,20 @@ void UActionTask_Composite::ReceiveStartActionTask_Implementation(AAIController*
 		}
 	}
 
-	auto GivenControllerActions = ActiveActions.Find(ActionInstigator);
-	if (GivenControllerActions != nullptr)
+	auto& GivenControllerActions = ActiveActions.FindOrAdd(ActionInstigator);
+	auto CurrentCount = GivenControllerActions.Num();
+	if (CurrentCount > 0)
 	{
-		auto CurrentCount = GivenControllerActions->Num();
-		if (CurrentCount > 0)
+		for (auto Idx = 0; Idx < CurrentCount; ++Idx)
 		{
-			for (auto Idx = 0; Idx < CurrentCount; ++Idx)
-			{
-				(*GivenControllerActions)[Idx]->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-			}
-		}
-		GivenControllerActions->Reset(Actions.Num());
-		for (auto Action : Actions)
-		{
-			GivenControllerActions->Add(Action);
-			Action->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+			GivenControllerActions[Idx]->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 		}
 	}
-	else
+	GivenControllerActions.Reset(Actions.Num());
+	for (auto Action : Actions)
 	{
-		for (auto Action : Actions)
-		{
-			GivenControllerActions->Add(Action);
-			Action->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-		}
+		GivenControllerActions.Add(Action);
+		Action->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 	}
 }
 

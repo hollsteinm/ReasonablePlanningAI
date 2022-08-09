@@ -22,6 +22,9 @@ class REASONABLEPLANNINGAI_API UReasonablePlanningAIBehavior : public UDataAsset
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = "RPAI")
+	TSubclassOf<UReasonablePlanningState> ConstructedStateType;
+
+	UPROPERTY(EditAnywhere, Category = "RPAI")
 	UReasonablePlanningReasonerBase* Reasoner;
 
 	UPROPERTY(EditAnywhere, Category = "RPAI")
@@ -34,9 +37,12 @@ class REASONABLEPLANNINGAI_API UReasonablePlanningAIBehavior : public UDataAsset
 	TArray<UReasonablePlanningActionBase*> Actions;
 
 public:
+
 	FORCEINLINE const UReasonablePlanningReasonerBase* GetReasoner() const { return Reasoner; }
 
 	FORCEINLINE const UReasonablePlanningPlannerBase* GetPlanner() const { return Planner; }
+
+	FORCEINLINE TSubclassOf<UReasonablePlanningState> GetConstructedStateType() const { return ConstructedStateType; }
 
 	FORCEINLINE TArray<UReasonablePlanningGoalBase*> GetGoals() const { return Goals; }
 

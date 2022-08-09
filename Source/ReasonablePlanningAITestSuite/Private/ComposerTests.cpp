@@ -352,10 +352,10 @@ void ReasonablePlanningComposerSpec::Define()
 					CloseToTreeQuery->SetRHS(300.f);
 
 					UStateQuery_Every* ChopTreeIsApplicableTreesInForest = NewObject<UStateQuery_Every>();
-					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, NoLogsToCarry });
+					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, NoLogsToCarry, HasTreesInTheForestQuery });
 
 					UStateQuery_Every* ChopTreeIsApplicableChopping = NewObject<UStateQuery_Every>();
-					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, CloseToTreeQuery });
+					ChopTreeIsApplicableChopping->SetSubQueries({ CloseToTreeQuery, NoLogsToCarry, HasTreesInTheForestQuery });
 
 					UStateQuery_Any* ChopTreeIsApplicable = NewObject<UStateQuery_Any>();
 					ChopTreeIsApplicable->SetSubQueries({ ChopTreeIsApplicableTreesInForest, ChopTreeIsApplicableChopping });
@@ -563,10 +563,12 @@ void ReasonablePlanningComposerSpec::Define()
 									TestTrue("Success", bSuccess);
 
 									TestEqual("Number of Actions", ActualActions.Num(), 4);
-									TestEqual("Go To Tree", ActualActions[0], GivenActions[0]);
-									TestEqual("Chop Wood", ActualActions[1], GivenActions[1]);
-									TestEqual("Go To Wood Pile", ActualActions[2], GivenActions[2]);
-									TestEqual("Drop Off Wood", ActualActions[3], GivenActions[3]);
+
+									// Output plan is meant to be popped. Thus invert the expected order.
+									TestEqual("Go To Tree", ActualActions[3], GivenActions[0]);
+									TestEqual("Chop Wood", ActualActions[2], GivenActions[1]);
+									TestEqual("Go To Wood Pile", ActualActions[1], GivenActions[2]);
+									TestEqual("Drop Off Wood", ActualActions[0], GivenActions[3]);
 								});
 						});
 
