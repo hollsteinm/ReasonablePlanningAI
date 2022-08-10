@@ -8,7 +8,7 @@
 
 /**
  * A container action task that executes all Actions listed and does not complete until all
- * actions are completed.
+ * actions are completed. Actions are executed as if they are parallel.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API UActionTask_Composite : public UReasonablePlanningActionTaskBase

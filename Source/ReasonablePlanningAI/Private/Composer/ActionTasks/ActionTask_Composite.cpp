@@ -43,32 +43,47 @@ void UActionTask_Composite::ReceiveStartActionTask_Implementation(AAIController*
 
 void UActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto& AIActiveActions = ActiveActions[ActionInstigator];
-	for (auto ActiveAction : AIActiveActions)
+	auto AIActiveActions = ActiveActions.Find(ActionInstigator);
+	if (AIActiveActions != nullptr)
 	{
-		ActiveAction->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor, ActionWorld);
+		for (auto ActiveAction : (*AIActiveActions))
+		{
+			ActiveAction->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor, ActionWorld);
+		}
+		FlushForController(ActionInstigator);
+		if (AIActiveActions->Num() == 0)
+		{
+			CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		}
 	}
-	FlushForController(ActionInstigator);
 }
 
 void UActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto& AIActiveActions = ActiveActions[ActionInstigator];
-	for (auto ActiveAction : AIActiveActions)
+	auto AIActiveActions = ActiveActions.Find(ActionInstigator);
+	if (AIActiveActions != nullptr)
 	{
-		ActiveAction->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		for (auto ActiveAction : (*AIActiveActions))
+		{
+			ActiveAction->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		}
+		FlushForController(ActionInstigator);
+		ActiveActions.Remove(ActionInstigator);
 	}
-	FlushForController(ActionInstigator);
 }
 
 void UActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto& AIActiveActions = ActiveActions[ActionInstigator];
-	for (auto ActiveAction : AIActiveActions)
+	auto AIActiveActions = ActiveActions.Find(ActionInstigator);
+	if (AIActiveActions != nullptr)
 	{
-		ActiveAction->CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		for (auto ActiveAction : (*AIActiveActions))
+		{
+			ActiveAction->CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		}
+		FlushForController(ActionInstigator);
+		ActiveActions.Remove(ActionInstigator);
 	}
-	FlushForController(ActionInstigator);
 }
 
 void UActionTask_Composite::OnActionTaskCompletedOrCancelled(UReasonablePlanningActionTaskBase* ActionTask, AAIController* ActionInstigator, UReasonablePlanningState* CurrentState)
@@ -87,14 +102,15 @@ void UActionTask_Composite::OnActionTaskCompletedOrCancelled(UReasonablePlanning
 
 void UActionTask_Composite::FlushForController(AAIController* ActionInstigator)
 {
+	static auto const SetSorter = TGreater<int32>();
 	auto AIActiveActions = ActiveActions.Find(ActionInstigator);
 	auto AIFlush = FlushActionIndices.Find(ActionInstigator);
 	if (AIFlush != nullptr && AIActiveActions != nullptr)
 	{
-		auto Num = AIFlush->Num();
-		for (auto Idx = 0; Idx < Num; ++Idx)
+		AIFlush->Sort(SetSorter);
+		for (const auto RemoveIdx : (*AIFlush))
 		{
-			AIActiveActions->RemoveAt(Idx, 1, false);
+			AIActiveActions->RemoveAt(RemoveIdx, 1, false);
 		}
 	}
 

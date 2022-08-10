@@ -9,7 +9,7 @@ UActionTask_Wait::UActionTask_Wait()
 	: WaitTimeSeconds(30.f)
 	, RandomDeviation(5.f)
 {
-
+	bCompleteAfterStart = false;
 }
 
 void UActionTask_Wait::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, UReasonablePlanningState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
