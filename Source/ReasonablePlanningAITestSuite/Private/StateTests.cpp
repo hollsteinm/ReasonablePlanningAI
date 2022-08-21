@@ -23,6 +23,23 @@ void ReasonablePlanningStateMapSpec::Define()
 			ClassUnderTest->SetAsDynamic(false);
 		});
 
+	Describe("Equality", [this]()
+		{
+			It("should be equal", [this]()
+				{
+					URpaiState* Copy = NewObject<URpaiState_Map>();
+					ClassUnderTest->CopyStateForPredictionTo(Copy);
+					TestTrue("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(Copy));
+					TestTrue("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(ClassUnderTest));
+				});
+
+			It("should not be equal", [this]()
+				{
+					URpaiState* Copy = NewObject<URpaiState_Map>();
+					TestFalse("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(Copy));
+				});
+		});
+
 	Describe("Getting Values", [this]()
 		{
 			It("should get the defined boolean value", [this]()

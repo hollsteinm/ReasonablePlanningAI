@@ -34,11 +34,44 @@ FORCEINLINE void TrySetMaybeAdd(TMap<FName, TValue>& Source, const FName& Key, T
 	}
 }
 
+template<typename TValue>
+FORCEINLINE bool AllElementsEqual(const TMap<FName, TValue>& LHS, const TMap<FName, TValue>& RHS)
+{
+	return LHS.OrderIndependentCompareEqual(RHS);
+}
+
 URpaiState_Map::URpaiState_Map()
 	: bDynamicMapPairs(true)
 	, Resources(CreateDefaultSubobject<URpaiResourceCollection>(TEXT("ResourceLocker")))
 {
 
+}
+
+bool URpaiState_Map::IsEqualTo(const URpaiState* OtherState) const
+{
+	check(OtherState != nullptr);
+	const URpaiState_Map* Other = Cast<URpaiState_Map>(OtherState);
+	if (Other == nullptr)
+	{
+		return false;
+	}
+	if (OtherState == this)
+	{
+		return true;
+	}
+
+
+	if(!AllElementsEqual(Other->BoolValues, BoolValues)) return false;
+	if(!AllElementsEqual(Other->ClassValues, ClassValues)) return false;
+	if(!AllElementsEqual(Other->EnumValues, EnumValues)) return false;
+	if(!AllElementsEqual(Other->FloatValues, FloatValues)) return false;
+	if(!AllElementsEqual(Other->IntValues, IntValues)) return false;
+	if(!AllElementsEqual(Other->NameValues, NameValues)) return false;
+	if(!AllElementsEqual(Other->ObjectValues, ObjectValues)) return false;
+	if(!AllElementsEqual(Other->RotatorValues, RotatorValues)) return false;
+	if(!AllElementsEqual(Other->StringValues, StringValues)) return false;
+	if(!AllElementsEqual(Other->VectorValues, VectorValues)) return false;
+	return true;
 }
 
 void URpaiState_Map::SetBool(FName ValueName, bool Value)

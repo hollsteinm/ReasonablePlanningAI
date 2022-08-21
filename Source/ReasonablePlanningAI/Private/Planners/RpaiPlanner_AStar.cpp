@@ -25,7 +25,9 @@ bool operator==(const FVisitedState& LHS, const FVisitedState& RHS)
 
 bool operator==(const FVisitedState& LHS, URpaiState* RHS)
 {
-    return LHS.State == RHS;
+    check(LHS.State != nullptr);
+    check(RHS != nullptr);
+    return LHS.State->IsEqualTo(RHS);
 }
 
 bool operator==(const FVisitedState& LHS, const FGuid& RHS)

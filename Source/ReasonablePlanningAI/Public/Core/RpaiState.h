@@ -18,6 +18,12 @@ class REASONABLEPLANNINGAI_API URpaiState : public UObject
 public:
 
     /**
+    * Determine if the internal state properties are equal to each other. Answer the question of, are we already in this state?
+    */
+    UFUNCTION(BlueprintPure, Category = "Rpai")
+    virtual bool IsEqualTo(const URpaiState* OtherState) const;
+
+    /**
      * Sets the boolean value defined with the given name. Implementation determines if values can be created (new) or only ever set based on a
      * previous definition (acting more like a class/object with defined properties)
      */

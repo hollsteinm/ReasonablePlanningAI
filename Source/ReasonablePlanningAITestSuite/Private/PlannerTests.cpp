@@ -146,7 +146,7 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 							TestActionD->KeyToApply = UTestGoal::ConditionCKey;
 							TestActionD->ValueToApply = 5;
 
-							TArray<URpaiActionBase*> Expected({ GivenActions[1], GivenActions[3], GivenActions[2] });
+							TArray<URpaiActionBase*> Expected({ GivenActions[1], GivenActions[2], GivenActions[3]});
 							TArray<URpaiActionBase*> Actual;
 
 							TestTrue("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));

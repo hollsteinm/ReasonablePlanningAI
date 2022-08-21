@@ -59,6 +59,7 @@ private:
 	URpaiResourceCollection* Resources;
 
 public:
+	virtual bool IsEqualTo(const URpaiState* OtherState) const override;
 	virtual void SetBool(FName ValueName, bool Value) override;
 	virtual void SetClassValue(FName ValueName, UClass* Value) override;
 	virtual void SetEnum(FName ValueName, UEnum* Type, uint8 Value) override;
