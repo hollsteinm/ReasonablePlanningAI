@@ -5,24 +5,24 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "BrainComponent.h"
-#include "RPAIComposerBrainComponent.generated.h"
+#include "RpaiComposerBrainComponent.generated.h"
 
-class UReasonablePlanningGoalBase;
-class UReasonablePlanningActionBase;
-class UReasonablePlanningAIBehavior;
-class UReasonablePlanningState;
+class URpaiGoalBase;
+class URpaiActionBase;
+class URpaiComposerBehavior;
+class URpaiState;
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup = (AI), meta = (BlueprintSpawnableComponent))
-class REASONABLEPLANNINGAI_API URPAIComposerBrainComponent : public UBrainComponent
+class REASONABLEPLANNINGAI_API URpaiComposerBrainComponent : public UBrainComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	URPAIComposerBrainComponent();
+	URpaiComposerBrainComponent();
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	void SetReasonablePlanningBehavior(UReasonablePlanningAIBehavior* NewBehavior);
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void SetReasonablePlanningBehavior(URpaiComposerBehavior* NewBehavior);
 
 	// Brain Component
 	virtual void StartLogic() override;
@@ -35,52 +35,52 @@ public:
 	// Actor Component
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	UReasonablePlanningState* LoadOrCreateStateFromAi();
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	URpaiState* LoadOrCreateStateFromAi();
 
 protected:
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	virtual void OnActionCompleted(UReasonablePlanningActionBase* CompletedAction, AAIController* ActionInstigator, UReasonablePlanningState* CompletedOnState);
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	virtual void OnActionCompleted(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	virtual void OnActionCancelled(UReasonablePlanningActionBase* CancelledAction, AAIController* ActionInstigator, UReasonablePlanningState* CompletedOnState);
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	virtual void OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	void UnregisterOldAction(UReasonablePlanningActionBase* OldAction);
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void UnregisterOldAction(URpaiActionBase* OldAction);
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
-	void RegisterNewAction(UReasonablePlanningActionBase* NewAction);
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void RegisterNewAction(URpaiActionBase* NewAction);
 
-	UFUNCTION(BlueprintCallable, Category = "RPAI")
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void PopNextAction();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "RPAI")
-	void SetStateFromAi(UReasonablePlanningState* StateToModify) const;
-	virtual void SetStateFromAi_Implementation(UReasonablePlanningState* StateToModify) const;
+	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
+	void SetStateFromAi(URpaiState* StateToModify) const;
+	virtual void SetStateFromAi_Implementation(URpaiState* StateToModify) const;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category = "RPAI")
-	UReasonablePlanningAIBehavior* ReasonablePlanningBehavior;
+	UPROPERTY(EditDefaultsOnly, Category = "Rpai")
+	URpaiComposerBehavior* ReasonablePlanningBehavior;
 
 	UPROPERTY(Transient)
-	UReasonablePlanningActionBase* CurrentAction;
+	URpaiActionBase* CurrentAction;
 
 	UPROPERTY(Transient)
-	TArray<UReasonablePlanningActionBase*> PlannedActions;
+	TArray<URpaiActionBase*> PlannedActions;
 
 	UPROPERTY(Transient)
-	UReasonablePlanningGoalBase* CurrentGoal;
+	URpaiGoalBase* CurrentGoal;
 
 	UPROPERTY(Transient)
-	UReasonablePlanningState* CachedStateInstance;
+	URpaiState* CachedStateInstance;
 
 	UPROPERTY()
 	bool bIsPaused;
 
 public:
-	FORCEINLINE const UReasonablePlanningActionBase* GetCurrentAction() const { return CurrentAction; }
+	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }
 
-	FORCEINLINE const UReasonablePlanningGoalBase* GetCurrentGoal() const { return CurrentGoal; }
+	FORCEINLINE const URpaiGoalBase* GetCurrentGoal() const { return CurrentGoal; }
 
 	FORCEINLINE bool IsPaused() const { return bIsPaused; }
 };

@@ -1,19 +1,19 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "Composer/ReasonablePlanningWeightBase.h"
-#include "Composer/Weights/Weight_Float.h"
-#include "Composer/Weights/Weight_CurveFloat.h"
-#include "Composer/Weights/Weight_ConstantFloat.h"
+#include "Composer/RpaiComposerWeightBase.h"
+#include "Composer/Weights/RpaiWeight_Float.h"
+#include "Composer/Weights/RpaiWeight_CurveFloat.h"
+#include "Composer/Weights/RpaiWeight_ConstantFloat.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec, "ReasonablePlanningAI.Weights.ConstantFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UWeight_ConstantFloat* ClassUnderTest;
+	URpaiWeight_ConstantFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec)
 void ReasonablePlanningWeightConstantFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UWeight_ConstantFloat>();
+			ClassUnderTest = NewObject<URpaiWeight_ConstantFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 		});
 
@@ -41,14 +41,14 @@ void ReasonablePlanningWeightConstantFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningWeightFloatSpec, "ReasonablePlanningAI.Weights.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UWeight_Float* ClassUnderTest;
+	URpaiWeight_Float* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningWeightFloatSpec)
 void ReasonablePlanningWeightFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UWeight_Float>();
+			ClassUnderTest = NewObject<URpaiWeight_Float>();
 			GivenState = NewObject<UTestPlanningState>();
 		});
 
@@ -83,7 +83,7 @@ void ReasonablePlanningWeightFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningWeightCurveFloatSpec, "ReasonablePlanningAI.Weights.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UWeight_CurveFloat* ClassUnderTest;
+	URpaiWeight_CurveFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 	UCurveFloat* GivenCurve;
 END_DEFINE_SPEC(ReasonablePlanningWeightCurveFloatSpec)
@@ -92,7 +92,7 @@ void ReasonablePlanningWeightCurveFloatSpec::Define()
 
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UWeight_CurveFloat>();
+			ClassUnderTest = NewObject<URpaiWeight_CurveFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 			GivenCurve = NewObject<UCurveFloat>();
 			GivenCurve->CreateCurveFromCSVString("0,0\r\n1,2\r\n");

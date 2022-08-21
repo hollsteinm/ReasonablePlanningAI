@@ -1,53 +1,53 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "States/State_Map.h"
-#include "Planners/Planner_AStar.h"
-#include "Reasoners/Reasoner_DualUtility.h"
-#include "Reasoners/Reasoner_AbsoluteUtility.h"
-#include "Composer/ReasonablePlanningAction.h"
-#include "Composer/ReasonablePlanningGoal.h"
-#include "Composer/Distances/Distance_State.h"
-#include "Composer/Distances/Distance_Bool.h"
-#include "Composer/Distances/Distance_Float.h"
-#include "Composer/Distances/Distance_Integer.h"
-#include "Composer/Distances/Distance_Rotator.h"
-#include "Composer/Distances/Distance_Vector.h"
-#include "Composer/Distances/Distance_AddAll.h"
-#include "Composer/Distances/Distance_Select.h"
-#include "Composer/Mutators/StateMutator_AddFloat.h"
-#include "Composer/Mutators/StateMutator_AddInteger.h"
-#include "Composer/Mutators/StateMutator_MultiplyFloat.h"
-#include "Composer/Mutators/StateMutator_MultiplyInteger.h"
-#include "Composer/Mutators/StateMutator_SetValueBool.h"
-#include "Composer/Mutators/StateMutator_SetValueClass.h"
-#include "Composer/Mutators/StateMutator_SetValueFloat.h"
-#include "Composer/Mutators/StateMutator_SetValueInteger.h"
-#include "Composer/Mutators/StateMutator_SetValueName.h"
-#include "Composer/Mutators/StateMutator_SetValueRotator.h"
-#include "Composer/Mutators/StateMutator_SetValueString.h"
-#include "Composer/Mutators/StateMutator_SetValueVector.h"
-#include "Composer/Mutators/StateMutator_CopyState.h"
-#include "Composer/Queries/StateQuery_CompareDistanceFloat.h"
-#include "Composer/Queries/StateQuery_CompareToBool.h"
-#include "Composer/Queries/StateQuery_CompareToDistance.h"
-#include "Composer/Queries/StateQuery_CompareToFloat.h"
-#include "Composer/Queries/StateQuery_CompareToInteger.h"
-#include "Composer/Queries/StateQuery_CompareToStateValue.h"
-#include "Composer/Queries/StateQuery_Every.h"
-#include "Composer/Queries/StateQuery_Any.h"
-#include "Composer/Weights/Weight_Float.h"
-#include "Composer/Weights/Weight_CurveFloat.h"
-#include "Composer/Weights/Weight_ConstantFloat.h"
-#include "Composer/Weights/Weight_AddAll.h"
-#include "Composer/Weights/Weight_Distance.h"
-#include "Composer/Weights/Weight_Select.h"
+#include "States/RpaiState_Map.h"
+#include "Planners/RpaiPlanner_AStar.h"
+#include "Reasoners/RpaiReasoner_DualUtility.h"
+#include "Reasoners/RpaiReasoner_AbsoluteUtility.h"
+#include "Composer/RpaiComposerAction.h"
+#include "Composer/RpaiComposerGoal.h"
+#include "Composer/Distances/RpaiDistance_State.h"
+#include "Composer/Distances/RpaiDistance_Bool.h"
+#include "Composer/Distances/RpaiDistance_Float.h"
+#include "Composer/Distances/RpaiDistance_Integer.h"
+#include "Composer/Distances/RpaiDistance_Rotator.h"
+#include "Composer/Distances/RpaiDistance_Vector.h"
+#include "Composer/Distances/RpaiDistance_AddAll.h"
+#include "Composer/Distances/RpaiDistance_Select.h"
+#include "Composer/Mutators/RpaiStateMutator_AddFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_AddInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_MultiplyFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_MultiplyInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueBool.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueClass.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueName.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueRotator.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueString.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueVector.h"
+#include "Composer/Mutators/RpaiStateMutator_CopyState.h"
+#include "Composer/Queries/RpaiStateQuery_CompareDistanceFloat.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToBool.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToDistance.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToFloat.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToInteger.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToStateValue.h"
+#include "Composer/Queries/RpaiStateQuery_Every.h"
+#include "Composer/Queries/RpaiStateQuery_Any.h"
+#include "Composer/Weights/RpaiWeight_Float.h"
+#include "Composer/Weights/RpaiWeight_CurveFloat.h"
+#include "Composer/Weights/RpaiWeight_ConstantFloat.h"
+#include "Composer/Weights/RpaiWeight_AddAll.h"
+#include "Composer/Weights/RpaiWeight_Distance.h"
+#include "Composer/Weights/RpaiWeight_Select.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningComposerSpec, "ReasonablePlanningAI.Composer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UReasonablePlanningPlannerBase* GivenPlanner;
-	UReasonablePlanningReasonerBase* GivenReasoner;
-	UReasonablePlanningState* GivenState;
-	TArray<UReasonablePlanningGoalBase*> GivenGoals;
-	TArray<UReasonablePlanningActionBase*> GivenActions;
+	URpaiPlannerBase* GivenPlanner;
+	URpaiReasonerBase* GivenReasoner;
+	URpaiState* GivenState;
+	TArray<URpaiGoalBase*> GivenGoals;
+	TArray<URpaiActionBase*> GivenActions;
 END_DEFINE_SPEC(ReasonablePlanningComposerSpec)
 void ReasonablePlanningComposerSpec::Define()
 {
@@ -55,10 +55,10 @@ void ReasonablePlanningComposerSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					GivenPlanner = NewObject<UPlanner_AStar>();
-					GivenReasoner = NewObject<UReasoner_DualUtility>();
+					GivenPlanner = NewObject<URpaiPlanner_AStar>();
+					GivenReasoner = NewObject<URpaiReasoner_DualUtility>();
 					
-					UState_Map* LumberjackState = NewObject<UState_Map>();
+					URpaiState_Map* LumberjackState = NewObject<URpaiState_Map>();
 					LumberjackState->SetAsDynamic(true);
 					LumberjackState->SetInt("TreesInTheForest", 100);
 					LumberjackState->SetInt("LogsLeftToCarry", 0);
@@ -82,11 +82,11 @@ void ReasonablePlanningComposerSpec::Define()
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// Gather wood goal.
-					UReasonablePlanningGoal* GatherWood = NewObject<UReasonablePlanningGoal>();
+					URpaiComposerGoal* GatherWood = NewObject<URpaiComposerGoal>();
 					GatherWood->SetCategory(1); //Setting a category to a higher value means to only apply this goal if lower value categories are 100% not applicable.
 
 					// Is Applicable: We can only gather wood if there are trees to gather wood from.
-					UStateQuery_CompareToInteger* HasTreesInTheForestQuery = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasTreesInTheForestQuery = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasTreesInTheForestQuery->SetQueriedState("TreesInTheForest", EStatePropertyType::Int);
 					HasTreesInTheForestQuery->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					HasTreesInTheForestQuery->SetComparisonValue(0);
@@ -96,51 +96,51 @@ void ReasonablePlanningComposerSpec::Define()
 					// Is in Desired State: Our actions have caused us to maximally be near a tree, chop wood, and carry wood, and be near the wood store location.
 					// we are done when we are no longer carrying wood, no longer chopping, and are near our wood drop off location. We will also need to add a gate/guard
 					// that lets us repeat this action if we start off in a desired state. For instance, immediately after dropping off the wood.
-					UStateQuery_CompareToBool* IsNotCarryingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					URpaiStateQuery_CompareToBool* IsNotCarryingWoodQuery = NewObject<URpaiStateQuery_CompareToBool>();
 					IsNotCarryingWoodQuery->SetQueriedState("IsCarryingWood", EStatePropertyType::Bool);
 					IsNotCarryingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::NotEqualTo);
 					IsNotCarryingWoodQuery->SetComparisonValue(true);
 
-					UStateQuery_CompareToBool* IsNotChoppingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					URpaiStateQuery_CompareToBool* IsNotChoppingWoodQuery = NewObject<URpaiStateQuery_CompareToBool>();
 					IsNotChoppingWoodQuery->SetQueriedState("IsChoppingWood", EStatePropertyType::Bool);
 					IsNotChoppingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::NotEqualTo);
 					IsNotChoppingWoodQuery->SetComparisonValue(true);
 
-					UDistance_State* WoodStoreDistance = NewObject<UDistance_State>();
+					URpaiDistance_State* WoodStoreDistance = NewObject<URpaiDistance_State>();
 					WoodStoreDistance->SetLHS("WoodStoreLocation", EStatePropertyType::Vector);
 					WoodStoreDistance->SetRHS("CurrentLocation", EStatePropertyType::Vector);
 
-					UStateQuery_CompareDistanceFloat* CloseToWoodStoreQuery = NewObject<UStateQuery_CompareDistanceFloat>();
+					URpaiStateQuery_CompareDistanceFloat* CloseToWoodStoreQuery = NewObject<URpaiStateQuery_CompareDistanceFloat>();
 					CloseToWoodStoreQuery->SetDistance(WoodStoreDistance);
 					CloseToWoodStoreQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
 					CloseToWoodStoreQuery->SetRHS(300.f);
 
-					UStateQuery_Every* IsInDesiredStateQuery = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* IsInDesiredStateQuery = NewObject<URpaiStateQuery_Every>();
 					IsInDesiredStateQuery->SetSubQueries({ IsNotCarryingWoodQuery, IsNotChoppingWoodQuery, CloseToWoodStoreQuery });
 
 					GatherWood->SetIsInDesiredStateQuery(IsInDesiredStateQuery);
 
 					// Distance: Based on whether we have any wood, we need to chop down a tree, and if we are actively chopping, as well as were wood is dropped off
-					// This is complex distance requiring UDistance_Select. We do not care about the distance to the next tree to cut if we are carrying wood, we only
+					// This is complex distance requiring URpaiDistance_Select. We do not care about the distance to the next tree to cut if we are carrying wood, we only
 					// care about the distance to the wood store location if we are carrying wood, so on and so forth
-					UDistance_Bool* IsCarryingWoodDistance = NewObject<UDistance_Bool>();
+					URpaiDistance_Bool* IsCarryingWoodDistance = NewObject<URpaiDistance_Bool>();
 					IsCarryingWoodDistance->SetLHS("IsCarryingWood", EStatePropertyType::Bool);
 					IsCarryingWoodDistance->SetRHS(true);
 
-					UStateQuery_CompareToBool* IsCarryingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					URpaiStateQuery_CompareToBool* IsCarryingWoodQuery = NewObject<URpaiStateQuery_CompareToBool>();
 					IsCarryingWoodQuery->SetQueriedState("IsCarryingWood", EStatePropertyType::Bool);
 					IsCarryingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::EqualTo);
 					IsCarryingWoodQuery->SetComparisonValue(true);
 
-					UDistance_Bool* IsChoppingWoodDistance = NewObject<UDistance_Bool>();
+					URpaiDistance_Bool* IsChoppingWoodDistance = NewObject<URpaiDistance_Bool>();
 					IsChoppingWoodDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
 					IsChoppingWoodDistance->SetRHS(true);
 
-					UDistance_State* DistanceNextTree = NewObject<UDistance_State>();
+					URpaiDistance_State* DistanceNextTree = NewObject<URpaiDistance_State>();
 					DistanceNextTree->SetLHS("CurrentLocation", EStatePropertyType::Vector);
 					DistanceNextTree->SetRHS("NextTreeLocation", EStatePropertyType::Vector);
 
-					UDistance_State* DistanceWoodPile = NewObject<UDistance_State>();
+					URpaiDistance_State* DistanceWoodPile = NewObject<URpaiDistance_State>();
 					DistanceWoodPile->SetLHS("CurrentLocation", EStatePropertyType::Vector);
 					DistanceWoodPile->SetRHS("WoodStoreLocation", EStatePropertyType::Vector);
 
@@ -148,12 +148,12 @@ void ReasonablePlanningComposerSpec::Define()
 					AlreadyCarryingWood.SelectionQuery = IsCarryingWoodQuery;
 					AlreadyCarryingWood.SelectionDistance = DistanceWoodPile;
 
-					UDistance_Select* GatherWoodDistance = NewObject<UDistance_Select>();
+					URpaiDistance_Select* GatherWoodDistance = NewObject<URpaiDistance_Select>();
 					GatherWoodDistance->SetSelections({
 						AlreadyCarryingWood,
 					});
 
-					UDistance_AddAll* GatherWoodDistanceDefault = NewObject<UDistance_AddAll>();
+					URpaiDistance_AddAll* GatherWoodDistanceDefault = NewObject<URpaiDistance_AddAll>();
 					GatherWoodDistanceDefault->SetSubDistances({ IsChoppingWoodDistance, DistanceNextTree });
 
 					GatherWoodDistance->SetDefault(DistanceNextTree);
@@ -161,7 +161,7 @@ void ReasonablePlanningComposerSpec::Define()
 					GatherWood->SetDistanceCalculator(GatherWoodDistance);
 
 					// Weight: What is the value (utility) of pursuing this goal right now
-					UWeight_CurveFloat* GatherWoodWeight = NewObject<UWeight_CurveFloat>();
+					URpaiWeight_CurveFloat* GatherWoodWeight = NewObject<URpaiWeight_CurveFloat>();
 					GatherWoodWeight->SetWeightStateKeyAndType("TreesInTheForest", EStatePropertyType::Int);
 
 					UCurveFloat* GatherWoodWeightCurve = NewObject<UCurveFloat>();
@@ -175,76 +175,76 @@ void ReasonablePlanningComposerSpec::Define()
 					
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// Sustain Self Goal
-					UReasonablePlanningGoal* SustainSelf = NewObject<UReasonablePlanningGoal>();
+					URpaiComposerGoal* SustainSelf = NewObject<URpaiComposerGoal>();
 
 					// Is Applicable: Is there food or someplace where rest is possible.
-					UStateQuery_CompareToFloat* IsHungry = NewObject<UStateQuery_CompareToFloat>();
+					URpaiStateQuery_CompareToFloat* IsHungry = NewObject<URpaiStateQuery_CompareToFloat>();
 					IsHungry->SetQueriedState("Satiation", EStatePropertyType::Float);
 					IsHungry->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
 					IsHungry->SetComparisonValue(0.5f);
 
-					UStateQuery_CompareToFloat* IsTired = NewObject<UStateQuery_CompareToFloat>();
+					URpaiStateQuery_CompareToFloat* IsTired = NewObject<URpaiStateQuery_CompareToFloat>();
 					IsTired->SetQueriedState("Rest", EStatePropertyType::Float);
 					IsTired->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
 					IsTired->SetComparisonValue(0.1f);
 
-					UStateQuery_CompareToInteger* HasFood = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasFood = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasFood->SetQueriedState("Food", EStatePropertyType::Int);
 					HasFood->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					HasFood->SetComparisonValue(0);
 
-					UStateQuery_CompareToInteger* HasBed = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasBed = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasBed->SetQueriedState("Bed", EStatePropertyType::Int);
 					HasBed->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					HasBed->SetComparisonValue(0);
 
-					UStateQuery_Every* IsRestPossibleOrNeeded = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* IsRestPossibleOrNeeded = NewObject<URpaiStateQuery_Every>();
 					IsRestPossibleOrNeeded->SetSubQueries({ IsTired, HasBed });
 
-					UStateQuery_Every* IsSatiationPossibleOrNeeded = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* IsSatiationPossibleOrNeeded = NewObject<URpaiStateQuery_Every>();
 					IsSatiationPossibleOrNeeded->SetSubQueries({ IsHungry, HasFood });
 
-					UStateQuery_Any* IsApplicable = NewObject<UStateQuery_Any>();
+					URpaiStateQuery_Any* IsApplicable = NewObject<URpaiStateQuery_Any>();
 					IsApplicable->SetSubQueries({ IsTired, IsHungry });
 
 					SustainSelf->SetIsApplicableQuery(IsApplicable);
 
 					// Is In Desired State: Satiated (full and well watered) and well rested.
-					UStateQuery_CompareToFloat* IsNotHungry = NewObject<UStateQuery_CompareToFloat>();
+					URpaiStateQuery_CompareToFloat* IsNotHungry = NewObject<URpaiStateQuery_CompareToFloat>();
 					IsNotHungry->SetQueriedState("Satiation", EStatePropertyType::Float);
 					IsNotHungry->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					IsNotHungry->SetComparisonValue(0.5f);
 
-					UStateQuery_CompareToFloat* IsNotTired = NewObject<UStateQuery_CompareToFloat>();
+					URpaiStateQuery_CompareToFloat* IsNotTired = NewObject<URpaiStateQuery_CompareToFloat>();
 					IsNotTired->SetQueriedState("Rest", EStatePropertyType::Float);
 					IsNotTired->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					IsNotTired->SetComparisonValue(0.1f);
 
-					UStateQuery_Every* IsSustainingSelf = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* IsSustainingSelf = NewObject<URpaiStateQuery_Every>();
 					IsSustainingSelf->SetSubQueries({ IsNotHungry, IsNotTired });
 
 					SustainSelf->SetIsInDesiredStateQuery(IsSustainingSelf);
 					
 					// Distance: How much work will it to eat or sleep, such as getting food or getting to a bed
-					UDistance_State* DistanceToFoodOrRest = NewObject<UDistance_State>();
+					URpaiDistance_State* DistanceToFoodOrRest = NewObject<URpaiDistance_State>();
 					DistanceToFoodOrRest->SetLHS("CurrentLocation", EStatePropertyType::Vector);
 					DistanceToFoodOrRest->SetRHS("TargetFoodOrRest", EStatePropertyType::Vector);
 
 					SustainSelf->SetDistanceCalculator(DistanceToFoodOrRest);
 
 					// Weight: The hungrier or more tired the lumberjack is the more weight
-					UDistance_Float* FullDistance = NewObject<UDistance_Float>();
+					URpaiDistance_Float* FullDistance = NewObject<URpaiDistance_Float>();
 					FullDistance->SetLHS("Satiation", EStatePropertyType::Float);
 					FullDistance->SetRHS(1.f);
 
-					UDistance_Float* RestDistance = NewObject<UDistance_Float>();
+					URpaiDistance_Float* RestDistance = NewObject<URpaiDistance_Float>();
 					RestDistance->SetLHS("Rest", EStatePropertyType::Float);
 					RestDistance->SetRHS(1.f);
 
-					UDistance_AddAll* RestFullDistance = NewObject<UDistance_AddAll>();
+					URpaiDistance_AddAll* RestFullDistance = NewObject<URpaiDistance_AddAll>();
 					RestFullDistance->SetSubDistances({ RestDistance, FullDistance });
 
-					UWeight_Distance* SustainWeight = NewObject<UWeight_Distance>();
+					URpaiWeight_Distance* SustainWeight = NewObject<URpaiWeight_Distance>();
 					SustainWeight->SetDistance(RestFullDistance);
 
 					SustainSelf->SetWeight(SustainWeight);
@@ -254,11 +254,11 @@ void ReasonablePlanningComposerSpec::Define()
 
 					/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 					// Sustain Self Goal
-					UReasonablePlanningGoal* PreserveForest = NewObject<UReasonablePlanningGoal>();
+					URpaiComposerGoal* PreserveForest = NewObject<URpaiComposerGoal>();
 					PreserveForest->SetCategory(1);
 
 					// Is Applicable: There are seeds to plant
-					UStateQuery_CompareToInteger* HasSeeds = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasSeeds = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasSeeds->SetQueriedState("Seeds", EStatePropertyType::Int);
 					HasSeeds->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					HasSeeds->SetComparisonValue(0);
@@ -266,7 +266,7 @@ void ReasonablePlanningComposerSpec::Define()
 					PreserveForest->SetIsApplicableQuery(HasSeeds);
 
 					// Is in Desired State: When we have enough trees planted
-					UStateQuery_CompareToInteger* HasEnoughTrees = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasEnoughTrees = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasEnoughTrees->SetQueriedState("TreesInTheForest", EStatePropertyType::Int);
 					HasEnoughTrees->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThanOrEqualTo);
 					HasEnoughTrees->SetComparisonValue(20);
@@ -274,7 +274,7 @@ void ReasonablePlanningComposerSpec::Define()
 					PreserveForest->SetIsInDesiredStateQuery(HasEnoughTrees);
 
 					// Distance: What is the difference in trees needing to be planted
-					UDistance_Integer* DistanceFromDesiredMinimumTrees = NewObject<UDistance_Integer>();
+					URpaiDistance_Integer* DistanceFromDesiredMinimumTrees = NewObject<URpaiDistance_Integer>();
 					DistanceFromDesiredMinimumTrees->SetLHS("TreesInTheForest", EStatePropertyType::Int);
 					DistanceFromDesiredMinimumTrees->SetRHS(20);
 
@@ -282,7 +282,7 @@ void ReasonablePlanningComposerSpec::Define()
 
 					//Weight: Distance to having no trees
 					// Weight: What is the value (utility) of pursuing this goal right now
-					UWeight_CurveFloat* PreserveWeight = NewObject<UWeight_CurveFloat>();
+					URpaiWeight_CurveFloat* PreserveWeight = NewObject<URpaiWeight_CurveFloat>();
 					PreserveWeight->SetWeightStateKeyAndType("TreesInTheForest", EStatePropertyType::Int);
 
 					UCurveFloat* PreserveWeightCurve = NewObject<UCurveFloat>();
@@ -306,31 +306,31 @@ void ReasonablePlanningComposerSpec::Define()
 					//We are only testing the planning here so we do not need to assign specific ActionTasks
 
 					//Start: Go To Tree
-					UReasonablePlanningAction* GoToTree = NewObject<UReasonablePlanningAction>();
+					URpaiComposerAction* GoToTree = NewObject<URpaiComposerAction>();
 
 					// Is Applicable: We can only go to a tree a tree if we are not chopping one already, we are not carrying wood, and there are trees in the forest
 					// Using the query of NoLogsToCarry to force all logs to be picked up before cutting more trees
-					UStateQuery_CompareToInteger* NoLogsToCarry = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* NoLogsToCarry = NewObject<URpaiStateQuery_CompareToInteger>();
 					NoLogsToCarry->SetQueriedState("LogsLeftToCarry", EStatePropertyType::Int);
 					NoLogsToCarry->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
 					NoLogsToCarry->SetComparisonValue(0);
 
-					UStateQuery_Every* GoToTreeIsApplicable = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* GoToTreeIsApplicable = NewObject<URpaiStateQuery_Every>();
 					GoToTreeIsApplicable->SetSubQueries({ HasTreesInTheForestQuery, IsNotChoppingWoodQuery, IsNotCarryingWoodQuery, NoLogsToCarry });
 					
 					GoToTree->SetIsApplicableQuery(GoToTreeIsApplicable);
 
 					// Weight: Distance from the tree, further is a higher weight
-					UWeight_Distance* DistanceToTreeWeight = NewObject<UWeight_Distance>();
+					URpaiWeight_Distance* DistanceToTreeWeight = NewObject<URpaiWeight_Distance>();
 					DistanceToTreeWeight->SetDistance(DistanceNextTree);
 					GoToTree->SetWeightAlgorithm(DistanceToTreeWeight);
 
 					// Mutator: We will be near the tree if we execute this action, for simplicity we are also chopping a tree if we are near it
-					UStateMutator_CopyState* CopyNextTreeToCurrentLocation = NewObject<UStateMutator_CopyState>();
+					URpaiStateMutator_CopyState* CopyNextTreeToCurrentLocation = NewObject<URpaiStateMutator_CopyState>();
 					CopyNextTreeToCurrentLocation->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
 					CopyNextTreeToCurrentLocation->SetCopiedFromStateValue("NextTreeLocation", EStatePropertyType::Vector);
 
-					UStateMutator_SetValueBool* StartChopping = NewObject<UStateMutator_SetValueBool>();
+					URpaiStateMutator_SetValueBool* StartChopping = NewObject<URpaiStateMutator_SetValueBool>();
 					StartChopping->SetMutatedStateValue("IsChoppingWood", EStatePropertyType::Bool);
 					StartChopping->SetValueToSet(true);
 
@@ -338,67 +338,67 @@ void ReasonablePlanningComposerSpec::Define()
 
 					//End: Go To Tree
 					//Start: Chop Tree
-					UReasonablePlanningAction* ChopTree = NewObject<UReasonablePlanningAction>();
+					URpaiComposerAction* ChopTree = NewObject<URpaiComposerAction>();
 
 					// Is Applicable: Two conditions make this applicable: agent is near a tree in a forest that has trees, or agent is already chopping.
-					UStateQuery_CompareToBool* IsAlreadyChoppingWoodQuery = NewObject<UStateQuery_CompareToBool>();
+					URpaiStateQuery_CompareToBool* IsAlreadyChoppingWoodQuery = NewObject<URpaiStateQuery_CompareToBool>();
 					IsAlreadyChoppingWoodQuery->SetQueriedState("IsChoppingWood", EStatePropertyType::Bool);
 					IsAlreadyChoppingWoodQuery->SetComparisonOperation(EStateQueryCompareToOperation::EqualTo);
 					IsAlreadyChoppingWoodQuery->SetComparisonValue(true);
 
-					UStateQuery_CompareDistanceFloat* CloseToTreeQuery = NewObject<UStateQuery_CompareDistanceFloat>();
+					URpaiStateQuery_CompareDistanceFloat* CloseToTreeQuery = NewObject<URpaiStateQuery_CompareDistanceFloat>();
 					CloseToTreeQuery->SetDistance(DistanceNextTree);
 					CloseToTreeQuery->SetComparisonOperation(EStateQueryCompareToOperation::LessThanOrEqualTo);
 					CloseToTreeQuery->SetRHS(300.f);
 
-					UStateQuery_Every* ChopTreeIsApplicableTreesInForest = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* ChopTreeIsApplicableTreesInForest = NewObject<URpaiStateQuery_Every>();
 					ChopTreeIsApplicableTreesInForest->SetSubQueries({ IsAlreadyChoppingWoodQuery, NoLogsToCarry, HasTreesInTheForestQuery });
 
-					UStateQuery_Every* ChopTreeIsApplicableChopping = NewObject<UStateQuery_Every>();
+					URpaiStateQuery_Every* ChopTreeIsApplicableChopping = NewObject<URpaiStateQuery_Every>();
 					ChopTreeIsApplicableChopping->SetSubQueries({ CloseToTreeQuery, NoLogsToCarry, HasTreesInTheForestQuery });
 
-					UStateQuery_Any* ChopTreeIsApplicable = NewObject<UStateQuery_Any>();
+					URpaiStateQuery_Any* ChopTreeIsApplicable = NewObject<URpaiStateQuery_Any>();
 					ChopTreeIsApplicable->SetSubQueries({ ChopTreeIsApplicableTreesInForest, ChopTreeIsApplicableChopping });
 
 					ChopTree->SetIsApplicableQuery(ChopTreeIsApplicable);
 
 					// Weight: Whether we are chopping or not, how far from even chopping
-					UDistance_Bool* ChopActionDistance = NewObject<UDistance_Bool>();
+					URpaiDistance_Bool* ChopActionDistance = NewObject<URpaiDistance_Bool>();
 					ChopActionDistance->SetLHS("IsChoppingWood", EStatePropertyType::Bool);
 					ChopActionDistance->SetRHS(true);
 
-					UWeight_Distance* ChopActionWeight = NewObject<UWeight_Distance>();
+					URpaiWeight_Distance* ChopActionWeight = NewObject<URpaiWeight_Distance>();
 					ChopActionWeight->SetDistance(ChopActionDistance);
 
-					UWeight_AddAll* ChopWeight = NewObject<UWeight_AddAll>();
+					URpaiWeight_AddAll* ChopWeight = NewObject<URpaiWeight_AddAll>();
 					ChopWeight->SetSubWeights({ DistanceToTreeWeight, ChopActionWeight });
 
 					ChopTree->SetWeightAlgorithm(ChopWeight);
 
 					// Mutators: Mutators should try to only reflect state after the action is completed.
-					UStateMutator_CopyState* ChoppedWoodLocation = NewObject<UStateMutator_CopyState>();
+					URpaiStateMutator_CopyState* ChoppedWoodLocation = NewObject<URpaiStateMutator_CopyState>();
 					ChoppedWoodLocation->SetMutatedStateValue("NextLogLocation", EStatePropertyType::Vector);
 					ChoppedWoodLocation->SetCopiedFromStateValue("CurrentLocation", EStatePropertyType::Vector);
 
-					UStateMutator_AddInteger* AddLogsToCarry = NewObject<UStateMutator_AddInteger>();
+					URpaiStateMutator_AddInteger* AddLogsToCarry = NewObject<URpaiStateMutator_AddInteger>();
 					AddLogsToCarry->SetMutatedStateValue("LogsLeftToCarry", EStatePropertyType::Int);
 					AddLogsToCarry->SetIntegerValueToAdd(1);
 
-					UStateMutator_AddInteger* RemoveTreeFromForest = NewObject<UStateMutator_AddInteger>();
+					URpaiStateMutator_AddInteger* RemoveTreeFromForest = NewObject<URpaiStateMutator_AddInteger>();
 					RemoveTreeFromForest->SetMutatedStateValue("TreesInTheForest", EStatePropertyType::Int);
 					RemoveTreeFromForest->SetIntegerValueToAdd(-100); //For test purposes we will chop down all trees in this one iteration, this is so we can fudge it and avoid goal selection of planting seeds
 
-					UStateMutator_SetValueBool* NoLongerChoppingWood = NewObject<UStateMutator_SetValueBool>();
+					URpaiStateMutator_SetValueBool* NoLongerChoppingWood = NewObject<URpaiStateMutator_SetValueBool>();
 					NoLongerChoppingWood->SetMutatedStateValue("IsChoppingWood", EStatePropertyType::Bool);
 					NoLongerChoppingWood->SetValueToSet(false);
 
 					ChopTree->SetStateMutators({ AddLogsToCarry, ChoppedWoodLocation, RemoveTreeFromForest, NoLongerChoppingWood });
 					//End: Chop Tree
 					//Start: GoToLogToCarry
-					UReasonablePlanningAction* GoToLogToCarry = NewObject<UReasonablePlanningAction>();
+					URpaiComposerAction* GoToLogToCarry = NewObject<URpaiComposerAction>();
 					
 					// Is Applicable: are there logs to carry
-					UStateQuery_CompareToInteger* HasLogsToCarryQuery = NewObject<UStateQuery_CompareToInteger>();
+					URpaiStateQuery_CompareToInteger* HasLogsToCarryQuery = NewObject<URpaiStateQuery_CompareToInteger>();
 					HasLogsToCarryQuery->SetQueriedState("LogsLeftToCarry", EStatePropertyType::Int);
 					HasLogsToCarryQuery->SetComparisonOperation(EStateQueryCompareToOperation::GreaterThan);
 					HasLogsToCarryQuery->SetComparisonValue(0);
@@ -406,25 +406,25 @@ void ReasonablePlanningComposerSpec::Define()
 					GoToLogToCarry->SetIsApplicableQuery(HasLogsToCarryQuery);
 
 					// Weight: How far to the log
-					UDistance_State* DistanceToNextLog = NewObject<UDistance_State>();
+					URpaiDistance_State* DistanceToNextLog = NewObject<URpaiDistance_State>();
 					DistanceToNextLog->SetLHS("CurrentLocation", EStatePropertyType::Vector);
 					DistanceToNextLog->SetRHS("NextLogLocation", EStatePropertyType::Vector);
 
-					UWeight_Distance* GoToLogToCarryWeight = NewObject<UWeight_Distance>();
+					URpaiWeight_Distance* GoToLogToCarryWeight = NewObject<URpaiWeight_Distance>();
 					GoToLogToCarryWeight->SetDistance(DistanceToNextLog);
 
 					GoToLogToCarry->SetWeightAlgorithm(GoToLogToCarryWeight);
 
 					// Mutators: agent is now carrying a log
-					UStateMutator_CopyState* AtLogMutator = NewObject<UStateMutator_CopyState>();
+					URpaiStateMutator_CopyState* AtLogMutator = NewObject<URpaiStateMutator_CopyState>();
 					AtLogMutator->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
 					AtLogMutator->SetCopiedFromStateValue("NextLogLocation", EStatePropertyType::Vector);
 
-					UStateMutator_SetValueBool* CarryingLogMutator = NewObject<UStateMutator_SetValueBool>();
+					URpaiStateMutator_SetValueBool* CarryingLogMutator = NewObject<URpaiStateMutator_SetValueBool>();
 					CarryingLogMutator->SetMutatedStateValue("IsCarryingWood", EStatePropertyType::Bool);
 					CarryingLogMutator->SetValueToSet(true);
 
-					UStateMutator_AddInteger* OneLessLogToCarry = NewObject<UStateMutator_AddInteger>();
+					URpaiStateMutator_AddInteger* OneLessLogToCarry = NewObject<URpaiStateMutator_AddInteger>();
 					OneLessLogToCarry->SetMutatedStateValue("LogsLeftToCarry", EStatePropertyType::Int);
 					OneLessLogToCarry->SetIntegerValueToAdd(-1);
 
@@ -432,23 +432,23 @@ void ReasonablePlanningComposerSpec::Define()
 
 					//End: GoToLogToCarry
 					//Start: TakeWoodToPile
-					UReasonablePlanningAction* TakeWoodToPile = NewObject<UReasonablePlanningAction>();
+					URpaiComposerAction* TakeWoodToPile = NewObject<URpaiComposerAction>();
 
 					// IsApplicable: We are carrying wood
 					TakeWoodToPile->SetIsApplicableQuery(IsCarryingWoodQuery);
 
 					// Weight: Distance to the wood pile
-					UWeight_Distance* TakeWoodToPileWeight = NewObject<UWeight_Distance>();
+					URpaiWeight_Distance* TakeWoodToPileWeight = NewObject<URpaiWeight_Distance>();
 					TakeWoodToPileWeight->SetDistance(DistanceWoodPile);
 
 					TakeWoodToPile->SetWeightAlgorithm(TakeWoodToPileWeight);
 
 					// Mutator: no longer carrying wood and our location is now at the wood pile
-					UStateMutator_CopyState* AtWoodPileMutator = NewObject<UStateMutator_CopyState>();
+					URpaiStateMutator_CopyState* AtWoodPileMutator = NewObject<URpaiStateMutator_CopyState>();
 					AtWoodPileMutator->SetMutatedStateValue("CurrentLocation", EStatePropertyType::Vector);
 					AtWoodPileMutator->SetCopiedFromStateValue("WoodStoreLocation", EStatePropertyType::Vector);
 
-					UStateMutator_SetValueBool* NotCarryingWoodMutator = NewObject<UStateMutator_SetValueBool>();
+					URpaiStateMutator_SetValueBool* NotCarryingWoodMutator = NewObject<URpaiStateMutator_SetValueBool>();
 					NotCarryingWoodMutator->SetMutatedStateValue("IsCarryingWood", EStatePropertyType::Bool);
 					NotCarryingWoodMutator->SetValueToSet(false);
 
@@ -470,7 +470,7 @@ void ReasonablePlanningComposerSpec::Define()
 						{
 							GivenState->SetFloat("Rest", 0.05f);
 
-							UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
+							URpaiGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 							TestEqual("ReasonNextGoal", ActualGoal, GivenGoals[1]);
 						});
 				});
@@ -481,7 +481,7 @@ void ReasonablePlanningComposerSpec::Define()
 						{
 							GivenState->SetFloat("Satiation", 0.1f);
 
-							UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
+							URpaiGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 							TestEqual("ReasonNextGoal", ActualGoal, GivenGoals[1]);
 						});
 				});
@@ -496,7 +496,7 @@ void ReasonablePlanningComposerSpec::Define()
 							for (int32 Idx = 0; Idx < 50; ++Idx)
 							{
 								GivenState->SetInt("TreesInTheForest", 100 - Idx);
-								UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
+								URpaiGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 								if (ActualGoal == GivenGoals[2])
 								{
 									PreserveCount++;
@@ -525,7 +525,7 @@ void ReasonablePlanningComposerSpec::Define()
 							for (int32 Idx = 0; Idx < 20; ++Idx)
 							{
 								GivenState->SetInt("TreesInTheForest", Idx);
-								UReasonablePlanningGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
+								URpaiGoalBase* ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 								if (ActualGoal == GivenGoals[2])
 								{
 									PreserveCount++;
@@ -557,7 +557,7 @@ void ReasonablePlanningComposerSpec::Define()
 									auto ActualGoal = GivenReasoner->ReasonNextGoal(GivenGoals, GivenState);
 									TestEqual("Selected Goal", ActualGoal, GivenGoals[0]);
 
-									TArray<UReasonablePlanningActionBase*> ActualActions;
+									TArray<URpaiActionBase*> ActualActions;
 									bool bSuccess = GivenPlanner->PlanChosenGoal(ActualGoal, GivenState, GivenActions, ActualActions);
 
 									TestTrue("Success", bSuccess);

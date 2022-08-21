@@ -271,7 +271,7 @@ EStatePropertyType UTestPlanningState::GetTypeFromName(FName ValueName) const
 	else { return EStatePropertyType::Invalid; }
 }
 
-void UTestPlanningState::CopyStateForPredictionTo(UReasonablePlanningState* OtherState) const
+void UTestPlanningState::CopyStateForPredictionTo(URpaiState* OtherState) const
 {
 	UTestPlanningState* OtherTestState = Cast<UTestPlanningState>(OtherState);
 	check(OtherTestState != nullptr);
@@ -297,12 +297,12 @@ UTestAction::UTestAction()
 
 }
 
-void UTestAction::ReceiveApplyToState_Implementation(UReasonablePlanningState* GivenState) const
+void UTestAction::ReceiveApplyToState_Implementation(URpaiState* GivenState) const
 {
 	GivenState->SetInt(KeyToApply, ValueToApply);
 }
 
-bool UTestAction::ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const
+bool UTestAction::ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const
 {
 	if (IsApplicable)
 	{
@@ -315,7 +315,7 @@ bool UTestAction::ReceiveIsApplicable_Implementation(const UReasonablePlanningSt
 	return false;
 }
 
-float UTestAction::ReceiveExecutionWeight_Implementation(const UReasonablePlanningState* GivenState) const
+float UTestAction::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
 	return Weight;
 }
@@ -329,12 +329,12 @@ UTestGoal::UTestGoal()
 
 }
 
-bool UTestGoal::ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const
+bool UTestGoal::ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const
 {
 	return true;
 }
 
-bool UTestGoal::ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
+bool UTestGoal::ReceiveIsInDesiredState_Implementation(const URpaiState* GivenState) const
 {
 	int32 StateAValue = 0;
 	int32 StateBValue = 0;
@@ -347,7 +347,7 @@ bool UTestGoal::ReceiveIsInDesiredState_Implementation(const UReasonablePlanning
 }
 
 //Unordered planning distance
-float UTestGoal::ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const
+float UTestGoal::ReceiveGetDistanceToDesiredState_Implementation(const URpaiState* GivenState) const
 {
 	int32 StateAValue = 0;
 	int32 StateBValue = 0;
@@ -359,7 +359,7 @@ float UTestGoal::ReceiveGetDistanceToDesiredState_Implementation(const UReasonab
 	return TNumericLimits<float>::Max();
 }
 
-float UTestGoal::ReceiveGetWeight_Implementation(const UReasonablePlanningState* GivenState) const
+float UTestGoal::ReceiveGetWeight_Implementation(const URpaiState* GivenState) const
 {
 	return Weight;
 }

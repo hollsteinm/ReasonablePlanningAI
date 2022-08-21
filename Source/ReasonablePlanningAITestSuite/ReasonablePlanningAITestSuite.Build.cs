@@ -13,7 +13,6 @@ namespace UnrealBuildTool.Rules
 
 			PublicDependencyModuleNames.AddRange(
 				new[] {
-					"AITestSuite",
 					"Core",
 					"CoreUObject",
 					"Engine",

@@ -1,14 +1,14 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "Reasoners/Reasoner_DualUtility.h"
-#include "Reasoners/Reasoner_AbsoluteUtility.h"
-#include "States/State_Map.h"
+#include "Reasoners/RpaiReasoner_DualUtility.h"
+#include "Reasoners/RpaiReasoner_AbsoluteUtility.h"
+#include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningReasonersSpec, "ReasonablePlanningAI.Reasoners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UReasonablePlanningReasonerBase* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
-	TArray<UReasonablePlanningGoalBase*> GivenGoals;
-TArray<UReasonablePlanningActionBase*> GivenActions;
+	URpaiReasonerBase* ClassUnderTest;
+	URpaiState* GivenState;
+	TArray<URpaiGoalBase*> GivenGoals;
+TArray<URpaiActionBase*> GivenActions;
 END_DEFINE_SPEC(ReasonablePlanningReasonersSpec)
 void ReasonablePlanningReasonersSpec::Define()
 {
@@ -16,14 +16,14 @@ void ReasonablePlanningReasonersSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 					MapState->SetValueOfType(UTestGoal::ConditionAKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionBKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionCKey, 0);
 					MapState->SetAsDynamic(false);
 
-					ClassUnderTest = NewObject<UReasoner_DualUtility>();
+					ClassUnderTest = NewObject<URpaiReasoner_DualUtility>();
 					GivenState = MapState;
 				});
 
@@ -50,7 +50,7 @@ void ReasonablePlanningReasonersSpec::Define()
 						{
 							auto Actual = ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState);
 							auto Expected = GivenGoals[2];
-							TestEqual("UReasoner_DualUtility::ReasonNextGoal", Actual, Expected);
+							TestEqual("URpaiReasoner_DualUtility::ReasonNextGoal", Actual, Expected);
 						});
 
 					AfterEach([this]()
@@ -75,7 +75,7 @@ void ReasonablePlanningReasonersSpec::Define()
 						{
 							auto Actual = ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState);
 							auto Expected = GivenGoals[0];
-							TestEqual("UReasoner_DualUtility::ReasonNextGoal", Actual, Expected);
+							TestEqual("URpaiReasoner_DualUtility::ReasonNextGoal", Actual, Expected);
 						});
 
 					AfterEach([this]()
@@ -96,7 +96,7 @@ void ReasonablePlanningReasonersSpec::Define()
 
 					It("should return null", [this]()
 						{
-							TestEqual("UReasoner_DualUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), (UReasonablePlanningGoalBase*)nullptr);
+							TestEqual("URpaiReasoner_DualUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), (URpaiGoalBase*)nullptr);
 						});
 				});
 
@@ -112,14 +112,14 @@ void ReasonablePlanningReasonersSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 					MapState->SetValueOfType(UTestGoal::ConditionAKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionBKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionCKey, 0);
 					MapState->SetAsDynamic(false);
 
-					ClassUnderTest = NewObject<UReasoner_AbsoluteUtility>();
+					ClassUnderTest = NewObject<URpaiReasoner_AbsoluteUtility>();
 					GivenState = MapState;
 				});
 
@@ -146,7 +146,7 @@ void ReasonablePlanningReasonersSpec::Define()
 
 							It("should select the goal with the highest weight", [this]()
 								{
-									TestEqual("UReasoner_AbsoluteUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), GivenGoals[1]);
+									TestEqual("URpaiReasoner_AbsoluteUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), GivenGoals[1]);
 								});
 
 							AfterEach([this]()
@@ -171,7 +171,7 @@ void ReasonablePlanningReasonersSpec::Define()
 								{
 									auto Actual = ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState);
 									auto Expected = GivenGoals[0];
-									TestEqual("UReasoner_AbsoluteUtility::ReasonNextGoal", Actual, Expected);
+									TestEqual("URpaiReasoner_AbsoluteUtility::ReasonNextGoal", Actual, Expected);
 								});
 
 							AfterEach([this]()
@@ -192,7 +192,7 @@ void ReasonablePlanningReasonersSpec::Define()
 
 							It("should return null", [this]()
 								{
-									TestEqual("UReasoner_AbsoluteUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), (UReasonablePlanningGoalBase*)nullptr);
+									TestEqual("URpaiReasoner_AbsoluteUtility::ReasonNextGoal", ClassUnderTest->ReasonNextGoal(GivenGoals, GivenState), (URpaiGoalBase*)nullptr);
 								});
 						});
 				});

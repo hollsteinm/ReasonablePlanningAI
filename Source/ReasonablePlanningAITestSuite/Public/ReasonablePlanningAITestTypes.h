@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Core/ReasonablePlanningState.h"
-#include "Core/ReasonablePlanningActionBase.h"
-#include "Core/ReasonablePlanningGoalBase.h"
+#include "Core/RpaiState.h"
+#include "Core/RpaiActionBase.h"
+#include "Core/RpaiGoalBase.h"
 #include "ReasonablePlanningAITestTypes.generated.h"
 
 UENUM()
@@ -13,8 +13,8 @@ enum class ETestEnum : uint8
 	C
 };
 
-UCLASS()
-class UTestPlanningState : public UReasonablePlanningState
+UCLASS(HideDropdown)
+class UTestPlanningState : public URpaiState
 {
 	GENERATED_BODY()
 private:
@@ -73,11 +73,11 @@ public:
 	virtual bool HasVector(FName ValueName) const override;
 	virtual bool HasValueWithName(FName ValueName) const override;
 	virtual EStatePropertyType GetTypeFromName(FName ValueName) const override;
-	virtual void CopyStateForPredictionTo(UReasonablePlanningState * OtherState) const override;
+	virtual void CopyStateForPredictionTo(URpaiState* OtherState) const override;
 };
 
-UCLASS()
-class UTestAction : public UReasonablePlanningActionBase
+UCLASS(HideDropdown)
+class UTestAction : public URpaiActionBase
 {
 	GENERATED_BODY()
 
@@ -92,13 +92,13 @@ public:
 protected:
 	//Only implement the planning heuristic functions
 
-	virtual void ReceiveApplyToState_Implementation(UReasonablePlanningState* GivenState) const override;
-	virtual bool ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const override;
-	virtual float ReceiveExecutionWeight_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual void ReceiveApplyToState_Implementation(URpaiState* GivenState) const override;
+	virtual bool ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const override;
+	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 };
 
-UCLASS()
-class UTestGoal : public UReasonablePlanningGoalBase
+UCLASS(HideDropdown)
+class UTestGoal : public URpaiGoalBase
 {
 	GENERATED_BODY()
 
@@ -114,8 +114,8 @@ public:
 
 	float Weight;
 
-	virtual bool ReceiveIsInDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
-	virtual float ReceiveGetDistanceToDesiredState_Implementation(const UReasonablePlanningState* GivenState) const override;
-	virtual float ReceiveGetWeight_Implementation(const UReasonablePlanningState* GivenState) const override;
-	virtual bool ReceiveIsApplicable_Implementation(const UReasonablePlanningState* GivenState) const override;
+	virtual bool ReceiveIsInDesiredState_Implementation(const URpaiState* GivenState) const override;
+	virtual float ReceiveGetDistanceToDesiredState_Implementation(const URpaiState* GivenState) const override;
+	virtual float ReceiveGetWeight_Implementation(const URpaiState* GivenState) const override;
+	virtual bool ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const override;
 };

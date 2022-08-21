@@ -1,17 +1,17 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "Composer/ReasonablePlanningDistance.h"
-#include "Composer/Distances/Distance_State.h"
-#include "Composer/Distances/Distance_Bool.h"
-#include "Composer/Distances/Distance_Float.h"
-#include "Composer/Distances/Distance_Integer.h"
-#include "Composer/Distances/Distance_Rotator.h"
-#include "Composer/Distances/Distance_Vector.h"
-#include "States/State_Map.h"
+#include "Composer/RpaiComposerDistance.h"
+#include "Composer/Distances/RpaiDistance_State.h"
+#include "Composer/Distances/RpaiDistance_Bool.h"
+#include "Composer/Distances/RpaiDistance_Float.h"
+#include "Composer/Distances/RpaiDistance_Integer.h"
+#include "Composer/Distances/RpaiDistance_Rotator.h"
+#include "Composer/Distances/RpaiDistance_Vector.h"
+#include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec, "ReasonablePlanningAI.Distance.Bool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-    UDistance_Bool* ClassUnderTest;
-    UReasonablePlanningState* GivenState;
+    URpaiDistance_Bool* ClassUnderTest;
+    URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec)
 void ReasonablePlanningDistanceBoolSpec::Define()
 {
@@ -19,10 +19,10 @@ void ReasonablePlanningDistanceBoolSpec::Define()
         {
             BeforeEach([this]()
                 {
-                    auto MapState = NewObject<UState_Map>();
+                    auto MapState = NewObject<URpaiState_Map>();
                     MapState->SetAsDynamic(true);
                     
-                    ClassUnderTest = NewObject<UDistance_Bool>();
+                    ClassUnderTest = NewObject<URpaiDistance_Bool>();
                     GivenState = MapState;
                 });
         
@@ -32,81 +32,81 @@ void ReasonablePlanningDistanceBoolSpec::Define()
 
                     GivenState->SetBool("LHS", true);
 					ClassUnderTest->SetRHS(true);
-                    TestEqual("UDistance_Bool::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+                    TestEqual("URpaiDistance_Bool::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
                     GivenState->SetBool("LHS", true);
                     ClassUnderTest->SetRHS(false);
-                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+                    TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
 
                     GivenState->SetBool("LHS", false);
                     ClassUnderTest->SetRHS(false);
-                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+                    TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
                     GivenState->SetBool("LHS", false);
                     ClassUnderTest->SetRHS(true);
-                    TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+                    TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 1.f);
                 });
         
             It("Should return max value if the state value is a class", [this]()
                 {
                     ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 					
                 });
 
 			It("Should return max value if the state value is a enum", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Enum);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a float", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a int", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a name", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Name);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a object", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Object);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a rotator", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a string", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::String);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a vector", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
         
@@ -119,8 +119,8 @@ void ReasonablePlanningDistanceBoolSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceFloatSpec, "ReasonablePlanningAI.Distance.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UDistance_Float* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+	URpaiDistance_Float* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceFloatSpec)
 void ReasonablePlanningDistanceFloatSpec::Define()
 {
@@ -128,10 +128,10 @@ void ReasonablePlanningDistanceFloatSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UDistance_Float>();
+					ClassUnderTest = NewObject<URpaiDistance_Float>();
 					GivenState = MapState;
 				});
 
@@ -140,7 +140,7 @@ void ReasonablePlanningDistanceFloatSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
 					GivenState->SetFloat("LHS", 50.0f);
 					ClassUnderTest->SetRHS(100.0f);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 50.f);
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 50.f);
 				});
 
 			It("Should support integer differences as well for LHS", [this]()
@@ -148,55 +148,55 @@ void ReasonablePlanningDistanceFloatSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
 					GivenState->SetInt("LHS", 200);
 					ClassUnderTest->SetRHS(54.6f);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 146.f);
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 146.f);
 				});
 
 			It("Should return max value if the state value is a class", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a enum", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Enum);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a bool", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Bool);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a name", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Name);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a object", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Object);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a rotator", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a string", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::String);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a vector", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			AfterEach([this]()
@@ -208,8 +208,8 @@ void ReasonablePlanningDistanceFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceIntegerSpec, "ReasonablePlanningAI.Distance.Integer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UDistance_Integer* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+	URpaiDistance_Integer* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceIntegerSpec)
 void ReasonablePlanningDistanceIntegerSpec::Define()
 {
@@ -217,10 +217,10 @@ void ReasonablePlanningDistanceIntegerSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UDistance_Integer>();
+					ClassUnderTest = NewObject<URpaiDistance_Integer>();
 					GivenState = MapState;
 				});
 
@@ -229,11 +229,11 @@ void ReasonablePlanningDistanceIntegerSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
 					GivenState->SetInt("LHS", 25);
 					ClassUnderTest->SetRHS(75);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 50.f);
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 50.f);
 
 					GivenState->SetInt("LHS", 4000);
 					ClassUnderTest->SetRHS(5);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 3995.f);
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 3995.f);
 				});
 
 			It("Should support float differences as well for LHS", [this]()
@@ -241,56 +241,56 @@ void ReasonablePlanningDistanceIntegerSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
 					GivenState->SetFloat("LHS", 200.5f);
 					ClassUnderTest->SetRHS(50);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 150.5f);
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 150.5f);
 				});
 
 			It("Should return max value if the state value is a class", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a enum", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Enum);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a bool", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Bool);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a name", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Name);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a object", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Object);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a rotator", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a string", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::String);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a vector", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			AfterEach([this]()
@@ -302,8 +302,8 @@ void ReasonablePlanningDistanceIntegerSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceRotatorSpec, "ReasonablePlanningAI.Distance.Rotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UDistance_Rotator* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+	URpaiDistance_Rotator* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceRotatorSpec)
 void ReasonablePlanningDistanceRotatorSpec::Define()
 {
@@ -311,10 +311,10 @@ void ReasonablePlanningDistanceRotatorSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UDistance_Rotator>();
+					ClassUnderTest = NewObject<URpaiDistance_Rotator>();
 					GivenState = MapState;
 				});
 
@@ -326,63 +326,63 @@ void ReasonablePlanningDistanceRotatorSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
 					GivenState->SetRotator("LHS", GivenLHS);
 					ClassUnderTest->SetRHS(GivenRHS);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(GivenLHS.GetManhattanDistance(GivenRHS)));
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(GivenLHS.GetManhattanDistance(GivenRHS)));
 				});
 
 			It("Should return max value if the state value is a float", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a integer", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 
 			It("Should return max value if the state value is a class", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a enum", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Enum);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a bool", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Bool);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a name", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Name);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a object", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Object);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a string", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::String);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a vector", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			AfterEach([this]()
@@ -394,8 +394,8 @@ void ReasonablePlanningDistanceRotatorSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceVectorSpec, "ReasonablePlanningAI.Distance.Vector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UDistance_Vector* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+	URpaiDistance_Vector* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceVectorSpec)
 void ReasonablePlanningDistanceVectorSpec::Define()
 {
@@ -403,10 +403,10 @@ void ReasonablePlanningDistanceVectorSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UDistance_Vector>();
+					ClassUnderTest = NewObject<URpaiDistance_Vector>();
 					GivenState = MapState;
 				});
 
@@ -418,63 +418,63 @@ void ReasonablePlanningDistanceVectorSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
 					GivenState->SetVector("LHS", GivenLHS);
 					ClassUnderTest->SetRHS(GivenRHS);
-					TestEqual("UDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(GivenLHS, GivenRHS)));
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(GivenLHS, GivenRHS)));
 				});
 
 			It("Should return max value if the state value is a float", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a integer", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 
 			It("Should return max value if the state value is a class", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Class);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a enum", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Enum);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a bool", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Bool);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a name", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Name);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a object", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Object);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 
 				});
 
 			It("Should return max value if the state value is a rotator", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			It("Should return max value if the state value is a string", [this]()
 				{
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::String);
-					TestEqual("UDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
+					TestEqual("URpaiDistance_Bool:::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), TNumericLimits<float>::Max());
 				});
 
 			AfterEach([this]()
@@ -486,8 +486,8 @@ void ReasonablePlanningDistanceVectorSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec, "ReasonablePlanningAI.Distance.State", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-    UDistance_State* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+    URpaiDistance_State* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec)
 void ReasonablePlanningDistanceStateSpec::Define()
 {
@@ -495,10 +495,10 @@ void ReasonablePlanningDistanceStateSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 
-					ClassUnderTest = NewObject<UDistance_State>();
+					ClassUnderTest = NewObject<URpaiDistance_State>();
 					GivenState = MapState;
 				});
 
@@ -510,7 +510,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 					GivenState->SetVector("RHS", RHS);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Vector);
-					TestEqual("UDistance_State::CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(LHS, RHS)));
+					TestEqual("URpaiDistance_State::CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(LHS, RHS)));
 				});
 
 			It("Should return the difference between two floats", [this]()
@@ -519,7 +519,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 					GivenState->SetFloat("RHS", 10.f);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Float);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Float);
-					TestEqual("UDistance_State::CalculateDistance - Float", ClassUnderTest->CalculateDistance(GivenState), 90.3f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Float", ClassUnderTest->CalculateDistance(GivenState), 90.3f);
 				});
 
 			It("Should return the difference between two integers", [this]()
@@ -528,7 +528,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 					GivenState->SetInt("RHS", 30);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Int);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Int);
-					TestEqual("UDistance_State::CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 55.f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Int", ClassUnderTest->CalculateDistance(GivenState), 55.f);
 				});
 
 			It("Should return a 0 or 1 as the difference between two bools", [this]()
@@ -538,19 +538,19 @@ void ReasonablePlanningDistanceStateSpec::Define()
 
 					GivenState->SetBool("LHS", true);
 					GivenState->SetBool("RHS", false);
-					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
 
 					GivenState->SetBool("LHS", true);
 					GivenState->SetBool("RHS", true);
-					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
 					GivenState->SetBool("LHS", false);
 					GivenState->SetBool("RHS", false);
-					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 0.f);
 
 					GivenState->SetBool("LHS", false);
 					GivenState->SetBool("RHS", true);
-					TestEqual("UDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
+					TestEqual("URpaiDistance_State::CalculateDistance - Bool", ClassUnderTest->CalculateDistance(GivenState), 1.f);
 				});
 
 			It("Should return the Manhattan distance between two rotators", [this]()
@@ -575,7 +575,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					ClassUnderTest = NewObject<UDistance_State>();
+					ClassUnderTest = NewObject<URpaiDistance_State>();
 					GivenState = NewObject<UTestPlanningState>();
 				});
 

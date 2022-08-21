@@ -1,22 +1,22 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "States/State_Map.h"
+#include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UState_Map* ClassUnderTest;
+	URpaiState_Map* ClassUnderTest;
 END_DEFINE_SPEC(ReasonablePlanningStateMapSpec)
 void ReasonablePlanningStateMapSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UState_Map>();
+			ClassUnderTest = NewObject<URpaiState_Map>();
 			ClassUnderTest->SetAsDynamic(true);
 			ClassUnderTest->SetBool(UTestPlanningState::NAME_TheBoolValue, false);
-			ClassUnderTest->SetClassValue(UTestPlanningState::NAME_TheClassValue, UState_Map::StaticClass());
+			ClassUnderTest->SetClassValue(UTestPlanningState::NAME_TheClassValue, URpaiState_Map::StaticClass());
 			ClassUnderTest->SetFloat(UTestPlanningState::NAME_TheFloatValue, 0.f);
 			ClassUnderTest->SetInt(UTestPlanningState::NAME_TheIntValue, 0);
 			ClassUnderTest->SetNameValue(UTestPlanningState::NAME_TheNameValue, NAME_None);
-			ClassUnderTest->SetObject(UTestPlanningState::NAME_TheObjectValue, NewObject<UState_Map>(ClassUnderTest));
+			ClassUnderTest->SetObject(UTestPlanningState::NAME_TheObjectValue, NewObject<URpaiState_Map>(ClassUnderTest));
 			ClassUnderTest->SetRotator(UTestPlanningState::NAME_TheRotatorValue, FRotator::ZeroRotator);
 			ClassUnderTest->SetString(UTestPlanningState::NAME_TheStringValue, FString("Hello World"));
 			ClassUnderTest->SetVector(UTestPlanningState::NAME_TheVectorValue, FVector::ZeroVector);
@@ -40,7 +40,7 @@ void ReasonablePlanningStateMapSpec::Define()
 					TestTrue("HasClass", ClassUnderTest->HasClass(UTestPlanningState::NAME_TheClassValue));
 					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheClassValue));
 					TestTrue("GetClassValue", ClassUnderTest->GetClassValue(UTestPlanningState::NAME_TheClassValue, Clazz));
-					TestEqual("Class is equal", Clazz, UState_Map::StaticClass());
+					TestEqual("Class is equal", Clazz, URpaiState_Map::StaticClass());
 				});
 
 			It("should get the defined float value", [this]()
@@ -176,7 +176,7 @@ void ReasonablePlanningStateMapSpec::Define()
 
 			It("should set and create a new object value", [this]()
 				{
-					UObject* Value = NewObject<UState_Map>(ClassUnderTest);
+					UObject* Value = NewObject<URpaiState_Map>(ClassUnderTest);
 					UObject* Expected = Value;
 					const FName Key = "AnObjectValue";
 					ClassUnderTest->SetObject(Key, Value);
@@ -282,7 +282,7 @@ void ReasonablePlanningStateMapSpec::Define()
 
 			It("should not set and create a new object value", [this]()
 				{
-					UObject* Value = NewObject<UState_Map>(ClassUnderTest);
+					UObject* Value = NewObject<URpaiState_Map>(ClassUnderTest);
 					const FName Key = "AnObjectValue2";
 					ClassUnderTest->SetObject(Key, Value);
 					TestFalse("HasObject", ClassUnderTest->HasObject(Key));
@@ -332,26 +332,26 @@ void ReasonablePlanningStateMapSpec::Define()
 				{
 					It("Should be free", [this]()
 						{
-							TestTrue("IsResourceFree", ClassUnderTest->IsResourceFree("RPAI.Test.LockedResourceA"));
+							TestTrue("IsResourceFree", ClassUnderTest->IsResourceFree("Rpai.Test.LockedResourceA"));
 						});
 
 					It("Should not allow unlocking", [this]()
 						{
-							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("RPAI.Test.LockedResourceA"));
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResourceA"));
 						});
 
 					It("Should not allow unlocking from a different lock object", [this]()
 						{
-							UState_Map* Temp = NewObject<UState_Map>(ClassUnderTest);
-							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("RPAI.Test.LockedResourceA"));
+							URpaiState_Map* Temp = NewObject<URpaiState_Map>(ClassUnderTest);
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResourceA"));
 							Temp->ConditionalBeginDestroy();
 						});
 
 					It("Should indicate locks on heirarchy", [this]()
 						{
-							TestFalse("DoesHeirarchyHaveAnyLocks - RPAI", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI"));
-							TestFalse("DoesHeirarchyHaveAnyLocks - RPAI.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI.Test"));
-							TestFalse("DoesHeirarchyHaveAnyLocks - RPAI.Test.LockedResourceA", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI.Test.LockedResourceA"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai.Test.LockedResourceA", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test.LockedResourceA"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - Test.LockedResourceA", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test.LockedResourceA"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("LockedResourceA"));
@@ -362,7 +362,7 @@ void ReasonablePlanningStateMapSpec::Define()
 				{
 					It("Should Allow Locking", [this]()
 						{
-							TestTrue("LockResource", ClassUnderTest->LockResource("RPAI.Test.LockedResource2"));
+							TestTrue("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
 						});
 				});
 
@@ -370,48 +370,48 @@ void ReasonablePlanningStateMapSpec::Define()
 				{
 					BeforeEach([this]()
 						{
-							ClassUnderTest->LockResource("RPAI.Test.LockedResource2");
+							ClassUnderTest->LockResource("Rpai.Test.LockedResource2");
 						});
 
 					It("Should be locked", [this]()
 						{
-							TestTrue("IsResourceLocked", ClassUnderTest->IsResourceLocked("RPAI.Test.LockedResource2"));
+							TestTrue("IsResourceLocked", ClassUnderTest->IsResourceLocked("Rpai.Test.LockedResource2"));
 						});
 
 					It("Should not be free", [this]()
 						{
-							TestFalse("IsResourceFree", ClassUnderTest->IsResourceFree("RPAI.Test.LockedResource2"));
+							TestFalse("IsResourceFree", ClassUnderTest->IsResourceFree("Rpai.Test.LockedResource2"));
 						});
 
 					It("Should not be re-locked", [this]()
 						{
-							TestFalse("LockResource", ClassUnderTest->LockResource("RPAI.Test.LockedResource2"));
+							TestFalse("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
 						});
 
 					It("Should not allow another object to lock the resource", [this]()
 						{
-							UState_Map* Temp = NewObject<UState_Map>(ClassUnderTest);
-							TestFalse("LockResource", ClassUnderTest->LockResource("RPAI.Test.LockedResource2"));
+							URpaiState_Map* Temp = NewObject<URpaiState_Map>(ClassUnderTest);
+							TestFalse("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
 							Temp->ConditionalBeginDestroy();
 						});
 
 					It("Should allow unlocking", [this]()
 						{
-							TestTrue("UnlockResource", ClassUnderTest->UnlockResource("RPAI.Test.LockedResource2"));
+							TestTrue("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2"));
 						});
 
 					It("Should not allow unlocking from a different lock object", [this]()
 						{
-							UState_Map* Temp = NewObject<UState_Map>(ClassUnderTest);
-							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("RPAI.Test.LockedResource2", Temp));
+							URpaiState_Map* Temp = NewObject<URpaiState_Map>(ClassUnderTest);
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2", Temp));
 							Temp->ConditionalBeginDestroy();
 						});
 
 					It("Should indicate locks on heirarchy", [this]()
 						{
-							TestTrue("DoesHeirarchyHaveAnyLocks - RPAI", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI"));
-							TestTrue("DoesHeirarchyHaveAnyLocks - RPAI.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI.Test"));
-							TestTrue("DoesHeirarchyHaveAnyLocks - RPAI.Test.LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("RPAI.Test.LockedResource2"));
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai"));
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test"));
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai.Test.LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test.LockedResource2"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - Test.LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test.LockedResource2"));
 							TestFalse("DoesHeirarchyHaveAnyLocks - LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("LockedResource2"));
@@ -419,7 +419,7 @@ void ReasonablePlanningStateMapSpec::Define()
 
 					AfterEach([this]()
 						{
-							ClassUnderTest->UnlockResource("RPAI.Test.LockedResource2");
+							ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2");
 						});
 				});
 		});

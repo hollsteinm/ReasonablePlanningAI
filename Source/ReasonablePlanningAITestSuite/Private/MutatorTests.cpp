@@ -1,29 +1,29 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "States/State_Map.h"
-#include "Composer/Mutators/StateMutator_AddFloat.h"
-#include "Composer/Mutators/StateMutator_AddInteger.h"
-#include "Composer/Mutators/StateMutator_MultiplyFloat.h"
-#include "Composer/Mutators/StateMutator_MultiplyInteger.h"
-#include "Composer/Mutators/StateMutator_SetValueBool.h"
-#include "Composer/Mutators/StateMutator_SetValueClass.h"
-#include "Composer/Mutators/StateMutator_SetValueFloat.h"
-#include "Composer/Mutators/StateMutator_SetValueInteger.h"
-#include "Composer/Mutators/StateMutator_SetValueName.h"
-#include "Composer/Mutators/StateMutator_SetValueRotator.h"
-#include "Composer/Mutators/StateMutator_SetValueString.h"
-#include "Composer/Mutators/StateMutator_SetValueVector.h"
-#include "Composer/Mutators/StateMutator_CopyState.h"
+#include "States/RpaiState_Map.h"
+#include "Composer/Mutators/RpaiStateMutator_AddFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_AddInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_MultiplyFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_MultiplyInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueBool.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueClass.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueFloat.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueInteger.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueName.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueRotator.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueString.h"
+#include "Composer/Mutators/RpaiStateMutator_SetValueVector.h"
+#include "Composer/Mutators/RpaiStateMutator_CopyState.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec, "ReasonablePlanningAI.Mutators.AddFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_AddFloat* ClassUnderTest;
+	URpaiStateMutator_AddFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec)
 void ReasonablePlanningMutatorAddFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_AddFloat>();
+			ClassUnderTest = NewObject<URpaiStateMutator_AddFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheFloatValue, EStatePropertyType::Float);
@@ -64,14 +64,14 @@ void ReasonablePlanningMutatorAddFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddIntegerSpec, "ReasonablePlanningAI.Mutators.AddInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_AddInteger* ClassUnderTest;
+	URpaiStateMutator_AddInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorAddIntegerSpec)
 void ReasonablePlanningMutatorAddIntegerSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_AddInteger>();
+			ClassUnderTest = NewObject<URpaiStateMutator_AddInteger>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Int);
@@ -112,14 +112,14 @@ void ReasonablePlanningMutatorAddIntegerSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyFloatSpec, "ReasonablePlanningAI.Mutators.MultiplyFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_MultiplyFloat* ClassUnderTest;
+	URpaiStateMutator_MultiplyFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyFloatSpec)
 void ReasonablePlanningMutatorMultiplyFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_MultiplyFloat>();
+			ClassUnderTest = NewObject<URpaiStateMutator_MultiplyFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheFloatValue, EStatePropertyType::Float);
@@ -173,14 +173,14 @@ void ReasonablePlanningMutatorMultiplyFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyIntegerSpec, "ReasonablePlanningAI.Mutators.MulitplyInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_MultiplyInteger* ClassUnderTest;
+	URpaiStateMutator_MultiplyInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyIntegerSpec)
 void ReasonablePlanningMutatorMultiplyIntegerSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_MultiplyInteger>();
+			ClassUnderTest = NewObject<URpaiStateMutator_MultiplyInteger>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Int);
@@ -210,14 +210,14 @@ void ReasonablePlanningMutatorMultiplyIntegerSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec, "ReasonablePlanningAI.Mutators.SetBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueBool* ClassUnderTest;
+	URpaiStateMutator_SetValueBool* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec)
 void ReasonablePlanningMutatorSetBoolSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueBool>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueBool>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheBoolValue, EStatePropertyType::Bool);
@@ -247,14 +247,14 @@ void ReasonablePlanningMutatorSetBoolSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetClassSpec, "ReasonablePlanningAI.Mutators.SetClass", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueClass* ClassUnderTest;
+	URpaiStateMutator_SetValueClass* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetClassSpec)
 void ReasonablePlanningMutatorSetClassSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueClass>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueClass>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheClassValue, EStatePropertyType::Class);
@@ -265,13 +265,13 @@ void ReasonablePlanningMutatorSetClassSpec::Define()
 			It("Should set the value", [this]()
 				{
 					GivenState->SetValueOfType(UTestPlanningState::NAME_TheClassValue, UTestPlanningState::StaticClass());
-					ClassUnderTest->SetValueToSet(UStateMutator_SetValueClass::StaticClass());
+					ClassUnderTest->SetValueToSet(URpaiStateMutator_SetValueClass::StaticClass());
 
 					ClassUnderTest->Mutate(GivenState);
 
 					UClass* ActualValue = nullptr;
 					TestTrue("Getting Value", GivenState->GetValueOfType(UTestPlanningState::NAME_TheClassValue, ActualValue));
-					TestEqual("State Mutated", ActualValue, UStateMutator_SetValueClass::StaticClass());
+					TestEqual("State Mutated", ActualValue, URpaiStateMutator_SetValueClass::StaticClass());
 				});
 
 		});
@@ -284,14 +284,14 @@ void ReasonablePlanningMutatorSetClassSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetFloatSpec, "ReasonablePlanningAI.Mutators.SetFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueFloat* ClassUnderTest;
+	URpaiStateMutator_SetValueFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetFloatSpec)
 void ReasonablePlanningMutatorSetFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueFloat>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheFloatValue, EStatePropertyType::Float);
@@ -321,14 +321,14 @@ void ReasonablePlanningMutatorSetFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetIntegerSpec, "ReasonablePlanningAI.Mutators.SetInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueInteger* ClassUnderTest;
+	URpaiStateMutator_SetValueInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetIntegerSpec)
 void ReasonablePlanningMutatorSetIntegerSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueInteger>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueInteger>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Int);
@@ -358,14 +358,14 @@ void ReasonablePlanningMutatorSetIntegerSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetNameSpec, "ReasonablePlanningAI.Mutators.SetName", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueName* ClassUnderTest;
+	URpaiStateMutator_SetValueName* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetNameSpec)
 void ReasonablePlanningMutatorSetNameSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueName>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueName>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheNameValue, EStatePropertyType::Name);
@@ -395,14 +395,14 @@ void ReasonablePlanningMutatorSetNameSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetRotatorSpec, "ReasonablePlanningAI.Mutators.SetRotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueRotator* ClassUnderTest;
+	URpaiStateMutator_SetValueRotator* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetRotatorSpec)
 void ReasonablePlanningMutatorSetRotatorSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueRotator>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueRotator>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheRotatorValue, EStatePropertyType::Rotator);
@@ -433,14 +433,14 @@ void ReasonablePlanningMutatorSetRotatorSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetStringSpec, "ReasonablePlanningAI.Mutators.SetString", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueString* ClassUnderTest;
+	URpaiStateMutator_SetValueString* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetStringSpec)
 void ReasonablePlanningMutatorSetStringSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueString>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueString>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheStringValue, EStatePropertyType::String);
@@ -471,14 +471,14 @@ void ReasonablePlanningMutatorSetStringSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetVectorSpec, "ReasonablePlanningAI.Mutators.SetVector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_SetValueVector* ClassUnderTest;
+	URpaiStateMutator_SetValueVector* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetVectorSpec)
 void ReasonablePlanningMutatorSetVectorSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_SetValueVector>();
+			ClassUnderTest = NewObject<URpaiStateMutator_SetValueVector>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetMutatedStateValue(UTestPlanningState::NAME_TheVectorValue, EStatePropertyType::Vector);
@@ -509,15 +509,15 @@ void ReasonablePlanningMutatorSetVectorSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateMutator_CopyState* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
+	URpaiStateMutator_CopyState* ClassUnderTest;
+	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec)
 void ReasonablePlanningMutatorCopyStateSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateMutator_CopyState>();
-			UState_Map* TestMap = NewObject<UState_Map>();
+			ClassUnderTest = NewObject<URpaiStateMutator_CopyState>();
+			URpaiState_Map* TestMap = NewObject<URpaiState_Map>();
 			GivenState = TestMap;
 
 			TestMap->SetAsDynamic(true);

@@ -1,20 +1,20 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "Composer/Queries/StateQuery_CompareToBool.h"
-#include "Composer/Queries/StateQuery_CompareToFloat.h"
-#include "Composer/Queries/StateQuery_CompareToInteger.h"
-#include "Composer/Queries/StateQuery_CompareToStateValue.h"
-#include "States/State_Map.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToBool.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToFloat.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToInteger.h"
+#include "Composer/Queries/RpaiStateQuery_CompareToStateValue.h"
+#include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToBoolSpec, "ReasonablePlanningAI.Queries.CompareBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateQuery_CompareToBool* ClassUnderTest;
+	URpaiStateQuery_CompareToBool* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToBoolSpec)
 void ReasonablePlanningQueryCompareToBoolSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateQuery_CompareToBool>();
+			ClassUnderTest = NewObject<URpaiStateQuery_CompareToBool>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetQueriedState(UTestPlanningState::NAME_TheBoolValue, EStatePropertyType::Bool);
@@ -28,7 +28,7 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, false);
 					ClassUnderTest->SetComparisonValue(true);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is less than or equal to state value", [this]()
@@ -37,10 +37,10 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, false);
 					ClassUnderTest->SetComparisonValue(true);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(false);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than state value", [this]()
@@ -49,7 +49,7 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, true);
 					ClassUnderTest->SetComparisonValue(false);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than or equal to state value", [this]()
@@ -58,10 +58,10 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, true);
 					ClassUnderTest->SetComparisonValue(true);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(false);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is equal to the value", [this]()
@@ -70,7 +70,7 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, true);
 					ClassUnderTest->SetComparisonValue(true);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is not equal to the value", [this]()
@@ -79,11 +79,11 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, false);
 					ClassUnderTest->SetComparisonValue(true);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetBool(UTestPlanningState::NAME_TheBoolValue, true);
 					ClassUnderTest->SetComparisonValue(false);
-					TestEqual("UStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToBool::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 		});
 
@@ -95,14 +95,14 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToFloatSpec, "ReasonablePlanningAI.Queries.CompareFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateQuery_CompareToFloat* ClassUnderTest;
+	URpaiStateQuery_CompareToFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToFloatSpec)
 void ReasonablePlanningQueryCompareToFloatSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateQuery_CompareToFloat>();
+			ClassUnderTest = NewObject<URpaiStateQuery_CompareToFloat>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetQueriedState(UTestPlanningState::NAME_TheFloatValue, EStatePropertyType::Float);
@@ -116,7 +116,7 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, 100.0f);
 					ClassUnderTest->SetComparisonValue(150.f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is less than or equal to state value", [this]()
@@ -125,10 +125,10 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, -25.f);
 					ClassUnderTest->SetComparisonValue(100.f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(-25.f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than state value", [this]()
@@ -137,7 +137,7 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, -2500.f);
 					ClassUnderTest->SetComparisonValue(-100000000.f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than or equal to state value", [this]()
@@ -146,10 +146,10 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, 1.f);
 					ClassUnderTest->SetComparisonValue(0.56f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(1.f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is equal to the value", [this]()
@@ -158,7 +158,7 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, 456.789f);
 					ClassUnderTest->SetComparisonValue(456.789f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is not equal to the value", [this]()
@@ -167,11 +167,11 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, -456.789f);
 					ClassUnderTest->SetComparisonValue(456.789f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetFloat(UTestPlanningState::NAME_TheFloatValue, 456.789f);
 					ClassUnderTest->SetComparisonValue(-456.789f);
-					TestEqual("UStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToFloat::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 		});
 
@@ -183,14 +183,14 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToIntegerSpec, "ReasonablePlanningAI.Queries.CompareInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateQuery_CompareToInteger* ClassUnderTest;
+	URpaiStateQuery_CompareToInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToIntegerSpec)
 void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateQuery_CompareToInteger>();
+			ClassUnderTest = NewObject<URpaiStateQuery_CompareToInteger>();
 			GivenState = NewObject<UTestPlanningState>();
 
 			ClassUnderTest->SetQueriedState(UTestPlanningState::NAME_TheIntValue, EStatePropertyType::Int);
@@ -204,7 +204,7 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 10);
 					ClassUnderTest->SetComparisonValue(15);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is less than or equal to state value", [this]()
@@ -213,10 +213,10 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 45);
 					ClassUnderTest->SetComparisonValue(800);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(45);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than state value", [this]()
@@ -225,7 +225,7 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 600);
 					ClassUnderTest->SetComparisonValue(-1);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than or equal to state value", [this]()
@@ -234,10 +234,10 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 100);
 					ClassUnderTest->SetComparisonValue(50);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					ClassUnderTest->SetComparisonValue(100);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is equal to the value", [this]()
@@ -246,7 +246,7 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 60);
 					ClassUnderTest->SetComparisonValue(60);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is not equal to the value", [this]()
@@ -255,11 +255,11 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, 20);
 					ClassUnderTest->SetComparisonValue(56789);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetInt(UTestPlanningState::NAME_TheIntValue, -20);
 					ClassUnderTest->SetComparisonValue(20);
-					TestEqual("UStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToInteger::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 		});
 
@@ -271,15 +271,15 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 }
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToStateSpec, "ReasonablePlanningAI.Queries.CompareState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UStateQuery_CompareToStateValue* ClassUnderTest;
-	UState_Map* GivenState;
+	URpaiStateQuery_CompareToStateValue* ClassUnderTest;
+	URpaiState_Map* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToStateSpec)
 void ReasonablePlanningQueryCompareToStateSpec::Define()
 {
 	BeforeEach([this]()
 		{
-			ClassUnderTest = NewObject<UStateQuery_CompareToStateValue>();
-			GivenState = NewObject<UState_Map>();
+			ClassUnderTest = NewObject<URpaiStateQuery_CompareToStateValue>();
+			GivenState = NewObject<URpaiState_Map>();
 			GivenState->SetAsDynamic(true);
 		});
 
@@ -293,7 +293,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 10);
 					GivenState->SetInt("B", 20);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is less than or equal to state value", [this]()
@@ -304,10 +304,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 10);
 					GivenState->SetInt("B", 20);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetInt("B", 10);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than state value", [this]()
@@ -318,7 +318,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 30);
 					GivenState->SetInt("B", 10);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than or equal to state value", [this]()
@@ -329,10 +329,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 30);
 					GivenState->SetInt("B", 29);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetInt("B", 30);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is equal to the value", [this]()
@@ -343,7 +343,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 400000);
 					GivenState->SetInt("B", 400000);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is not equal to the value", [this]()
@@ -354,10 +354,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetInt("A", 36965);
 					GivenState->SetInt("B", 400000);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetInt("A", -400000);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 		});
 
@@ -371,7 +371,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 100.f);
 					GivenState->SetFloat("B", 200.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is less than or equal to state value", [this]()
@@ -382,10 +382,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 101.f);
 					GivenState->SetFloat("B", 202.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetFloat("B", 101.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than state value", [this]()
@@ -396,7 +396,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 30.f);
 					GivenState->SetFloat("B", 10.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is greater than or equal to state value", [this]()
@@ -407,10 +407,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 30000.12f);
 					GivenState->SetFloat("B", 29000.111f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetFloat("B", 30000.12f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is equal to the value", [this]()
@@ -421,7 +421,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 400004.f);
 					GivenState->SetFloat("B", 400004.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 			It("Should return success when the value defined is not equal to the value", [this]()
@@ -432,10 +432,10 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 
 					GivenState->SetFloat("A", 36965.f);
 					GivenState->SetFloat("B", 400000.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 
 					GivenState->SetFloat("A", -400000.f);
-					TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
+					TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Succeeded);
 				});
 
 		});
@@ -468,7 +468,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 							{
 								ClassUnderTest->SetQueriedState("A", A);
 								ClassUnderTest->SetComparedToState("B", B);
-								TestEqual("UStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Invalid);
+								TestEqual("URpaiStateQuery_CompareToStateValue::Query", ClassUnderTest->Query(GivenState), EStateQueryResult::Invalid);
 							});
 					}
 				}

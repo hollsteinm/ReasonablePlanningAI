@@ -1,13 +1,13 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
-#include "Planners/Planner_AStar.h"
-#include "States/State_Map.h"
+#include "Planners/RpaiPlanner_AStar.h"
+#include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningPlannerAStarSpec, "ReasonablePlanningAI.Planners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
-	UReasonablePlanningPlannerBase* ClassUnderTest;
-	UReasonablePlanningState* GivenState;
-	UReasonablePlanningGoalBase* GivenGoal;
-	TArray<UReasonablePlanningActionBase*> GivenActions;
+	URpaiPlannerBase* ClassUnderTest;
+	URpaiState* GivenState;
+	URpaiGoalBase* GivenGoal;
+	TArray<URpaiActionBase*> GivenActions;
 END_DEFINE_SPEC(ReasonablePlanningPlannerAStarSpec)
 void ReasonablePlanningPlannerAStarSpec::Define()
 {
@@ -15,14 +15,14 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 		{
 			BeforeEach([this]()
 				{
-					auto MapState = NewObject<UState_Map>();
+					auto MapState = NewObject<URpaiState_Map>();
 					MapState->SetAsDynamic(true);
 					MapState->SetValueOfType(UTestGoal::ConditionAKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionBKey, 0);
 					MapState->SetValueOfType(UTestGoal::ConditionCKey, 0);
 					MapState->SetAsDynamic(false);
 
-					ClassUnderTest = NewObject<UPlanner_AStar>();
+					ClassUnderTest = NewObject<URpaiPlanner_AStar>();
 					GivenGoal = NewObject<UTestGoal>();
 					GivenState = MapState;
 				});
@@ -41,19 +41,19 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 						{
 							Cast<UTestAction>(GivenActions[0])->IsApplicable = false;
 
-							TArray<UReasonablePlanningActionBase*> Expected({});
-							TArray<UReasonablePlanningActionBase*> Actual;
+							TArray<URpaiActionBase*> Expected({});
+							TArray<URpaiActionBase*> Actual;
 
-							TestFalse("UPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
+							TestFalse("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
 							TestEqual("Planned Actions", Actual, Expected);
 						});
 
 					It("should not return a partially satisfied plan", [this]()
 						{
-							TArray<UReasonablePlanningActionBase*> Expected({});
-							TArray<UReasonablePlanningActionBase*> Actual;
+							TArray<URpaiActionBase*> Expected({});
+							TArray<URpaiActionBase*> Actual;
 
-							TestFalse("UPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
+							TestFalse("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
 							TestEqual("Planned Actions", Actual, Expected);
 						});
 
@@ -87,10 +87,10 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 							Cast<UTestAction>(GivenActions[0])->IsApplicable = false;
 							Cast<UTestAction>(GivenActions[3])->IsApplicable = false;
 
-							TArray<UReasonablePlanningActionBase*> Expected({});
-							TArray<UReasonablePlanningActionBase*> Actual;
+							TArray<URpaiActionBase*> Expected({});
+							TArray<URpaiActionBase*> Actual;
 
-							TestFalse("UPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
+							TestFalse("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
 							TestEqual("Planned Actions", Actual, Expected);
 						});
 
@@ -116,10 +116,10 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 							TestActionD->KeyToApply = UTestGoal::ConditionCKey;
 							TestActionD->ValueToApply = TestGoal->ConditionCValue;
 
-							TArray<UReasonablePlanningActionBase*> Expected({ GivenActions[0], GivenActions[2], GivenActions[3] });
-							TArray<UReasonablePlanningActionBase*> Actual;
+							TArray<URpaiActionBase*> Expected({ GivenActions[0], GivenActions[2], GivenActions[3] });
+							TArray<URpaiActionBase*> Actual;
 
-							TestTrue("UPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
+							TestTrue("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
 							TestEqual("Planned Actions", Actual, Expected);
 						});
 
@@ -146,10 +146,10 @@ void ReasonablePlanningPlannerAStarSpec::Define()
 							TestActionD->KeyToApply = UTestGoal::ConditionCKey;
 							TestActionD->ValueToApply = 5;
 
-							TArray<UReasonablePlanningActionBase*> Expected({ GivenActions[1], GivenActions[3], GivenActions[2] });
-							TArray<UReasonablePlanningActionBase*> Actual;
+							TArray<URpaiActionBase*> Expected({ GivenActions[1], GivenActions[3], GivenActions[2] });
+							TArray<URpaiActionBase*> Actual;
 
-							TestTrue("UPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
+							TestTrue("URpaiPlanner_AStar::PlanChosenGoal", ClassUnderTest->PlanChosenGoal(GivenGoal, GivenState, GivenActions, Actual));
 							TestEqual("Planned Actions", Actual, Expected);
 						});
 
