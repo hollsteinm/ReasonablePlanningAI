@@ -326,7 +326,7 @@ void ReasonablePlanningDistanceRotatorSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
 					GivenState->SetRotator("LHS", GivenLHS);
 					ClassUnderTest->SetRHS(GivenRHS);
-					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(GivenLHS.GetManhattanDistance(GivenRHS)));
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs<float>(GivenLHS.GetManhattanDistance(GivenRHS)));
 				});
 
 			It("Should return max value if the state value is a float", [this]()
@@ -418,7 +418,7 @@ void ReasonablePlanningDistanceVectorSpec::Define()
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
 					GivenState->SetVector("LHS", GivenLHS);
 					ClassUnderTest->SetRHS(GivenRHS);
-					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(GivenLHS, GivenRHS)));
+					TestEqual("URpaiDistance_Float::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs<float>(FVector::DistSquared(GivenLHS, GivenRHS)));
 				});
 
 			It("Should return max value if the state value is a float", [this]()
@@ -510,7 +510,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 					GivenState->SetVector("RHS", RHS);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Vector);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Vector);
-					TestEqual("URpaiDistance_State::CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(FVector::DistSquared(LHS, RHS)));
+					TestEqual("URpaiDistance_State::CalculateDistance - Vector", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs<float>(FVector::DistSquared(LHS, RHS)));
 				});
 
 			It("Should return the difference between two floats", [this]()
@@ -561,7 +561,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 					GivenState->SetRotator("RHS", RHS);
 					ClassUnderTest->SetLHS("LHS", EStatePropertyType::Rotator);
 					ClassUnderTest->SetRHS("RHS", EStatePropertyType::Rotator);
-					TestEqual("CalculateDistance - FRotator", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs(LHS.GetManhattanDistance(RHS)));
+					TestEqual("CalculateDistance - FRotator", ClassUnderTest->CalculateDistance(GivenState), FMath::Abs<float>(LHS.GetManhattanDistance(RHS)));
 				});
 
 			AfterEach([this]()

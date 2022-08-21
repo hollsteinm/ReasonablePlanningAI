@@ -77,10 +77,20 @@ You can give Reasonable Planning AI a quick try by configuring a simple AI by fo
 
 1) Create a new Basic world with Navigation
 
-a) In your project select New -> Level. In the dialogue select "Basic".
-b) Place a Navigation Volume from the "Place Actors" panel. If you do not see it, open by selecting Window -> Place Actors. Search for "Nav" and drag and drop "NavMeshBoundsVolume" into the Level Viewport.
-	i) Set Location to 0,0,0
-	ii) Set the Brush X and Y values to 10000.0 and the Z value to 1000.0
-	iii) To confirm navigation covers the floor, press `P` to visualize the NavMesh. It should have a green overlay.
+	a) In your project select New -> Level. In the dialogue select "Basic".
+	b) Place a Navigation Volume from the "Place Actors" panel. If you do not see it, open by selecting Window -> Place Actors. Search for "Nav" and drag and drop "NavMeshBoundsVolume" into the Level Viewport.
+		i) Set Location to 0,0,0
+		ii) Set the Brush X and Y values to 10000.0 and the Z value to 1000.0
+		iii) To confirm navigation covers the floor, press `P` to visualize the NavMesh. It should have a green overlay.
 
 2) Create an `RpaiComposerBehavior`
+
+	a) For the `StateType` select `RpaiState_Map`
+	b) Add a Goal by clicking the plus sign
+		i)
+		ii)
+		iii)
+	c) Add an Action by clicking the plus sign
+		i)
+		ii)
+		iii)
