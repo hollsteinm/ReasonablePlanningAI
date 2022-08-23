@@ -1,6 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
 #include "States/RpaiState_Map.h"
+#include "States/RpaiState_Reflection.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	URpaiState_Map* ClassUnderTest;
@@ -420,6 +421,234 @@ void ReasonablePlanningStateMapSpec::Define()
 					It("Should not allow unlocking from a different lock object", [this]()
 						{
 							URpaiState_Map* Temp = NewObject<URpaiState_Map>(ClassUnderTest);
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2", Temp));
+							Temp->ConditionalBeginDestroy();
+						});
+
+					It("Should indicate locks on heirarchy", [this]()
+						{
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai"));
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test"));
+							TestTrue("DoesHeirarchyHaveAnyLocks - Rpai.Test.LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test.LockedResource2"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Test.LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test.LockedResource2"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("LockedResource2"));
+						});
+
+					AfterEach([this]()
+						{
+							ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2");
+						});
+				});
+		});
+}
+
+BEGIN_DEFINE_SPEC(ReasonablePlanningStateReflectionSpec, "ReasonablePlanningAI.StateReflection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+	URpaiState_Reflection* ClassUnderTest;
+END_DEFINE_SPEC(ReasonablePlanningStateReflectionSpec)
+void ReasonablePlanningStateReflectionSpec::Define()
+{
+	BeforeEach([this]()
+		{
+			ClassUnderTest = NewObject<UTestPlanningState>();
+			ClassUnderTest->SetBool(UTestPlanningState::NAME_TheBoolValue, false);
+			ClassUnderTest->SetClassValue(UTestPlanningState::NAME_TheClassValue, URpaiState_Map::StaticClass());
+			ClassUnderTest->SetFloat(UTestPlanningState::NAME_TheFloatValue, 0.f);
+			ClassUnderTest->SetInt(UTestPlanningState::NAME_TheIntValue, 0);
+			ClassUnderTest->SetNameValue(UTestPlanningState::NAME_TheNameValue, NAME_None);
+			ClassUnderTest->SetObject(UTestPlanningState::NAME_TheObjectValue, NewObject<URpaiState_Map>(ClassUnderTest));
+			ClassUnderTest->SetRotator(UTestPlanningState::NAME_TheRotatorValue, FRotator::ZeroRotator);
+			ClassUnderTest->SetString(UTestPlanningState::NAME_TheStringValue, FString("Hello World"));
+			ClassUnderTest->SetVector(UTestPlanningState::NAME_TheVectorValue, FVector::ZeroVector);
+		});
+
+	Describe("Equality", [this]()
+		{
+			It("should be equal", [this]()
+				{
+					URpaiState* Copy = NewObject<UTestPlanningState>();
+					ClassUnderTest->CopyStateForPredictionTo(Copy);
+					TestTrue("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(Copy));
+					TestTrue("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(ClassUnderTest));
+				});
+
+			It("should not be equal", [this]()
+				{
+					URpaiState* Copy = NewObject<UTestPlanningState>();
+					bool bFlip = false;
+					ClassUnderTest->GetBool(UTestPlanningState::NAME_TheBoolValue, bFlip);
+					Copy->SetBool(UTestPlanningState::NAME_TheBoolValue, !bFlip);
+					TestFalse("URpaiState::IsEqualTo", ClassUnderTest->IsEqualTo(Copy));
+				});
+		});
+
+	Describe("Getting Values", [this]()
+		{
+			It("should get the defined boolean value", [this]()
+				{
+					bool Value = true;
+					TestTrue("HasBool", ClassUnderTest->HasBool(UTestPlanningState::NAME_TheBoolValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheBoolValue));
+					TestTrue("GetBool", ClassUnderTest->GetBool(UTestPlanningState::NAME_TheBoolValue, Value));
+					TestFalse("The Out Value of Get Bool", Value);
+				});
+
+			It("should get the defined class value", [this]()
+				{
+					UClass* Clazz = nullptr;
+					TestTrue("HasClass", ClassUnderTest->HasClass(UTestPlanningState::NAME_TheClassValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheClassValue));
+					TestTrue("GetClassValue", ClassUnderTest->GetClassValue(UTestPlanningState::NAME_TheClassValue, Clazz));
+					TestEqual("Class is equal", Clazz, URpaiState_Map::StaticClass());
+				});
+
+			It("should get the defined float value", [this]()
+				{
+					float Value = 1000.f;
+					TestTrue("HasFloat", ClassUnderTest->HasFloat(UTestPlanningState::NAME_TheFloatValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheFloatValue));
+					TestTrue("GetFloat", ClassUnderTest->GetFloat(UTestPlanningState::NAME_TheFloatValue, Value));
+					TestEqual("Float is equal", Value, 0.f);
+				});
+
+			It("should get the defined integer value", [this]()
+				{
+					int32 Value = 32;
+					TestTrue("HasInt", ClassUnderTest->HasInt(UTestPlanningState::NAME_TheIntValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheIntValue));
+					TestTrue("GetInt", ClassUnderTest->GetInt(UTestPlanningState::NAME_TheIntValue, Value));
+					TestEqual("Int is equal", Value, 0);
+				});
+
+			It("should get the defined Name value", [this]()
+				{
+					FName Value = "TEST_NAME";
+					TestTrue("HasName", ClassUnderTest->HasName(UTestPlanningState::NAME_TheNameValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheNameValue));
+					TestTrue("GetNameValue", ClassUnderTest->GetNameValue(UTestPlanningState::NAME_TheNameValue, Value));
+					TestTrue("Name is NONE", Value.IsNone());
+				});
+
+			It("should get the defined object value", [this]()
+				{
+					UObject* Value = nullptr;
+					TestTrue("HasObject", ClassUnderTest->HasObject(UTestPlanningState::NAME_TheObjectValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheObjectValue));
+					TestTrue("GetObject", ClassUnderTest->GetObject(UTestPlanningState::NAME_TheObjectValue, Value));
+					TestNotEqual("Pointer is valid", Value, static_cast<UObject*>(nullptr));
+					TestEqual("Is object", Value->GetOuter(), static_cast<UObject*>(ClassUnderTest));
+				});
+
+			It("should get the defined rotator value", [this]()
+				{
+					FRotator Value(3.f, 1.f, 2.f);
+					TestTrue("HasRotator", ClassUnderTest->HasRotator(UTestPlanningState::NAME_TheRotatorValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheRotatorValue));
+					TestTrue("GetRotator", ClassUnderTest->GetRotator(UTestPlanningState::NAME_TheRotatorValue, Value));
+					TestEqual("The value is from state", Value, FRotator::ZeroRotator);
+				});
+
+			It("should get the defined string value", [this]()
+				{
+					FString Value = "Test";
+					TestTrue("HasString", ClassUnderTest->HasString(UTestPlanningState::NAME_TheStringValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheStringValue));
+					TestTrue("GetString", ClassUnderTest->GetString(UTestPlanningState::NAME_TheStringValue, Value));
+					TestEqual("The value is from state", Value, "Hello World");
+				});
+
+			It("should get the defined vector value", [this]()
+				{
+					FVector Value(3.f, 1.f, 2.f);
+					TestTrue("HasVector", ClassUnderTest->HasVector(UTestPlanningState::NAME_TheVectorValue));
+					TestTrue("HasValueWithName", ClassUnderTest->HasValueWithName(UTestPlanningState::NAME_TheVectorValue));
+					TestTrue("GetVector", ClassUnderTest->GetVector(UTestPlanningState::NAME_TheVectorValue, Value));
+					TestEqual("The value is from state", Value, FVector::ZeroVector);
+				});
+		});
+
+	AfterEach([this]()
+		{
+			ClassUnderTest->ConditionalBeginDestroy();
+		});
+
+	Describe("Resource Locking", [this]()
+		{
+			Describe("Unlocked State", [this]()
+				{
+					It("Should be free", [this]()
+						{
+							TestTrue("IsResourceFree", ClassUnderTest->IsResourceFree("Rpai.Test.LockedResourceA"));
+						});
+
+					It("Should not allow unlocking", [this]()
+						{
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResourceA"));
+						});
+
+					It("Should not allow unlocking from a different lock object", [this]()
+						{
+							URpaiState_Reflection* Temp = NewObject<UTestPlanningState>(ClassUnderTest);
+							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResourceA"));
+							Temp->ConditionalBeginDestroy();
+						});
+
+					It("Should indicate locks on heirarchy", [this]()
+						{
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai.Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Rpai.Test.LockedResourceA", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Rpai.Test.LockedResourceA"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Test", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - Test.LockedResourceA", ClassUnderTest->DoesHeirarchyHaveAnyLocks("Test.LockedResourceA"));
+							TestFalse("DoesHeirarchyHaveAnyLocks - LockedResource2", ClassUnderTest->DoesHeirarchyHaveAnyLocks("LockedResourceA"));
+						});
+				});
+
+			Describe("Locking", [this]()
+				{
+					It("Should Allow Locking", [this]()
+						{
+							TestTrue("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
+						});
+				});
+
+			Describe("Locked State", [this]()
+				{
+					BeforeEach([this]()
+						{
+							ClassUnderTest->LockResource("Rpai.Test.LockedResource2");
+						});
+
+					It("Should be locked", [this]()
+						{
+							TestTrue("IsResourceLocked", ClassUnderTest->IsResourceLocked("Rpai.Test.LockedResource2"));
+						});
+
+					It("Should not be free", [this]()
+						{
+							TestFalse("IsResourceFree", ClassUnderTest->IsResourceFree("Rpai.Test.LockedResource2"));
+						});
+
+					It("Should not be re-locked", [this]()
+						{
+							TestFalse("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
+						});
+
+					It("Should not allow another object to lock the resource", [this]()
+						{
+							URpaiState_Reflection* Temp = NewObject<UTestPlanningState>(ClassUnderTest);
+							TestFalse("LockResource", ClassUnderTest->LockResource("Rpai.Test.LockedResource2"));
+							Temp->ConditionalBeginDestroy();
+						});
+
+					It("Should allow unlocking", [this]()
+						{
+							TestTrue("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2"));
+						});
+
+					It("Should not allow unlocking from a different lock object", [this]()
+						{
+							URpaiState_Reflection* Temp = NewObject<UTestPlanningState>(ClassUnderTest);
 							TestFalse("UnlockResource", ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2", Temp));
 							Temp->ConditionalBeginDestroy();
 						});

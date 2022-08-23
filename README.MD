@@ -28,8 +28,8 @@ There are five (6) Core components implementing Reasonable Planning AI that buil
 
 - RpaiGoalBase
 - RpaiActionBase
-- RpaiRpaiPlannerBase
-- RpaiRpaiReasonerBase
+- RpaiPlannerBase
+- RpaiReasonerBase
 - RpaiBrainComponent
 
 The main execution engine for Reasonable Planning AI is the `RpaiBrainComponent`. This is a `UBrainComponent` from the `AIModule` used to execute AI logic and interact with the rest of the `AIModule` defined components. The two logic driving classes are `RpaiRpaiReasonerBase` and `RpaiRpaiPlannerBase`. The `RpaiRpaiReasonerBase` class is used to provide implementations for determining goals. Out of the box, there are two implementations provided `RpaiReasoners/RpaiRpaiReasoner_DualUtility` and `RpaiReasoners/RpaiRpaiReasoner_AbsoluteUtility`. Please read the documentation of each class to understand thier capabilities. For goal reasoning there is one provided solution. This solution is `RpaiPlanners/RpaiRpaiPlanner_AStar`. This implementation determines an action plan by using the `RpaiGoalBase::DistanceToCompletion` and `RpaiActionBase::ExecutionWeight` functions for the cost heuristic.

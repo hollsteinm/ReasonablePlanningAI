@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/RpaiState.h"
+#include "States/RpaiState_Reflection.h"
 #include "Core/RpaiActionBase.h"
 #include "Core/RpaiGoalBase.h"
 #include "ReasonablePlanningAITestTypes.generated.h"
@@ -14,19 +15,38 @@ enum class ETestEnum : uint8
 };
 
 UCLASS(HideDropdown)
-class UTestPlanningState : public URpaiState
+class UTestPlanningState : public URpaiState_Reflection
 {
 	GENERATED_BODY()
 private:
+	UPROPERTY()
 	bool TheBoolValue;
+
+	UPROPERTY()
 	UClass* TheClassValue;
+
+	UPROPERTY()
 	ETestEnum TheTestEnumValue;
+
+	UPROPERTY()
 	float TheFloatValue;
+
+	UPROPERTY()
 	int32 TheIntValue;
+
+	UPROPERTY()
 	FName TheNameValue;
+
+	UPROPERTY()
 	UObject* TheObjectValue;
+
+	UPROPERTY()
 	FRotator TheRotatorValue;
+
+	UPROPERTY()
 	FString TheStringValue;
+
+	UPROPERTY()
 	FVector TheVectorValue;
 
 public:
@@ -40,40 +60,6 @@ public:
 	static FName NAME_TheRotatorValue;
 	static FName NAME_TheStringValue;
 	static FName NAME_TheVectorValue;
-
-	virtual void SetBool(FName ValueName, bool Value) override;
-	virtual void SetClassValue(FName ValueName, UClass* Value) override;
-	virtual void SetEnum(FName ValueName, UEnum* Type, uint8 Value) override;
-	virtual void SetFloat(FName ValueName, float Value) override;
-	virtual void SetInt(FName ValueName, int32 Value) override;
-	virtual void SetNameValue(FName ValueName, FName Value) override;
-	virtual void SetObject(FName ValueName, UObject* Value) override;
-	virtual void SetRotator(FName ValueName, FRotator Value) override;
-	virtual void SetString(FName ValueName, FString Value) override;
-	virtual void SetVector(FName ValueName, FVector Value) override;
-	virtual bool GetBool(FName ValueName, bool& OutValue) const override;
-	virtual bool GetClassValue(FName ValueName, UClass * &OutValue) const override;
-	virtual bool GetEnum(FName ValueName, UEnum * Type, uint8 & OutValue) const override;
-	virtual bool GetFloat(FName ValueName, float& OutValue) const override;
-	virtual bool GetInt(FName ValueName, int32 & OutValue) const override;
-	virtual bool GetNameValue(FName ValueName, FName & OutValue) const override;
-	virtual bool GetObject(FName ValueName, UObject * &OutValue) const override;
-	virtual bool GetRotator(FName ValueName, FRotator & OutValue) const override;
-	virtual bool GetString(FName ValueName, FString & OutValue) const override;
-	virtual bool GetVector(FName ValueName, FVector & OutValue) const override;
-	virtual bool HasBool(FName ValueName) const override;
-	virtual bool HasClass(FName ValueName) const override;
-	virtual bool HasEnum(FName ValueName) const override;
-	virtual bool HasFloat(FName ValueName) const override;
-	virtual bool HasInt(FName ValueName) const override;
-	virtual bool HasName(FName ValueName) const override;
-	virtual bool HasObject(FName ValueName) const override;
-	virtual bool HasRotator(FName ValueName) const override;
-	virtual bool HasString(FName ValueName) const override;
-	virtual bool HasVector(FName ValueName) const override;
-	virtual bool HasValueWithName(FName ValueName) const override;
-	virtual EStatePropertyType GetTypeFromName(FName ValueName) const override;
-	virtual void CopyStateForPredictionTo(URpaiState* OtherState) const override;
 };
 
 UCLASS(HideDropdown)
