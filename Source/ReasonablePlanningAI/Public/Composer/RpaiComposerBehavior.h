@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Core/RpaiState.h"
 #include "RpaiComposerBehavior.generated.h"
 
 class URpaiActionBase;

@@ -195,7 +195,7 @@ bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
 		}
 		else if (Piter->IsA<FStructProperty>())
 		{
-			if (auto StructProperty = Cast<FStructProperty>(*Piter))
+			if (auto StructProperty = CastField<FStructProperty>(*Piter))
 			{
 				if (StructProperty->Struct == TBaseStructure<FVector>::Get())
 				{
