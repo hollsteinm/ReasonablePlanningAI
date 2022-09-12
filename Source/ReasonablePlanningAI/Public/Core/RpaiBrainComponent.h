@@ -28,6 +28,8 @@ public:
 
 	// Actor Component
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason::Type Reason) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	URpaiState* LoadOrCreateStateFromAi();
@@ -91,6 +93,8 @@ private:
 	UPROPERTY()
 	bool bIsPaused;
 
+	FTimerHandle PlanningDebounce;
+	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }
 

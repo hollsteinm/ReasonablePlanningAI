@@ -7,6 +7,8 @@
 #include "Core/RpaiTypes.h"
 #include "RpaiState.generated.h"
 
+class AAIController;
+
 /**
  * A generic copyable state used for tracking actions and planning action sets
  */
@@ -16,6 +18,11 @@ class REASONABLEPLANNINGAI_API URpaiState : public UObject
 	GENERATED_BODY()
 
 public:
+
+    /**
+    * In a system of N-M States to AIControllers where N exceeds M, it may be better to implement this function to support setting state rather than overriding the Brain Component method. This is what the default brain component uses to set state.
+    **/
+    virtual void SetStateFromController(const AAIController* FromController);
 
     /**
     * Determine if the internal state properties are equal to each other. Answer the question of, are we already in this state?

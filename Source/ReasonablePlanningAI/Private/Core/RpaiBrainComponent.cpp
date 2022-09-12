@@ -17,7 +17,21 @@ URpaiBrainComponent::URpaiBrainComponent()
 	, PlannedActions({})
 	, CurrentGoal(nullptr)
 	, CachedStateInstance(nullptr)
+	, bIsPaused(false)
 {
+}
+
+void URpaiBrainComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void URpaiBrainComponent::EndPlay(EEndPlayReason::Type Reason)
+{
+	Super::EndPlay(Reason);
+	StopLogic("End Play");
+	auto& TimerManager = GetWorld()->GetTimerManager();
+	TimerManager.ClearAllTimersForObject(this);
 }
 
 void URpaiBrainComponent::UnregisterOldAction(URpaiActionBase* OldAction)
@@ -55,6 +69,8 @@ void URpaiBrainComponent::PopNextAction()
 	}
 	else
 	{
+		CurrentAction = nullptr;
+		CurrentGoal = nullptr;
 		StartLogic();
 	}
 }
@@ -119,10 +135,6 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	{
 		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
-	else
-	{
-		StartLogic();
-	}
 }
 
 const URpaiReasonerBase* URpaiBrainComponent::AcquireReasoner_Implementation()
@@ -170,8 +182,8 @@ void URpaiBrainComponent::StartLogic()
 
 	check(Reasoner != nullptr);
 	check(Planner != nullptr);
-
 	CurrentGoal = Reasoner->ReasonNextGoal(Goals, LoadOrCreateStateFromAi());
+
 	if (CurrentGoal != nullptr && Planner->PlanChosenGoal(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions))
 	{
 		UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Goal Planned %s"), *CurrentGoal->GetGoalName());
@@ -179,7 +191,15 @@ void URpaiBrainComponent::StartLogic()
 	}
 	else
 	{
-		StopLogic("No Plan");
+		auto& TimerManager = GetWorld()->GetTimerManager();
+
+		if (TimerManager.GetTimerRemaining(PlanningDebounce) > 0.f)
+		{
+			return;
+		}
+
+		TimerManager.ClearTimer(PlanningDebounce);
+		TimerManager.SetTimer(PlanningDebounce, this, &URpaiBrainComponent::StartLogic, 1.f);
 	}
 }
 
@@ -187,6 +207,7 @@ void URpaiBrainComponent::RestartLogic()
 {
 	UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s"), ANSI_TO_TCHAR(__FUNCTION__));
 	StopLogic("Restart Logic");
+	Cleanup();
 	StartLogic();
 }
 
@@ -196,6 +217,7 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 	PlannedActions.Empty();
 	if (CurrentAction != nullptr)
 	{
+		UnregisterOldAction(CurrentAction);
 		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	CurrentAction = nullptr;
@@ -239,5 +261,8 @@ URpaiState* URpaiBrainComponent::LoadOrCreateStateFromAi()
 
 void URpaiBrainComponent::SetStateFromAi_Implementation(URpaiState* StateToModify) const
 {
-
+	if (auto AI = GetAIOwner())
+	{
+		StateToModify->SetStateFromController(AI);
+	}
 }

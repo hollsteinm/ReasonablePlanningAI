@@ -38,22 +38,30 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 	if (SkelMesh != nullptr)
 	{
 		auto AnimMode = SkelMesh->GetAnimationMode();
+		PreviousAnimationModes.Add(CurrentState, AnimMode);
 		SkelMesh->PlayAnimation(AnimationToPlay, bLooping);
-		if (AnimationToPlay->GetMaxCurrentTime() > 0 && !bLooping)
+		if (!bLooping)
 		{
-			FTimerHandle& NewOrExistingHandle = ActiveHandles.FindOrAdd(MoveTemp(CurrentState));
-			ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh, AnimMode), AnimationToPlay->GetMaxCurrentTime(), false);
-		}
-		else if(AnimMode == EAnimationMode::AnimationBlueprint)
-		{
-			SkelMesh->SetAnimationMode(AnimMode);
+			if (AnimationToPlay->GetMaxCurrentTime() > 0)
+			{
+				FTimerHandle& NewOrExistingHandle = ActiveHandles.FindOrAdd(MoveTemp(CurrentState));
+				ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetMaxCurrentTime(), false);
+			}
+			else if (AnimMode == EAnimationMode::AnimationBlueprint)
+			{
+				SkelMesh->SetAnimationMode(AnimMode);
+			}
 		}
 	}
 }
 
 void URpaiActionTask_PlayAnimation::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	ActiveHandles.Remove(CurrentState);
+	if (!bLooping)
+	{
+		ActiveHandles.Remove(CurrentState);
+		PreviousAnimationModes.Remove(CurrentState);
+	}
 }
 
 void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
@@ -65,21 +73,36 @@ void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAICo
 	}
 
 	USkeletalMeshComponent* SkelMesh = GetMeshFromController(ActionInstigator);
-	if (SkelMesh != nullptr && SkelMesh->AnimationData.AnimToPlay == AnimationToPlay && SkelMesh->IsPlaying())
+	if (SkelMesh != nullptr)
 	{
 		SkelMesh->Stop();
+		EAnimationMode::Type PreviousAnimationMode;
+		if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
+		{
+			if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
+			{
+				SkelMesh->SetAnimationMode(PreviousAnimationMode);
+			}
+		}
 	}
 }
 
-void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh, EAnimationMode::Type PreviousAnimationMode)
+void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh)
 {
-	if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
+	EAnimationMode::Type PreviousAnimationMode;
+	if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
 	{
-		if (Mesh == GetMeshFromController(ActionInstigator))
+		if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
 		{
-			Mesh->SetAnimationMode(PreviousAnimationMode);
+			if (Mesh == GetMeshFromController(ActionInstigator))
+			{
+				Mesh->SetAnimationMode(PreviousAnimationMode);
+			}
 		}
 	}
-	CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	if (!bCompleteAfterStart)
+	{
+		CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	}
 }
 

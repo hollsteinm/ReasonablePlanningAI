@@ -8,6 +8,15 @@
 #include "Composer/RpaiComposerStateQuery.h"
 #include "Core/RpaiState.h"
 
+void URpaiComposerAction::HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, AActor* ActionTargetActor, UWorld* ActionWorld)
+{
+	if (CompletedActionTask == ActionTask)
+	{
+		ActionTask->OnActionTaskComplete().RemoveAll(this);
+		CompleteAction(ActionInstigator, State, ActionTargetActor, ActionWorld);
+	}
+}
+
 float URpaiComposerAction::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
 	check(WeightAlgorithm != nullptr);
@@ -19,17 +28,19 @@ void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* Actio
 	check(ActionTask != nullptr);
 	if (LockResourceOnStart.IsNone())
 	{
+		ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionTargetActor, ActionWorld);
 		ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 	}
 	else
 	{
-		if (CurrentState->LockResource(LockResourceOnStart))
+		if (CurrentState->LockResource(LockResourceOnStart, this))
 		{
+			ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionTargetActor, ActionWorld);
 			ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 		}
 		else
 		{
-			ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+			CancelAction(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 		}
 	}
 }
@@ -46,7 +57,7 @@ void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* Acti
 	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 	if (!LockResourceOnStart.IsNone())
 	{
-		CurrentState->UnlockResource(LockResourceOnStart);
+		CurrentState->UnlockResource(LockResourceOnStart, this);
 	}
 }
 
@@ -56,7 +67,7 @@ void URpaiComposerAction::ReceiveCompleteAction_Implementation(AAIController* Ac
 	ActionTask->CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 	if (!LockResourceOnStart.IsNone())
 	{
-		CurrentState->UnlockResource(LockResourceOnStart);
+		CurrentState->UnlockResource(LockResourceOnStart, this);
 	}
 }
 

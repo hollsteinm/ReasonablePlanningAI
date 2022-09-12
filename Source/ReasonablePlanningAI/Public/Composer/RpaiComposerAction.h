@@ -20,6 +20,9 @@ class REASONABLEPLANNINGAI_API URpaiComposerAction : public URpaiActionBase
 {
 	GENERATED_BODY()
 
+private:
+	void HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, AActor* ActionTargetActor, UWorld* ActionWorld);
+
 protected:
 	/** Start URpaiActionBase*/
 	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;

@@ -15,3 +15,8 @@ bool URpaiState::HasReferencedState(const FStateKeyValueReference& StateProperty
 		StatePropertyReference.ExpectedValueType != EStatePropertyType::Invalid &&
 		StatePropertyReference.ExpectedValueType == GetTypeFromName(StatePropertyReference.StateKeyName);
 }
+
+void URpaiState::SetStateFromController(const AAIController* FromController)
+{
+
+}

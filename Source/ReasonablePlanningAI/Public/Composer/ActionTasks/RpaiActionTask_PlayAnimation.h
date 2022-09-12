@@ -31,6 +31,7 @@ protected:
 private:
 	//So we can support a service type action task. Handle won't have valid index set by the time we setup the callback, so use Guid
 	TMap<URpaiState*, FTimerHandle> ActiveHandles;
+	TMap<URpaiState*, EAnimationMode::Type> PreviousAnimationModes;
 
-	void OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh, EAnimationMode::Type PreviousAnimationMode);
+	void OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh);
 };

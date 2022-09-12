@@ -42,7 +42,6 @@ static void SetStructType(URpaiState_Reflection* Container, FName ValueName, TTy
 URpaiState_Reflection::URpaiState_Reflection()
 	: Resources(CreateDefaultSubobject<URpaiResourceCollection>(TEXT("Resources")))
 {
-
 }
 
 bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
@@ -119,6 +118,22 @@ bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
 			if (OtherState->GetValueOfType(Piter->NamePrivate, Rhs))
 			{
 				float Lhs = CastField<FFloatProperty>(*Piter)->GetPropertyValue_InContainer(this);
+				if (Lhs != Rhs)
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else if (Piter->IsA<FDoubleProperty>())
+		{
+			double Rhs;
+			if (OtherState->GetValueOfType(Piter->NamePrivate, Rhs))
+			{
+				double Lhs = CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this);
 				if (Lhs != Rhs)
 				{
 					return false;
@@ -249,7 +264,7 @@ bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
 
 void URpaiState_Reflection::SetBool(FName ValueName, bool Value)
 {
-	auto Property = CastField<FBoolProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FBoolProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -258,7 +273,7 @@ void URpaiState_Reflection::SetBool(FName ValueName, bool Value)
 
 void URpaiState_Reflection::SetClassValue(FName ValueName, UClass* Value)
 {
-	auto Property = CastField<FClassProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FClassProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -269,7 +284,7 @@ void URpaiState_Reflection::SetEnum(FName ValueName, UEnum* Type, uint8 Value)
 {
 	if (Type != nullptr && Type->IsValidEnumValue(Value))
 	{
-		auto Property = CastField<FEnumProperty>(GetClass()->FindPropertyByName(ValueName));
+		auto Property = FindFProperty<FEnumProperty>(GetClass(), ValueName);
 		if (Property != nullptr)
 		{
 			if (Property->GetEnum() == Type)
@@ -286,16 +301,20 @@ void URpaiState_Reflection::SetEnum(FName ValueName, UEnum* Type, uint8 Value)
 
 void URpaiState_Reflection::SetFloat(FName ValueName, float Value)
 {
-	auto Property = CastField<FFloatProperty>(GetClass()->FindPropertyByName(ValueName));
-	if (Property != nullptr)
+	auto Property = FindFProperty<FProperty>(GetClass(), ValueName);
+	if (auto FloatProperty = CastField<FFloatProperty>(Property))
 	{
-		Property->SetPropertyValue_InContainer(this, Value);
+		FloatProperty->SetPropertyValue_InContainer(this, Value);
+	}
+	else if (auto DoubleProperty = CastField<FDoubleProperty>(Property))
+	{
+		DoubleProperty->SetPropertyValue_InContainer(this, static_cast<double>(Value));
 	}
 }
 
 void URpaiState_Reflection::SetInt(FName ValueName, int32 Value)
 {
-	auto Property = CastField<FIntProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FIntProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -304,7 +323,7 @@ void URpaiState_Reflection::SetInt(FName ValueName, int32 Value)
 
 void URpaiState_Reflection::SetNameValue(FName ValueName, FName Value)
 {
-	auto Property = CastField<FNameProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FNameProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -313,7 +332,7 @@ void URpaiState_Reflection::SetNameValue(FName ValueName, FName Value)
 
 void URpaiState_Reflection::SetObject(FName ValueName, UObject* Value)
 {
-	auto Property = CastField<FObjectProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FObjectProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -327,7 +346,7 @@ void URpaiState_Reflection::SetRotator(FName ValueName, FRotator Value)
 
 void URpaiState_Reflection::SetString(FName ValueName, FString Value)
 {
-	auto Property = CastField<FStrProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FStrProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		Property->SetPropertyValue_InContainer(this, Value);
@@ -341,7 +360,7 @@ void URpaiState_Reflection::SetVector(FName ValueName, FVector Value)
 
 bool URpaiState_Reflection::GetBool(FName ValueName, bool& OutValue) const
 {
-	auto Property = CastField<FBoolProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FBoolProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Property->GetPropertyValue_InContainer(this);
@@ -352,7 +371,7 @@ bool URpaiState_Reflection::GetBool(FName ValueName, bool& OutValue) const
 
 bool URpaiState_Reflection::GetClassValue(FName ValueName, UClass*& OutValue) const
 {
-	auto Property = CastField<FClassProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FClassProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Cast<UClass>(Property->GetPropertyValue_InContainer(this));
@@ -363,7 +382,7 @@ bool URpaiState_Reflection::GetClassValue(FName ValueName, UClass*& OutValue) co
 
 bool URpaiState_Reflection::GetEnum(FName ValueName, UEnum* Type, uint8& OutValue) const
 {
-	auto Property = CastField<FEnumProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FEnumProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		if (Property->GetEnum() == Type)
@@ -381,10 +400,15 @@ bool URpaiState_Reflection::GetEnum(FName ValueName, UEnum* Type, uint8& OutValu
 
 bool URpaiState_Reflection::GetFloat(FName ValueName, float& OutValue) const
 {
-	auto Property = CastField<FFloatProperty>(GetClass()->FindPropertyByName(ValueName));
-	if (Property != nullptr)
+	auto Property = FindFProperty<FProperty>(GetClass(), ValueName);
+	if (auto FloatProperty = CastField<FFloatProperty>(Property))
 	{
-		OutValue = Property->GetPropertyValue_InContainer(this);
+		OutValue = FloatProperty->GetPropertyValue_InContainer(this);
+		return true;
+	}
+	else if (auto DoubleProperty = CastField<FDoubleProperty>(Property))
+	{
+		OutValue = DoubleProperty->GetPropertyValue_InContainer(this);
 		return true;
 	}
 	return false;
@@ -392,7 +416,7 @@ bool URpaiState_Reflection::GetFloat(FName ValueName, float& OutValue) const
 
 bool URpaiState_Reflection::GetInt(FName ValueName, int32& OutValue) const
 {
-	auto Property = CastField<FIntProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FIntProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Property->GetPropertyValue_InContainer(this);
@@ -403,7 +427,7 @@ bool URpaiState_Reflection::GetInt(FName ValueName, int32& OutValue) const
 
 bool URpaiState_Reflection::GetNameValue(FName ValueName, FName& OutValue) const
 {
-	auto Property = CastField<FNameProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FNameProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Property->GetPropertyValue_InContainer(this);
@@ -414,7 +438,7 @@ bool URpaiState_Reflection::GetNameValue(FName ValueName, FName& OutValue) const
 
 bool URpaiState_Reflection::GetObject(FName ValueName, UObject*& OutValue) const
 {
-	auto Property = CastField<FObjectProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FObjectProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Property->GetPropertyValue_InContainer(this);
@@ -430,7 +454,7 @@ bool URpaiState_Reflection::GetRotator(FName ValueName, FRotator& OutValue) cons
 
 bool URpaiState_Reflection::GetString(FName ValueName, FString& OutValue) const
 {
-	auto Property = CastField<FStrProperty>(GetClass()->FindPropertyByName(ValueName));
+	auto Property = FindFProperty<FStrProperty>(GetClass(), ValueName);
 	if (Property != nullptr)
 	{
 		OutValue = Property->GetPropertyValue_InContainer(this);
@@ -465,7 +489,7 @@ bool URpaiState_Reflection::HasEnum(FName ValueName) const
 bool URpaiState_Reflection::HasFloat(FName ValueName) const
 {
 	auto Property = GetClass()->FindPropertyByName(ValueName);
-	return Property != nullptr ? Property->IsA<FFloatProperty>() : false;
+	return Property != nullptr ? (Property->IsA<FFloatProperty>() || Property->IsA<FDoubleProperty>()) : false;
 }
 
 bool URpaiState_Reflection::HasInt(FName ValueName) const
@@ -595,6 +619,10 @@ void URpaiState_Reflection::CopyStateForPredictionTo(URpaiState* OtherState) con
 			{
 				OtherState->SetValueOfType(Piter->NamePrivate, CastField<FFloatProperty>(*Piter)->GetPropertyValue_InContainer(this));
 			}
+			else if (Piter->IsA<FDoubleProperty>())
+			{
+				OtherState->SetValueOfType(Piter->NamePrivate, CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this));
+			}
 			else if (Piter->IsA<FIntProperty>())
 			{
 				OtherState->SetValueOfType(Piter->NamePrivate, CastField<FIntProperty>(*Piter)->GetPropertyValue_InContainer(this));
@@ -613,7 +641,7 @@ void URpaiState_Reflection::CopyStateForPredictionTo(URpaiState* OtherState) con
 			}
 			else if (Piter->IsA<FStructProperty>())
 			{
-				if (auto StructProperty = Cast<FStructProperty>(*Piter))
+				if (auto StructProperty = CastField<FStructProperty>(*Piter))
 				{
 					if (StructProperty->Struct == TBaseStructure<FVector>::Get())
 					{
