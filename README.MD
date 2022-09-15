@@ -1,5 +1,7 @@
 # Reasonable Planning AI
 
+Discuss the future of this project with us in real time on our [Discord](https://discord.com/invite/Tv7uMsMh).
+
 ![Icon](./Resources/Icon128.png)
 
 Create an AI that can think for itself and plan a series of actions using only a data driven Editor. Your players will be astounded by the smart responsiveness of the AI to your game environment and marvel at it's ability to adapt and act on the fly!
@@ -24,7 +26,7 @@ There are two layers to the Reasonable Planning AI that make it a robust AI solu
 
 ### Core
 
-There are five (6) Core components implementing Reasonable Planning AI that builds the foundation of the plugin.
+There are five (5) Core components implementing Reasonable Planning AI that builds the foundation of the plugin.
 
 - RpaiGoalBase
 - RpaiActionBase
@@ -44,6 +46,7 @@ The Composer layer is built on top of the Core layer of Reasonable Planning AI. 
 - RpaiComposerAction
 - RpaiComposerBrainComponent
 - RpaiComposerActionTask
+- RpaiComposerActionTaskBase
 - RpaiComposerStateQuery
 - RpaiComposerStateMutator
 - RpaiComposerDistance
@@ -53,23 +56,23 @@ The Composer layer is built on top of the Core layer of Reasonable Planning AI. 
 The relationship of these classes to each other are defined below. For additonal details please refer to the documentation of the classes either in the Unreal Engine Editor or C++ comments. Ultimately the classes are used to configure data queries to provide cost, weight, applicability, and mutations during the goal selection and action planning processes. `RpaiActionTasks` are predefined actions your AI can do within the game world. `RpaiComposerBrianComponent` is an extension of `RpaiBrainComponent` that adds a factory method to create goals and actions plans from the defined `RpaiComposerBehavior` data asset.
 
 - RpaiComposerGoal
--- RpaiStateQuery
--- RpaiComposerDistance
--- RpaiComposerWeight
+  - RpaiStateQuery
+  - RpaiComposerDistance
+  - RpaiComposerWeight
 
 - RpaiComposerAction
--- RpaiComposerStateQuery
--- RpaiComposerWeight
--- RpaiComposerStateMutator
--- RpaiComposerActionTask
+  - RpaiComposerStateQuery
+  - RpaiComposerWeight
+  - RpaiComposerStateMutator
+  - RpaiComposerActionTask
 
 - RpaiComposerBehavior
--- RpaiComposerAction[]
--- RpaiComposerGoal[]
--- RpaiState: SubclassOf
+  - RpaiComposerAction[]
+  - RpaiComposerGoal[]
+  - RpaiState: SubclassOf
 
 - RpaiComposerBrainComponent
--- RpaiComposerBehavior
+  - RpaiComposerBehavior
 
 To start using Reasonable Planning AI Composer within the Editor, simply create a new DataAsset within your Content folder and select the type RpaiCmposerBehavior. From there you will be able to define and configure your new AI! See below for a simple tutorial.
 
@@ -103,147 +106,184 @@ You can give Reasonable Planning AI a quick try by configuring a simple AI by fo
 
 > This works for both Unreal Engine 4.27.2 and Unreal Engine 5.0.2. Screenshots are taken in UE5, but the workflow is the same with the exception of step 1.a where the Place Actors window should already be open in 4.27.2.
 
-1) Create a New Project (Third Person C++) with Starter Content or open an existing project and create a new Basic world with Navigation
-
-	a) In your project select New -> Level. In the dialogue select "Basic".
-	b) Place a Navigation Volume from the "Place Actors" panel. If you do not see it, open by selecting Window -> Place Actors. Search for "Nav" and drag and drop "NavMeshBoundsVolume" into the Level Viewport.
+- Create a New Project (Third Person C++) with Starter Content or open an existing project and create a new Basic world with Navigation
+- In your project select New -> Level. In the dialogue select "Basic".
+- Place a Navigation Volume from the "Place Actors" panel. If you do not see it, open by selecting Window -> Place Actors. Search for "Nav" and drag and drop "NavMeshBoundsVolume" into the Level Viewport.
 
 ![View of the Place Actor Window and the proper selection](./Images/00-Tutorial-AddNavMeshBoundsVolume.png)
 
-		i) Set Location to 0,0,0
-		ii) Set the Brush X and Y values to 10000.0 and the Z value to 1000.0
+- Set Location to 0,0,0
+- Set the Brush X and Y values to 10000.0 and the Z value to 1000.0
 
 ![Example of the Brush Settings](./Images/01-Tutorial-SetNavMeshBOundsVolume.png)
 
-		iii) To confirm navigation covers the floor, press `P` to visualize the NavMesh. It should have a green overlay.
+- To confirm navigation covers the floor, press `P` to visualize the NavMesh. It should have a green overlay.
 
 ![Example of the AI Nav Mesh Debug View](./Images/02-Tutorial-ExampleAINavDebugView.png)
 
-2) Create an `RpaiComposerBehavior`
-
-	a) Right click your Content Browser drawer and select Miscelaneous > Data Asset
+- Create an `RpaiComposerBehavior`
+- Right click your Content Browser drawer and select Miscelaneous > Data Asset
 
 ![What the view will look like if you follow instructions](./Images/03-Tutorial-SelectDataAsset.png)
 
-	c) Search for "Rpai" and select `RpaiComposerBehavior`
+- Search for "Rpai" and select `RpaiComposerBehavior`
 
 ![Example of the correct selection](./Images/04-Tutorial-SelectRpaiComposerBehavior.png)
 
-3) Configure your newly named Composer Behavior
-
-	a) For the `ConstructedStateType` select `RpaiState_Map`
-	b) For the `Reasoner` select `Rpai Reasoner Dual Utility`
-	c) For the `Planner` select `Rpai Planner AStar`
+- Configure your newly named Composer Behavior
+- For the `ConstructedStateType` select `RpaiState_Map`
+- For the `Reasoner` select `Rpai Reasoner Dual Utility`
+- For the `Planner` select `Rpai Planner AStar`
 
 ![What your configuration view should look like at this point](./Images/05-Tutorial-StateReasonerPlannerConfiguration.png)
 
-	b) Add a Goal by clicking the plus sign to the right of the `Goals` field.
+- Add a Goal by clicking the plus sign to the right of the `Goals` field.
 
 > Note within Rpai Vector to Vector comparisons are done via the squared value of the distance between the two vectors. `FVector::DistSquared`.
 
-		i) Select the arrow to the left of `Index [ 0 ]`
-		ii) For `Distance Calculator` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
-			aa) For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
-			bb) For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- Select the arrow to the left of `Index [ 0 ]`
+- For `Distance Calculator` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
+- For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
 
-![Distance Calculator Configuration](./Images/06-Tutorial-DistanceCalculatorConfiguration.png)
+![Distance Calculator Configuration](./Images/06-Tutorial-DistanceAlgorithmConfiguration.png)
 
-		iii) For `Weight` select `Rpai Weight Distance`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
-			aa) For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessar
-			bb) For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
-			cc) For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- For `Weight` select `Rpai Weight Distance`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
+- For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessar
+- For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
 
 > Because there are no other goals configured in this tutorial, the Weight is somewhat of a throw away configuration. Ideally, the weight of a goal represents the value of choosing this goal.
 
 ![Weight Configuration](./Images/07-Tutorial-WeightConfiguration.png)
 
-		iv) For `Is Applicable Query` select `Rpai State Query Compare Distance Float`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
-			aa) For `Comparison Operation` select "Greater Than"
-			bb) For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessar
-			bb) For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
-			cc) For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
-			dd) For `RHS` set the value to "90000.0" (this is 300.0 squared)
+- For `Is Applicable Query` select `Rpai State Query Compare Distance Float`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
+- For `Comparison Operation` select "Greater Than"
+- For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessar
+- For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- For `RHS` set the value to "90000.0" (this is 300.0 squared)
 
 ![Is Applicable Query Configuration](./Images/08-Tutorial-IsApplicableQueryConfiguration.png)
 
-		v) For `Is in Desired State Query` select `Rpai State Query Compare Distance Float`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary. Configure these fields the same as the step above.
-			aa) For `Comparison Operation` select "Less Than Or Equal To"
-			bb) For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
-			bb) For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
-			cc) For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
-			dd) For `RHS` set the value to "90000.0" (this is 300.0 squared)
+- For `Is in Desired State Query` select `Rpai State Query Compare Distance Float`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary. Configure these fields the same as the step above.
+- For `Comparison Operation` select "Less Than Or Equal To"
+- For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
+- For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- For `RHS` set the value to "90000.0" (this is 300.0 squared)
 
 ![Is In Desired State Query Configuration](./Images/09-Tutorial-IsInDesiredStateQueryConfiguration.png)
 
-		vi) Set the `Category` to 0 (this is the Highest Priority Group)
-		vii) Set the `Goal Name` to "TravelToTargetLocation".
-
-	c) Add an Action by clicking the plus sign
-		i) For `Weight Algorithm` select `Rpai Weight Distance`
-			aa) For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
-			bb) For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
-			cc) For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- Set the `Category` to 0 (this is the Highest Priority Group)
+- Set the `Goal Name` to "TravelToTargetLocation".
+- Add an Action by clicking the plus sign
+- For `Weight Algorithm` select `Rpai Weight Distance`
+- For `Distance` select `Rpai Distance State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
+- For `Right Hand Side State Reference Key`, expand details and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Left Hand Side State Reference Key`, expand details and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
 
 ![Weight Algorithm Configuration](./Images/10-Tutorial-WeightAlgorithmConfiguration.png)
 
-		ii) For `Action Task` select `Rpai Action Task Move To`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
-		iii) Change `Action Task State Key Value Reference` by setting `State Key Name` to "TargetLocation".
+- For `Action Task` select `Rpai Action Task Move To`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary
+- Change `Action Task State Key Value Reference` by setting `State Key Name` to "TargetLocation".
 
 ![Action Task Configuration](./Images/11-Tutorial-ActionTaskConfiguration.png)
 
-		iv) For `Apply to State Mutators`, press the plus icon to add a new element and expand using the dropdown arrow on the left side, then expand `Index [ 0 ]` in the same manner as before.
-			aa) For the element select `Rpai State Mutator Copy State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
-			bb) Expand `State Property to Copy` and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
-			cc) Expand `State Property to Mutate` and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
+- For `Apply to State Mutators`, press the plus icon to add a new element and expand using the dropdown arrow on the left side, then expand `Index [ 0 ]` in the same manner as before.
+- For the element select `Rpai State Mutator Copy State`. Select the arrow to the left to expand details if necessary, also expand the Rpai details if necessary.
+- Expand `State Property to Copy` and set `State Key Name` to "TargetLocation" and `Expected Value Type` to "Vector"
+- Expand `State Property to Mutate` and set `State Key Name` to "CurrentLocation" and `Expected Value Type` to "Vector"
 
 ![Apply to State Mutator Configuration](./Images/12-Tutorial-ApplyToStateMutatorConfiguration.png)
 
 > Keep in Mind: The action mutators only have an impact in the hueristics of planning an action plan. Do not think of this as actions happening over time in your game. Rather, consider the state of the AI after the action has fully completed. So for this tutorial, when the action is completed, the AI agent will be at the location of "TargetLocation" (or at least near it). Do not try to make everything exact, fuzzy values work best here.
 
-		v) For `Is Applicable Query` set the value to `Rpai State Query Every`.
+- For `Is Applicable Query` set the value to `Rpai State Query Every`.
 
 > Note: An empty `Rpai State Query Every` is equivalent to an Always True configuration. An empty `Rpai State Query Any` is equivalent to an Always False configuration.
 
-		vi) Set the `Action Name` to "WalkToTargetLocation"
-	
-	d) Save and close your new behavior data asset
+- Set the `Action Name` to "WalkToTargetLocation"
+- Save and close your new behavior data asset
 
 ![Final Set of Reasonable Planning AI Configuration Configuration](./Images/13-Tutorial-FinalSetOfActionConfiguration.png)
 
-3) Create a child class of `RpaiComposerBrainComponent`.
+- Create a child class of `RpaiComposerBrainComponent`.
 
 > Important Note: At this state the generation of current state does occur in code or Blueprints. This is a temporary stop gap and will be data driven in the future.
 
 ![Creating a child class of RpaiComposerBrainComponent](./Images/14-Tutorial-SelectComposerBrainComponentParentClass.png)
 
-	a) Open your newly created Blueprint Class
-	b) Hover over Functions and select Override and `Set State from Ai`
+- Open your newly created Blueprint Class
+- Hover over Functions and select Override and `Set State from Ai`
 
 ![Creating a child class of RpaiComposerBrainComponent](./Images/15-Tutorial-OverrideSetStateFromAi.png)
 
-	c) Configure the function definition as pictured below
+- Configure the function definition as pictured below
 
 ![Set State from Ai tutorial configuration](./Images/16-Tutorial-ConfigureSetStateFromAiBlueprints.png)
 
-	d) In the "Event Graph" call `Start Logic` in the `Event Begin Play` node.
+- In the "Event Graph" call `Start Logic` in the `Event Begin Play` node.
 
 ![Start Logic in Begin Play](./Images/17-Tutorial-StartLogic.png)
 
-	e) In the Details panel for your component, expand the `Rpai` section and set the `Reasonable Planning Behavior` field to your newly created `RpaiComposerBehavior` data asset.
-
-4) Create a new AIController child class.
-
-5) Add your newly created Brain Component as a component to the newly created AIController class.
-
-6) Create a new Character Blueprint.
-	a) Set the AI Controller class for your new Character Blueprint to your newly created AIController class.
-	b) Set the SkeletalMeshComponent Mesh to the Mannequin Mesh
-	c) Set the Animation to Use Anim Blueprint and select the Third Person Anim Blueprint (if not already configured)
-
-8) Place your new AI Character in the World and Press "Play" or "Simulate" (Alt+S on Windows)
+- In the Details panel for your component, expand the `Rpai` section and set the `Reasonable Planning Behavior` field to your newly created `RpaiComposerBehavior` data asset.
+- Create a new AIController child class.
+- Add your newly created Brain Component as a component to the newly created AIController class.
+- Create a new Character Blueprint.
+- Set the AI Controller class for your new Character Blueprint to your newly created AIController class.
+- Set the SkeletalMeshComponent Mesh to the Mannequin Mesh
+- Set the Animation to Use Anim Blueprint and select the Third Person Anim Blueprint (if not already configured)
+- Place your new AI Character in the World and Press "Play" or "Simulate" (Alt+S on Windows)
 
 ![Start Logic in Begin Play](./Images/18-Tutorial-PlaceYourNewAiCharacter.png)
 
-9) Marvel and your AI walks to the defined "TargetLocation"!
+- Marvel and your AI walks to the defined "TargetLocation"!
+- Now go out there and create some fascinating AI and shared it on the [Troll Purse Discord](https://discord.com/invite/TGhNfHtS) in the *#trollpurse-oss* channel!
 
-10) Now go out there and create some fascinating AI and shared it on the [Troll Purse Discord](https://discord.com/invite/TGhNfHtS) in the *#trollpurse-oss* channel!
+
+## Design Patterns
+
+Porting Utility AI design patterns to Goal selection in Reasonable Planning AI as based on the reasearch found in [neu.edu](https://course.ccs.neu.edu/cs5150f13/readings/dill_designpatterns.pdf).
+Since planning uses a lot of the same structures, one may also consider adding these patterns to the actions for planning. All of the patterns referenced are the same as described in the referenced whitepaper.
+
+### Utility Patterns
+
+#### Opt Out Pattern
+
+The opt out pattern is a means to signal a consideration for a goal must not be considered regardless of utility. To accomplish this pattern assign a `StateQuery` to the `IsApplicable` array as those return boolean results. To utilize the concept of a logical and, use the `StateQuery_Every`.
+
+#### Opt In
+
+The opt in pattern can be included by using an `RpaiWeight_Select` in the `Weight` configuration. This allows the concept of "only one of those reasons needs to be true in order for the option to be valid." Additionally, it can also be implemented by using a `StateQuery_Any` within the `IsApplicable` configuration.
+
+### Execution History Patterns
+
+### Commit
+
+Apply a state variable specific to the action. Then in the `StateMutator` amplify a float value that will be applied to a `UWeight_CurveFloat` that returns a reducing weight value as the float value increases. Use a polynomial to settle down the commitment after repeated uses.
+
+### Inertia
+
+Use a `UWeight_CurveFloat` on your goal. Set a float value within your state that changes over time. Have a shorter plan of actions for the goal.
+
+### Is Done
+
+Many answers to follow this design pattern. One can use a boolean toggle on the state and use a combination of `StateMutator` and `StateQuery` within `IsApplicable`. However that is not a scalable soution and couples many actions with each other via state properties. Rather, just consider how goals and actions are weighed and distance is determined and this will be accomplished via careful planning.
+
+### Cooldown
+
+There is no concept of time natively built into the framework. One could implement this by using a float state value and a history to determine last time a goal was chosen. This is only in consideration of heuristics. `ActionTask_Wait` can implement this as part of a `ActionTask_Sequence`.
+
+### Do Once
+
+Use a boolean value on the state and an `IsApplicable` `StateQuery` to test for this value. Once entered, set to false and the Goal or Action will not be considered.
+
+### One-Time Bonus
+
+A weight based on a depreciating float value on the state can accomplish this pattern.
+
+### Repeat Penalty
+
+A combination of an incrementing integer on the state and a curve can accomplish this.
+
