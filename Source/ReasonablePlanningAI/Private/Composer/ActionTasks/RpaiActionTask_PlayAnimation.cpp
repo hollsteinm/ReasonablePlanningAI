@@ -42,10 +42,10 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 		SkelMesh->PlayAnimation(AnimationToPlay, bLooping);
 		if (!bLooping)
 		{
-			if (AnimationToPlay->GetMaxCurrentTime() > 0)
+			if (AnimationToPlay->GetPlayLength() > 0)
 			{
 				FTimerHandle& NewOrExistingHandle = ActiveHandles.FindOrAdd(MoveTemp(CurrentState));
-				ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetMaxCurrentTime(), false);
+				ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetPlayLength(), false);
 			}
 			else if (AnimMode == EAnimationMode::AnimationBlueprint)
 			{

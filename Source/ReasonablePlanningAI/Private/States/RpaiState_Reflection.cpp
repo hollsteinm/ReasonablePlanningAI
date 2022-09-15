@@ -34,7 +34,8 @@ static void SetStructType(URpaiState_Reflection* Container, FName ValueName, TTy
 		auto PropertyValuePtr = Property->ContainerPtrToValuePtr<TType>(Container);
 		if (PropertyValuePtr != nullptr)
 		{
-			FMemory::Memcpy(PropertyValuePtr, &Value, sizeof(TType));
+			auto Size = sizeof(TType);
+			FMemory::Memcpy(PropertyValuePtr, &Value, Size);
 		}
 	}
 }
@@ -130,10 +131,11 @@ bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
 		}
 		else if (Piter->IsA<FDoubleProperty>())
 		{
-			double Rhs;
+			//Intentional at the moment
+			float Rhs;
 			if (OtherState->GetValueOfType(Piter->NamePrivate, Rhs))
 			{
-				double Lhs = CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this);
+				float Lhs = CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this);
 				if (Lhs != Rhs)
 				{
 					return false;
@@ -621,7 +623,7 @@ void URpaiState_Reflection::CopyStateForPredictionTo(URpaiState* OtherState) con
 			}
 			else if (Piter->IsA<FDoubleProperty>())
 			{
-				OtherState->SetValueOfType(Piter->NamePrivate, CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this));
+				OtherState->SetValueOfType(Piter->NamePrivate, static_cast<float>(CastField<FDoubleProperty>(*Piter)->GetPropertyValue_InContainer(this)));
 			}
 			else if (Piter->IsA<FIntProperty>())
 			{
@@ -645,11 +647,13 @@ void URpaiState_Reflection::CopyStateForPredictionTo(URpaiState* OtherState) con
 				{
 					if (StructProperty->Struct == TBaseStructure<FVector>::Get())
 					{
-						OtherState->SetValueOfType(Piter->NamePrivate, StructProperty->ContainerPtrToValuePtr<FVector>(this));
+						const FVector* Value = StructProperty->ContainerPtrToValuePtr<FVector>(this);
+						OtherState->SetValueOfType(Piter->NamePrivate, *Value);
 					}
 					else if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
 					{
-						OtherState->SetValueOfType(Piter->NamePrivate, StructProperty->ContainerPtrToValuePtr<FRotator>(this));
+						const FRotator* Value = StructProperty->ContainerPtrToValuePtr<FRotator>(this);
+						OtherState->SetValueOfType(Piter->NamePrivate, *Value);
 					}
 				}
 			}

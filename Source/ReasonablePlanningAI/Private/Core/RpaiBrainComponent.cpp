@@ -19,6 +19,7 @@ URpaiBrainComponent::URpaiBrainComponent()
 	, CachedStateInstance(nullptr)
 	, bIsPaused(false)
 {
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void URpaiBrainComponent::BeginPlay()
@@ -265,4 +266,21 @@ void URpaiBrainComponent::SetStateFromAi_Implementation(URpaiState* StateToModif
 	{
 		StateToModify->SetStateFromController(AI);
 	}
+}
+
+FString URpaiBrainComponent::GetDebugInfoString() const
+{
+	FString DebugInfo = Super::GetDebugInfoString();
+
+	auto CurrentGoalString = CurrentGoal == nullptr ? "none" : CurrentGoal->GetName().Append(":").Append(CurrentGoal->GetGoalName());
+	auto CurrentActionString = CurrentAction == nullptr ? "none" : CurrentAction->GetName().Append(":").Append(CurrentAction->GetActionName());
+
+	DebugInfo += FString::Printf(TEXT("Goal: %s\n"), *CurrentGoalString);
+	DebugInfo += FString::Printf(TEXT("Action: %s\n"), *CurrentActionString);
+	DebugInfo += FString::Printf(TEXT("Remaining Planned Actions (%i):\n"), PlannedActions.Num());
+	for (const auto PlannedAction : PlannedActions)
+	{
+		DebugInfo += FString::Printf(TEXT("\t%s\n"), *FString(PlannedAction->GetName().Append(":").Append(PlannedAction->GetActionName())));
+	}
+	return DebugInfo;
 }

@@ -361,13 +361,13 @@ public:
     // C++ Template Helpers
 
     template<typename T>
-    FORCEINLINE bool HasValueOfType(FName ValueName) const { return false; }
+    FORCEINLINE bool HasValueOfType(FName ValueName) const { static_assert(false, "Not Implemented"); return false; }
 
     template<typename T>
-    FORCEINLINE bool GetValueOfType(FName ValueName, T& OutValue) const { return false; }
+    FORCEINLINE bool GetValueOfType(FName ValueName, T& OutValue) const { static_assert(false, "Not Implemented"); return false; }
 
     template<typename T>
-    FORCEINLINE void SetValueOfType(FName ValueName, T NewValue) { }
+    FORCEINLINE void SetValueOfType(FName ValueName, T NewValue) { static_assert(false, "Not Implemented"); }
 
 
     // Helper Specializations

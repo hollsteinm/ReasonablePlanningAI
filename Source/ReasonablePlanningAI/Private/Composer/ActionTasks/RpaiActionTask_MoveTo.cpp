@@ -109,8 +109,10 @@ void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator
 			if (AIBrain != nullptr)
 			{
 				//Returns a handle, but the brain component actually caches it so let us not worry about it.
-				FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_MoveFinished, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
-				FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_RepathFailed, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
+				auto MoveHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_MoveFinished, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
+				auto RepathHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_RepathFailed, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
+				MoveFinishedHandles.Add(MoveRequest.MoveId, MoveHandle);
+				RepathFailedHandles.Add(MoveRequest.MoveId, RepathHandle);
 			}
 		}
 		break;
@@ -125,6 +127,8 @@ void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator
 
 void URpaiActionTask_MoveTo::OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState)
 {
+	MoveFinishedHandles.Remove(Message.RequestID);
+	RepathFailedHandles.Remove(Message.RequestID);
 	if (Message.Status == FAIMessage::Success)
 	{
 		CompleteActionTask(ActionInstigator, CurrentState);

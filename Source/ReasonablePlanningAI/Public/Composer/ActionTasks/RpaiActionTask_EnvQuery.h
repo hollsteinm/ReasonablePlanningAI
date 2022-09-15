@@ -30,8 +30,8 @@ public:
 	TEnumAsByte<EEnvQueryRunMode::Type> RunMode;
 
 private:
-	UPROPERTY()
 	TMap<const URpaiState*, int32> QueryRequestToState;
+	TArray<FAIMessageObserverHandle> ObserverCache;
 
 	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result, AAIController* ActionInstigator, URpaiState* CurrentState);
 	void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState);

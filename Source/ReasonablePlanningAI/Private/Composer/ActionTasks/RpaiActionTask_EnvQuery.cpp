@@ -28,7 +28,7 @@ void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIControll
 		//Execute
 		if (QueryTemplate != nullptr)
 		{
-			FEnvQueryRequest Request(QueryTemplate, this);
+			FEnvQueryRequest Request(QueryTemplate, ActionInstigator->GetPawn());
 			if (QueryConfig.Num() > 0)
 			{
 				for (auto& Param : QueryConfig)
@@ -42,7 +42,11 @@ void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIControll
 			{
 				if (UBrainComponent* AIBrain = ActionInstigator->GetBrainComponent())
 				{
-					FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_QueryFinished, RequestId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_EnvQuery::OnAIMessage, ActionInstigator, CurrentState));
+					if (ObserverCache.Num() <= RequestId)
+					{
+						ObserverCache.SetNum(RequestId + 8 /*Arbitrarily grow by this amount*/, false);
+					}
+					ObserverCache[RequestId] = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_QueryFinished, RequestId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_EnvQuery::OnAIMessage, ActionInstigator, CurrentState));
 				}
 			}
 		}
@@ -71,6 +75,7 @@ void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Resul
 {
 	if (Result->IsAborted())
 	{
+		ObserverCache.RemoveAt(Result->QueryID);
 		return;
 	}
 
@@ -82,10 +87,21 @@ void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Resul
 	{
 		//Need to use reflection here (which sucks) because the interface is tightly
 		//coupled to blackboard. That is unless we use a blackboard state object.
-		if (UEnvQueryItemType_Actor::StaticClass() == *Result->ItemType && ActionTaskStateKeyValueReference.ExpectedValueType == EStatePropertyType::Object)
+		if (UEnvQueryItemType_Actor::StaticClass() == *Result->ItemType)
 		{
 			auto ActorItem = Cast<UEnvQueryItemType_Actor>(ItemTypeCDO);
-			CurrentState->SetObject(ActionTaskStateKeyValueReference.StateKeyName, ActorItem->GetActor(Data));
+			if (ActionTaskStateKeyValueReference.ExpectedValueType == EStatePropertyType::Object)
+			{
+				CurrentState->SetObject(ActionTaskStateKeyValueReference.StateKeyName, ActorItem->GetActor(Data));
+			}
+			else if (ActionTaskStateKeyValueReference.ExpectedValueType == EStatePropertyType::Vector)
+			{
+				CurrentState->SetValueOfType(ActionTaskStateKeyValueReference.StateKeyName, ActorItem->GetActor(Data)->GetActorLocation());
+			}
+			else
+			{
+				bSuccess = false;
+			}
 		}
 		else if (UEnvQueryItemType_Point::StaticClass() == *Result->ItemType && ActionTaskStateKeyValueReference.ExpectedValueType == EStatePropertyType::Vector)
 		{
@@ -120,4 +136,5 @@ void URpaiActionTask_EnvQuery::OnAIMessage(UBrainComponent* BrainComp, const FAI
 	{
 		CancelActionTask(ActionInstigator, CurrentState);
 	}
+	ObserverCache.RemoveAt(Message.RequestID);
 }

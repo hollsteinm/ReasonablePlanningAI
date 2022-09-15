@@ -5,6 +5,8 @@
 #include "Core/RpaiGoalBase.h"
 #include "Core/RpaiActionBase.h"
 #include "Core/RpaiState.h"
+#include "VisualLogger/VisualLoggerTypes.h"
+#include "VisualLogger/VisualLogger.h"
 
 struct FVisitedState
 {
@@ -68,6 +70,8 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(const URpaiGoalBas
 
     OpenActions.HeapPush(Start);
     int32 Iterations = 0;
+    //Reusable so we are only instantiatng new states when we need to
+    URpaiState* FutureState = NewObject<URpaiState>(Start.State, CurrentState->GetClass());
 
     while (OpenActions.Num() > 0 && ++Iterations < MaxIterations)
     {
@@ -87,10 +91,10 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(const URpaiGoalBas
                 }
                 Current = *Next;
             } while (Current.ParentId.IsValid());
+            Start.State->ConditionalBeginDestroy();
             return true;
         }
 
-        URpaiState* FutureState = NewObject<URpaiState>(GetTransientPackage(), CurrentState->GetClass());
         for (const auto& Action : GivenActions)
         {
             if (Action->IsApplicable(Current.State))
@@ -104,9 +108,10 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(const URpaiGoalBas
                 }
 
                 FVisitedState* InOpen = OpenActions.FindByKey(FutureState);
-                auto ActionCost = Action->ExecutionWeight(FutureState);
+                auto ActionCost = Action->ExecutionWeight(Current.State);
                 auto NewCost = Current.Cost + ActionCost;
                 auto NewRemaining = TargetGoal->GetDistanceToDesiredState(FutureState);
+
                 if (InOpen == nullptr)
                 {
                     FVisitedState NewNode;
@@ -115,7 +120,7 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(const URpaiGoalBas
                     NewNode.Cost = NewCost;
                     NewNode.Remaining = NewRemaining;
                     NewNode.ParentId = Current.Id;
-                    NewNode.State = NewObject<URpaiState>(GetTransientPackage(), CurrentState->GetClass());
+                    NewNode.State = NewObject<URpaiState>(Start.State, CurrentState->GetClass());
                     FutureState->CopyStateForPredictionTo(NewNode.State);
 
                     OpenActions.HeapPush(NewNode);
@@ -135,6 +140,6 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(const URpaiGoalBas
             }
         }
     }
-
+    Start.State->ConditionalBeginDestroy();
     return false;
 }

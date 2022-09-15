@@ -7,7 +7,7 @@
 #include "RpaiActionTask_Composite.generated.h"
 
 USTRUCT(BlueprintType)
-struct FRpaiCompositeActionTaskEntry
+struct REASONABLEPLANNINGAI_API FRpaiCompositeActionTaskEntry
 {
 	GENERATED_BODY()
 public:

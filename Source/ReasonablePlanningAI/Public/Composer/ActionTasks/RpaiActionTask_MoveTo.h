@@ -68,4 +68,7 @@ protected:
 private:
 	void StartMoveActionTask(AAIController* ActionInstigator, URpaiState* CurrentState);
 	void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState);
+
+	TMap<FAIRequestID, FAIMessageObserverHandle> MoveFinishedHandles;
+	TMap<FAIRequestID, FAIMessageObserverHandle> RepathFailedHandles;
 };

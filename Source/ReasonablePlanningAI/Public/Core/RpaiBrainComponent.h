@@ -25,6 +25,7 @@ public:
 	virtual void Cleanup() override;
 	virtual void PauseLogic(const FString& Reason) override;
 	virtual EAILogicResuming::Type ResumeLogic(const FString& Reason) override;
+	virtual FString GetDebugInfoString() const override;
 
 	// Actor Component
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

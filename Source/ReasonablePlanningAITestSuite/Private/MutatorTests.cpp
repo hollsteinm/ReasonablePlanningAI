@@ -375,7 +375,7 @@ void ReasonablePlanningMutatorSetNameSpec::Define()
 		{
 			It("Should set the value", [this]()
 				{
-					GivenState->SetValueOfType(UTestPlanningState::NAME_TheIntValue, NAME_None);
+					GivenState->SetValueOfType(UTestPlanningState::NAME_TheIntValue, FName(NAME_None));
 					ClassUnderTest->SetValueToSet(NAME_Actor);
 
 					ClassUnderTest->Mutate(GivenState);

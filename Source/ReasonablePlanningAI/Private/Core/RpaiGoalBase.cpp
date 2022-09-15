@@ -20,7 +20,7 @@ float URpaiGoalBase::GetDistanceToDesiredState(const URpaiState* GivenState) con
 
 bool URpaiGoalBase::IsApplicable(const URpaiState* GivenState) const
 {
-	return IsPendingKill() ? false : ReceiveIsApplicable(GivenState);
+	return IsValid(this) && ReceiveIsApplicable(GivenState);
 }
 
 float URpaiGoalBase::GetWeight(const URpaiState* GivenState) const
