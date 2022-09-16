@@ -287,3 +287,88 @@ A weight based on a depreciating float value on the state can accomplish this pa
 
 A combination of an incrementing integer on the state and a curve can accomplish this.
 
+## Integrating Smart Objects (Or Any AITask)
+
+Because Reasonable Planning AI was built with flexibilty in mind and parity with the features offered by Behavior Trees, AITasks are a natural integration supported by the Reasonable Planning AI Composer Action Task class. To add an AI Task Action Task to Reasonable Planning AI, simple extend from the parent class `RpaiActionTask_GameplayTaskBase`. Here is an example in Unreal Engine 5 (UE5) on how to add the [Smart Objects Module](https://docs.unrealengine.com/5.0/en-US/smart-objects-in-unreal-engine---overview/) to your game using Reasonable Planning AI.
+
+First, follow the instructions in the above link to active Smart Objects in your project. In your Build.cs file add the "SmartObjectModule" (if you haven't already) as a Build Dependency. Then create a C++ class similar to what is defined below.
+
+### Header Definition
+```C++
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AI/AITask_UseSmartObject.h"
+#include "Composer/ActionTasks/RpaiActionTask_GameplayTaskBase.h"
+#include "MyActionTask_WalkToUseSmartObject.generated.h"
+
+/**
+ * Navigate to and Use a Smart Object
+ */
+UCLASS()
+class MY_API UMyActionTask_WalkToUseSmartObject : public URpaiActionTask_GameplayTaskBase
+{
+	GENERATED_BODY()
+	
+protected:
+	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld) override;
+
+	UPROPERTY(EditAnywhere, Category = SmartObjects)
+	FGameplayTagQuery ActivityRequirements;
+
+	UPROPERTY(EditAnywhere, Category = SmartObjects)
+	float Radius;
+};
+```
+
+### Source Implementation
+```C++
+#include "ActionTask_WalkToUseSmartObject.h"
+#include "AI/AITask_UseSmartObject.h"
+#include "AIController.h"
+#include "GameplayTagAssetInterface.h"
+#include "SmartObjectSubsystem.h"
+#include "SmartObjectDefinition.h"
+
+void UMyActionTask_WalkToUseSmartObject::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr)
+{
+	USmartObjectSubsystem* SOSubsystem = USmartObjectSubsystem::GetCurrent(ActionWorld);
+	if (!SOSubsystem)
+	{
+		CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	}
+	
+	if (auto AIPawn = ActionInstigator->GetPawn())
+	{
+		FSmartObjectRequestFilter Filter(ActivityRequirements);
+		Filter.BehaviorDefinitionClass = USmartObjectGameplayBehaviorDefinition::StaticClass();
+		if (const IGameplayTagAssetInterface* TagsSource = Cast<const IGameplayTagAssetInterface>(AIPawn))
+		{
+			TagsSource->GetOwnedGameplayTags(Filter.UserTags);
+		}
+
+		auto Location = AIPawn->GetActorLocation();
+		FSmartObjectRequest Request(FBox(Location, Location).ExpandBy(FVector(Radius), FVector(Radius)), Filter);
+		TArray<FSmartObjectRequestResult> Results;
+		if (SOSubsystem->FindSmartObjects(Request, Results))
+		{
+			for (const auto& Result : Results)
+			{
+				auto ClaimHandle = SOSubsystem->Claim(Result);
+				if (ClaimHandle.IsValid())
+				{
+					if (auto SOTask = UAITask::NewAITask<UAITask_UseSmartObject>(*ActionInstigator, *this))
+					{
+						SOTask->SetClaimHandle(ClaimHandle);
+						SOTask->ReadyForActivation();
+						StartTask(CurrentState, SOTask);
+						return;
+					}
+				}
+			}
+		}
+	}
+	CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+}
+```
+

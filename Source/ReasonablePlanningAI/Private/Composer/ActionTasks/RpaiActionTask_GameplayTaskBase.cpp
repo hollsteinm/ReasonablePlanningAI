@@ -97,7 +97,12 @@ void URpaiActionTask_GameplayTaskBase::OnGameplayTaskDeactivated(UGameplayTask& 
 	UAITask* AITask = Cast<UAITask>(&Task);
 	if (AITask && AITask->GetAIController() && AITask->GetState() != EGameplayTaskState::Paused)
 	{
-		CompleteActionTask(AITask->GetAIController(), nullptr);
+		auto StateKey = TaskToState.FindKey(AITask);
+		if (StateKey != nullptr)
+		{
+			//naughty
+			CompleteActionTask(AITask->GetAIController(), const_cast<URpaiState*>(*StateKey));
+		}
 	}
 }
 

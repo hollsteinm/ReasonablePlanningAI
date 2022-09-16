@@ -76,7 +76,11 @@ void URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled(URpaiComposerAct
 	if (CurrentControllerAction != nullptr)
 	{
 		*CurrentControllerAction = *CurrentControllerAction + 1;
-		if (!Actions.IsValidIndex(*CurrentControllerAction))
+		if (Actions.IsValidIndex(*CurrentControllerAction))
+		{
+			Actions[*CurrentControllerAction]->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		}
+		else
 		{
 			ActiveActionSequenceIndex.Remove(ActionInstigator);
 			CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
