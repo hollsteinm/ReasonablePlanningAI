@@ -115,7 +115,7 @@ You can give Reasonable Planning AI a quick try by configuring a simple AI by fo
 - Set Location to 0,0,0
 - Set the Brush X and Y values to 10000.0 and the Z value to 1000.0
 
-![Example of the Brush Settings](./Images/01-Tutorial-SetNavMeshBOundsVolume.png)
+![Example of the Brush Settings](./Images/01-Tutorial-SetNavMeshBoundsVolume.png)
 
 - To confirm navigation covers the floor, press `P` to visualize the NavMesh. It should have a green overlay.
 
