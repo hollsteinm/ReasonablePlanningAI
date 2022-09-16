@@ -259,31 +259,31 @@ The opt in pattern can be included by using an `RpaiWeight_Select` in the `Weigh
 
 ### Execution History Patterns
 
-### Commit
+#### Commit
 
 Apply a state variable specific to the action. Then in the `StateMutator` amplify a float value that will be applied to a `UWeight_CurveFloat` that returns a reducing weight value as the float value increases. Use a polynomial to settle down the commitment after repeated uses.
 
-### Inertia
+#### Inertia
 
 Use a `UWeight_CurveFloat` on your goal. Set a float value within your state that changes over time. Have a shorter plan of actions for the goal.
 
-### Is Done
+#### Is Done
 
 Many answers to follow this design pattern. One can use a boolean toggle on the state and use a combination of `StateMutator` and `StateQuery` within `IsApplicable`. However that is not a scalable soution and couples many actions with each other via state properties. Rather, just consider how goals and actions are weighed and distance is determined and this will be accomplished via careful planning.
 
-### Cooldown
+#### Cooldown
 
 There is no concept of time natively built into the framework. One could implement this by using a float state value and a history to determine last time a goal was chosen. This is only in consideration of heuristics. `ActionTask_Wait` can implement this as part of a `ActionTask_Sequence`.
 
-### Do Once
+#### Do Once
 
 Use a boolean value on the state and an `IsApplicable` `StateQuery` to test for this value. Once entered, set to false and the Goal or Action will not be considered.
 
-### One-Time Bonus
+#### One-Time Bonus
 
 A weight based on a depreciating float value on the state can accomplish this pattern.
 
-### Repeat Penalty
+#### Repeat Penalty
 
 A combination of an incrementing integer on the state and a curve can accomplish this.
 
