@@ -25,6 +25,7 @@ static USkeletalMeshComponent* GetMeshFromController(const AAIController* Contro
 URpaiActionTask_PlayAnimation::URpaiActionTask_PlayAnimation()
 	: AnimationToPlay(nullptr)
 	, bLooping(false)
+	, bPersistOnComplete(false)
 {
 	bCompleteAfterStart = false;
 }
@@ -47,7 +48,7 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 				FTimerHandle& NewOrExistingHandle = ActiveHandles.FindOrAdd(MoveTemp(CurrentState));
 				ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetPlayLength(), false);
 			}
-			else if (AnimMode == EAnimationMode::AnimationBlueprint)
+			else if (AnimMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 			{
 				SkelMesh->SetAnimationMode(AnimMode);
 			}
@@ -79,7 +80,7 @@ void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAICo
 		EAnimationMode::Type PreviousAnimationMode;
 		if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
 		{
-			if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
+			if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 			{
 				SkelMesh->SetAnimationMode(PreviousAnimationMode);
 			}
@@ -92,7 +93,7 @@ void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigat
 	EAnimationMode::Type PreviousAnimationMode;
 	if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
 	{
-		if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint)
+		if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 		{
 			if (Mesh == GetMeshFromController(ActionInstigator))
 			{
@@ -100,7 +101,7 @@ void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigat
 			}
 		}
 	}
-	if (!bCompleteAfterStart)
+	if (!bCompleteAfterStart && !bPersistOnComplete)
 	{
 		CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
 	}

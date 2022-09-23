@@ -28,6 +28,9 @@ protected:
 	UPROPERTY(Category = "Rpai", EditAnywhere)
 	bool bLooping;
 
+	UPROPERTY(Category = "Rpai", EditAnywhere)
+	bool bPersistOnComplete;
+
 private:
 	//So we can support a service type action task. Handle won't have valid index set by the time we setup the callback, so use Guid
 	TMap<URpaiState*, FTimerHandle> ActiveHandles;
