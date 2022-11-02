@@ -42,7 +42,7 @@ void URpaiBrainComponent::UnregisterOldAction(URpaiActionBase* OldAction)
 		return;
 	}
 
-	OldAction->OnActionStarted.RemoveAll(this);
+	OldAction->OnActionComplete.RemoveAll(this);
 	OldAction->OnActionCancelled.RemoveAll(this);
 }
 
@@ -67,12 +67,6 @@ void URpaiBrainComponent::PopNextAction()
 		RegisterNewAction(CurrentAction);
 		CurrentAction->StartAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
 		UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Action Started %s"), *CurrentAction->GetActionName());
-	}
-	else
-	{
-		CurrentAction = nullptr;
-		CurrentGoal = nullptr;
-		StartLogic();
 	}
 }
 
@@ -135,6 +129,10 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 	if (CurrentAction != nullptr)
 	{
 		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, AIOwner->GetPawn(), AIOwner->GetWorld());
+	}
+	else if (PlannedActions.Num() <= 0)
+	{
+		StartLogic();
 	}
 }
 
@@ -222,14 +220,12 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	CurrentAction = nullptr;
-	CurrentGoal = nullptr;
 }
 
 void URpaiBrainComponent::Cleanup()
 {
 	PlannedActions.Empty();
 	CurrentAction = nullptr;
-	CurrentGoal = nullptr;
 }
 
 void URpaiBrainComponent::PauseLogic(const FString& Reason)
