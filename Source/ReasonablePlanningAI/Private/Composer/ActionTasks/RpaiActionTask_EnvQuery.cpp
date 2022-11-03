@@ -79,12 +79,13 @@ void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Resul
 		return;
 	}
 
-	uint8* Data = Result->RawData.GetData() + Result->Items[0].DataOffset;
-	auto ItemTypeCDO = Result->ItemType->GetDefaultObject<UEnvQueryItemType>();
 	bool bSuccess = Result->IsSuccessful() && Result->Items.Num() > 0;
 
 	if (bSuccess)
 	{
+		uint8* Data = Result->RawData.GetData() + Result->Items[0].DataOffset;
+		auto ItemTypeCDO = Result->ItemType->GetDefaultObject<UEnvQueryItemType>();
+
 		//Need to use reflection here (which sucks) because the interface is tightly
 		//coupled to blackboard. That is unless we use a blackboard state object.
 		if (UEnvQueryItemType_Actor::StaticClass() == *Result->ItemType)
