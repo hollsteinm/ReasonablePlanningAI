@@ -105,3 +105,11 @@ public:
 	virtual float ReceiveGetWeight_Implementation(const URpaiState* GivenState) const override;
 	virtual bool ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const override;
 };
+
+USTRUCT(BlueprintType)
+struct FTestStruct
+{
+	GENERATED_BODY()
+
+	int32 Value;
+};

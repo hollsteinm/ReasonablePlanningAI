@@ -8,35 +8,29 @@
 #include "AIController.h"
 #include "AITypes.h"
 
+FActionTaskGameplayTaskBaseMemory::FActionTaskGameplayTaskBaseMemory()
+	: AITask(nullptr)
+{
+
+}
+
 URpaiActionTask_GameplayTaskBase::URpaiActionTask_GameplayTaskBase()
 {
 	bCompleteAfterStart = false;
+	ActionTaskMemoryStructType = FActionTaskGameplayTaskBaseMemory::StaticStruct();
 }
 
-void URpaiActionTask_GameplayTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_GameplayTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	if (!bCompleteAfterStart)
 	{
-		UAITask* TheTask = nullptr;
-		if (TaskToState.RemoveAndCopyValue(CurrentState, TheTask))
+		UAITask* TheTask = ActionMemory.Get<FActionTaskGameplayTaskBaseMemory>()->AITask;
+		if (TheTask != nullptr && !TheTask->IsFinished())
 		{
-			if (!TheTask->IsFinished())
-			{
-				TheTask->ExternalCancel();
-			}
+			TheTask->ExternalCancel();
 		}
 	}
-	else
-	{
-		TaskToState.Remove(CurrentState);
-	}
 }
-
-void URpaiActionTask_GameplayTaskBase::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
-{
-	TaskToState.Remove(CurrentState);
-}
-
 
 UGameplayTasksComponent* URpaiActionTask_GameplayTaskBase::GetGameplayTasksComponent(const UGameplayTask& Task) const
 {
@@ -97,33 +91,22 @@ void URpaiActionTask_GameplayTaskBase::OnGameplayTaskDeactivated(UGameplayTask& 
 	UAITask* AITask = Cast<UAITask>(&Task);
 	if (AITask && AITask->GetAIController() && AITask->GetState() != EGameplayTaskState::Paused)
 	{
-		auto StateKey = TaskToState.FindKey(AITask);
-		if (StateKey != nullptr)
-		{
-			//naughty
-			CompleteActionTask(AITask->GetAIController(), const_cast<URpaiState*>(*StateKey));
-		}
+		// UMMMMMM.....
+		//auto StateKey = TaskToState.FindKey(AITask);
+		//if (StateKey != nullptr)
+		//{
+		//	//naughty
+		//	CompleteActionTask(AITask->GetAIController(), const_cast<URpaiState*>(*StateKey));
+		//}
 	}
 }
 
-UAITask* URpaiActionTask_GameplayTaskBase::GetTaskForState(const URpaiState* CurrentState)
+void URpaiActionTask_GameplayTaskBase::StartTask(URpaiState* CurrentState, UAITask* TaskToStart, FRpaiMemoryStruct ActionMemory)
 {
-	auto Result = TaskToState.Find(CurrentState);
-	return Result == nullptr ? nullptr : *Result;
-}
-
-void URpaiActionTask_GameplayTaskBase::StartTask(URpaiState* CurrentState, UAITask* TaskToStart)
-{
-	auto CurrentStateTask = TaskToState.Find(CurrentState);
-	if (CurrentStateTask != nullptr)
-	{
-		CancelActionTask(Cast<AAIController>(GetGameplayTaskOwner(*CurrentStateTask)), CurrentState);
-	}
-
+	ActionMemory.Get<FActionTaskGameplayTaskBaseMemory>()->AITask = TaskToStart;
 	TaskToStart->ReadyForActivation();
-	TaskToState.Emplace(CurrentState, TaskToStart);
 	if (TaskToStart->GetState() == EGameplayTaskState::Finished)
 	{
-		CompleteActionTask(Cast<AAIController>(GetGameplayTaskOwner(*CurrentStateTask)), CurrentState);
+		CompleteActionTask(Cast<AAIController>(GetGameplayTaskOwner(TaskToStart)), CurrentState, ActionMemory);
 	}
 }

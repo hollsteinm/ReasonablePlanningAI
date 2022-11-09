@@ -22,24 +22,24 @@ URpaiActionTask_MoveTo::URpaiActionTask_MoveTo()
 	bCompleteAfterStart = false;
 }
 
-void URpaiActionTask_MoveTo::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_MoveTo::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	if (!ActionInstigator->ShouldPostponePathUpdates())
 	{
-		StartMoveActionTask(ActionInstigator, CurrentState);
+		StartMoveActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 }
 
-void URpaiActionTask_MoveTo::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_MoveTo::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	UPathFollowingComponent* PathFollowingComponent = ActionInstigator->GetPathFollowingComponent();
 	if (!ActionInstigator->ShouldPostponePathUpdates() && PathFollowingComponent && PathFollowingComponent->GetStatus() == EPathFollowingStatus::Idle)
 	{
-		StartMoveActionTask(ActionInstigator, CurrentState);
+		StartMoveActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 }
 
-void URpaiActionTask_MoveTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_MoveTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	UPathFollowingComponent* PathFollowingComponent = ActionInstigator->GetPathFollowingComponent();
 	if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
@@ -48,7 +48,7 @@ void URpaiActionTask_MoveTo::ReceiveCancelActionTask_Implementation(AAIControlle
 	}
 }
 
-void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator, URpaiState* CurrentState)
+void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
@@ -68,14 +68,14 @@ void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator
 		UObject* MaybeActor = nullptr;
 		if (!CurrentState->GetObject(ActionTaskStateKeyValueReference.StateKeyName, MaybeActor))
 		{
-			CancelActionTask(ActionInstigator, CurrentState);
+			CancelActionTask(ActionInstigator, CurrentState, ActionMemory);
 			return;
 		}
 
 		AActor* TargetActor = Cast<AActor>(MaybeActor);
 		if (TargetActor == nullptr)
 		{
-			CancelActionTask(ActionInstigator, CurrentState);
+			CancelActionTask(ActionInstigator, CurrentState, ActionMemory);
 			return;
 		}
 		else if (bTrackMovingGoal)
@@ -109,8 +109,8 @@ void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator
 			if (AIBrain != nullptr)
 			{
 				//Returns a handle, but the brain component actually caches it so let us not worry about it.
-				auto MoveHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_MoveFinished, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
-				auto RepathHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_RepathFailed, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState));
+				auto MoveHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_MoveFinished, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState, ActionMemory));
+				auto RepathHandle = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_RepathFailed, MoveRequest.MoveId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_MoveTo::OnAIMessage, ActionInstigator, CurrentState, ActionMemory));
 				MoveFinishedHandles.Add(MoveRequest.MoveId, MoveHandle);
 				RepathFailedHandles.Add(MoveRequest.MoveId, RepathHandle);
 			}
@@ -119,22 +119,22 @@ void URpaiActionTask_MoveTo::StartMoveActionTask(AAIController* ActionInstigator
 		case EPathFollowingRequestResult::Failed:
 		case EPathFollowingRequestResult::AlreadyAtGoal:
 		default:
-			CompleteActionTask(ActionInstigator, CurrentState);
+			CompleteActionTask(ActionInstigator, CurrentState, ActionMemory);
 			break;
 		}
 	}
 }
 
-void URpaiActionTask_MoveTo::OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState)
+void URpaiActionTask_MoveTo::OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory)
 {
 	MoveFinishedHandles.Remove(Message.RequestID);
 	RepathFailedHandles.Remove(Message.RequestID);
 	if (Message.Status == FAIMessage::Success)
 	{
-		CompleteActionTask(ActionInstigator, CurrentState);
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 	else
 	{
-		CancelActionTask(ActionInstigator, CurrentState);
+		CancelActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 }

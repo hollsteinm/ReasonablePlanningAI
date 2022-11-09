@@ -18,12 +18,12 @@ static float CalculateAngleDifferenceDot(const FVector& VectorA, const FVector& 
 		: VectorA.CosineAngle2D(VectorB);
 }
 
-void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	APawn* Pawn = ActionInstigator->GetPawn();
 	if (Pawn == nullptr)
 	{
-		CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 		return;
 	}
 
@@ -41,7 +41,7 @@ void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIControll
 
 			if (AngleDifference >= PrecisionDot)
 			{
-				CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+				CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 				return;
 			}
 			else
@@ -60,7 +60,7 @@ void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIControll
 
 			if (AngleDifference >= PrecisionDot)
 			{
-				CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+				CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 				return;
 			}
 			else
@@ -79,7 +79,7 @@ void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIControll
 
 			if (AngleDifference >= PrecisionDot)
 			{
-				CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+				CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 				return;
 			}
 			else
@@ -90,22 +90,22 @@ void URpaiActionTask_RotateTo::ReceiveStartActionTask_Implementation(AAIControll
 			}
 		}
 	}
-	CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 }
 
-void URpaiActionTask_RotateTo::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_RotateTo::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	const FVector PawnDirection = ActionInstigator->GetPawn()->GetActorForwardVector();
 	const FVector FocalPoint = ActionInstigator->GetFocalPointForPriority(EAIFocusPriority::Gameplay);
 
 	if (CalculateAngleDifferenceDot(PawnDirection, FocalPoint - ActionInstigator->GetPawn()->GetActorLocation()) >= PrecisionDot)
 	{
-		CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 		ActionInstigator->ClearFocus(EAIFocusPriority::Gameplay);
 	}
 }
 
-void URpaiActionTask_RotateTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_RotateTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	ActionInstigator->ClearFocus(EAIFocusPriority::Gameplay);
 }

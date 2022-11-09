@@ -7,11 +7,22 @@
 #include "RpaiActionTask_Composite.generated.h"
 
 USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FActionTaskCompositeMemory
+{
+	GENERATED_BODY()
+
+	FActionTaskCompositeMemory();
+
+	TArray<FRpaiMemoryStruct> CompositeActionTaskSlices;
+	TArray<FRpaiCompositeActionTaskEntry> ActionActionTasks;
+	TSet<int32> FlushActionIndices;
+};
+
+USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FRpaiCompositeActionTaskEntry
 {
 	GENERATED_BODY()
 public:
-
 	UPROPERTY(EditAnywhere, Instanced, Category = "Rpai")
 	URpaiComposerActionTaskBase* Action;
 
@@ -46,14 +57,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	TArray<FRpaiCompositeActionTaskEntry> ActionEntries;
 
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+	virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
 private:
-	void OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState);
-	void FlushForController(AAIController* ActionInstigator);
-	TMap<AAIController*, TArray<FRpaiCompositeActionTaskEntry>> ActiveActions;
-	TMap<AAIController*, TSet<int32>> FlushActionIndices;
+	void OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+	void Flush(FRpaiMemoryStruct ActionMemory);
+
+	FRpaiMemory CompositeMemoryPool;
 };

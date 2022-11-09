@@ -5,31 +5,28 @@
 #include "Core/RpaiTypes.h"
 #include "AIController.h"
 
+FActionTaskWait::FActionTaskWait()
+{
+
+}
+
 URpaiActionTask_Wait::URpaiActionTask_Wait()
 	: WaitTimeSeconds(30.f)
 	, RandomDeviation(5.f)
 {
 	bCompleteAfterStart = false;
+	ActionTaskMemoryStructType = FActionTaskWait::StaticStruct();
 }
 
-void URpaiActionTask_Wait::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Wait::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	FActionTaskWait* WaitMemory = ActionMemory.Get<FActionTaskWait>();
 	float WaitTime = FMath::FRandRange(FMath::Max(0.f, WaitTimeSeconds - RandomDeviation), WaitTimeSeconds + RandomDeviation);
-	FTimerHandle NewHandle;
-	ActionWorld->GetTimerManager().SetTimer(NewHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_Wait::CompleteActionTask, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld), WaitTime, false);
-	ActiveHandles.Emplace(MoveTemp(CurrentState), MoveTemp(NewHandle));
+	ActionWorld->GetTimerManager().SetTimer(WaitMemory->ActiveHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_Wait::CompleteActionTask, ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld), WaitTime, false);
 }
 
-void URpaiActionTask_Wait::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiActionTask_Wait::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
 {
-	FTimerHandle ClearHandle;
-	if (ActiveHandles.RemoveAndCopyValue(CurrentState, ClearHandle))
-	{
-		ActionWorld->GetTimerManager().ClearTimer(ClearHandle);
-	}
+	ActionWorld->GetTimerManager().ClearTimer(ActionMemory.Get<FActionTaskWait>()->ActiveHandle);
 }
 
-void URpaiActionTask_Wait::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
-{
-	ActiveHandles.Remove(CurrentState);
-}

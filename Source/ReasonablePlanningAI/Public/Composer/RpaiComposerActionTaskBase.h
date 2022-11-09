@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Core/RpaiTypes.h"
 #include "RpaiComposerActionTaskBase.generated.h"
 
 class URpaiComposerActionTaskBase;
@@ -39,26 +40,26 @@ public:
 	* The initial logic to run when this action is entered. For actions that do not run over time, this is the appropriate action to call.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void StartActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void StartActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Subsequent calls to this action state after StartAction has been called and before CancelAction or CompleteAction have been called. Will not execute
 	* if IsActionComplete returns true after invoking StartAction.
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void UpdateActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void UpdateActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Immediately terminate the current action and apply any state changes needed to revert this action (if desired).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Called immediately after IsActionComplete returns true. Use this to update the state
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void CompleteActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void CompleteActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Event indicating that the action task has started.
@@ -80,35 +81,42 @@ public:
 	*/
 	FActionTaskUpdated& OnActionTaskUpdated() { return ActionTaskUpdatedEvent; }
 
+	FRpaiMemoryStruct AllocateMemorySlice(FRpaiMemory& FromMemory) const;
+
+	uint64 EstimateMemorySize() const;
+
 protected:
 	/**
 	* Override this to implement StartAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "ResoanablePlanning")
-	void ReceiveStartActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveStartActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Override this to implement UpdateAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	void ReceiveUpdateActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveUpdateActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Override this to implement CancelAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	void ReceiveCancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveCancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	/**
 	* Override this to implement CompleteAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	void ReceiveCompleteActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveCompleteActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	bool bCompleteAfterStart;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Rpai")
+	UScriptStruct* ActionTaskMemoryStructType;
 };

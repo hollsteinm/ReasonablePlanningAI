@@ -287,6 +287,10 @@ A weight based on a depreciating float value on the state can accomplish this pa
 
 A combination of an incrementing integer on the state and a curve can accomplish this.
 
+# Advanced Topics
+
+Below you will find a collection of topics going deep into the details and possible implementations of actions within RPAI.
+
 ## Integrating Smart Objects (Or Any AITask)
 
 Because Reasonable Planning AI was built with flexibilty in mind and parity with the features offered by Behavior Trees, AITasks are a natural integration supported by the Reasonable Planning AI Composer Action Task class. To add an AI Task Action Task to Reasonable Planning AI, simple extend from the parent class `RpaiActionTask_GameplayTaskBase`. Here is an example in Unreal Engine 5 (UE5) on how to add the [Smart Objects Module](https://docs.unrealengine.com/5.0/en-US/smart-objects-in-unreal-engine---overview/) to your game using Reasonable Planning AI.
@@ -372,3 +376,18 @@ void UMyActionTask_WalkToUseSmartObject::ReceiveStartActionTask_Implementation(A
 }
 ```
 
+## Scoped Design of Action and ActionTask function Interfaces
+
+In the code base you will run across a common function interface for Action and ActionTask which will look something like this:
+
+```
+virtual void SomeFunctionName(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemorySlice ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+```
+
+This is the standard function interface (which may also include `float DeltaSeconds`) used for runtime execution of Actions and ActionTasks. There is a clear and intended idea of scoping within each of the parameters of the function explained below. This may help you during design of your extensions to RPAI where data should live.
+
+- `AAIController* ActionInstigator`: The lifetime of this controller object is managed by the lifetime defined by Unreal Engine or the AIModule. It is ideal to include variables and functions in your implementation and cast it to you implementation for your Action and ActionTask implementations. Use this for functions and variables that must persist beyond the planning or execution of RPAI.
+- `URpaiState* CurrentState`: The lifetime of this object is scoped to the lifetime of an executing plan. If you want to share data across actions scoped to the execution of the plan, put the variable here. You may also use any variables here to assist in planning and goal determination (see tutorial above). Once a plan finishes, the state is reset.
+- `FRpaiMemorySlice ActionMemory`: For those familiar with Behavior Tree C++ instancing of Tasks, this is a similar construct. For those not familiar, this memory object is used as a generic storage container of arbitrary data that must persist across function calls for the defined Action or ActionTask. The lifetime of this memory is a single execution lifecycle (Start -> Update -> Complete | Cancel) of a defined Action or ActionTask.
+- `AActor* ActionTargetActor`: Same lifetime scope as `AAIController* ActionInstigator*. Defaults to owned pawn of the AI Controller, but could be any AActor of interest.
+- `UWorld* ActionWorld`: Same lifetime scope as the `AAIController* ActionInstigator` World. An Action or ActionTask is not guarenteed to execute within the same world scope as the AI agent. Therefore, use this if you want to be sure to execute within World scope of the AI Agent.

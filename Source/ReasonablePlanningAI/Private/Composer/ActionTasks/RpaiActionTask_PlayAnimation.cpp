@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "Components/SkeletalMeshComponent.h"
 
+FActionTaskPlayAnimationMemory::FActionTaskPlayAnimationMemory()
+	: AnimationTimerHandle()
+	, PreviousAnimationMode(EAnimationMode::Type::AnimationCustomMode)
+	, CachedMesh(nullptr)
+{
+
+}
+
 static USkeletalMeshComponent* GetMeshFromController(const AAIController* Controller)
 {
 	USkeletalMeshComponent* SkelMesh = nullptr;
@@ -28,9 +36,10 @@ URpaiActionTask_PlayAnimation::URpaiActionTask_PlayAnimation()
 	, bPersistOnComplete(false)
 {
 	bCompleteAfterStart = false;
+	ActionTaskMemoryStructType = FActionTaskPlayAnimationMemory::StaticStruct();
 }
 
-void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(AnimationToPlay != nullptr);
 	check(ActionInstigator != nullptr);
@@ -38,15 +47,18 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 
 	if (SkelMesh != nullptr)
 	{
+		FActionTaskPlayAnimationMemory* Memory = ActionMemory.Get<FActionTaskPlayAnimationMemory>();
 		auto AnimMode = SkelMesh->GetAnimationMode();
-		PreviousAnimationModes.Add(CurrentState, AnimMode);
+		
+		Memory->CachedMesh = SkelMesh;
+		Memory->PreviousAnimationMode = AnimMode;
+
 		SkelMesh->PlayAnimation(AnimationToPlay, bLooping);
 		if (!bLooping)
 		{
 			if (AnimationToPlay->GetPlayLength() > 0)
 			{
-				FTimerHandle& NewOrExistingHandle = ActiveHandles.FindOrAdd(MoveTemp(CurrentState));
-				ActionWorld->GetTimerManager().SetTimer(NewOrExistingHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetPlayLength(), false);
+				ActionWorld->GetTimerManager().SetTimer(Memory->AnimationTimerHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_PlayAnimation::OnAnimationEnd, ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld, SkelMesh), AnimationToPlay->GetPlayLength(), false);
 			}
 			else if (AnimMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 			{
@@ -56,54 +68,36 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 	}
 }
 
-void URpaiActionTask_PlayAnimation::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	if (!bLooping)
-	{
-		ActiveHandles.Remove(CurrentState);
-		PreviousAnimationModes.Remove(CurrentState);
-	}
-}
+	FActionTaskPlayAnimationMemory* Memory = ActionMemory.Get<FActionTaskPlayAnimationMemory>();
+	ActionWorld->GetTimerManager().ClearTimer(Memory->AnimationTimerHandle);
 
-void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
-{
-	FTimerHandle MaybeClearTimer;
-	if (ActiveHandles.RemoveAndCopyValue(CurrentState, MaybeClearTimer))
-	{
-		ActionWorld->GetTimerManager().ClearTimer(MaybeClearTimer);
-	}
-
-	USkeletalMeshComponent* SkelMesh = GetMeshFromController(ActionInstigator);
+	USkeletalMeshComponent* SkelMesh = Memory->CachedMesh;
 	if (SkelMesh != nullptr)
 	{
 		SkelMesh->Stop();
-		EAnimationMode::Type PreviousAnimationMode;
-		if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
+		if (Memory->PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 		{
-			if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
-			{
-				SkelMesh->SetAnimationMode(PreviousAnimationMode);
-			}
+			SkelMesh->SetAnimationMode(Memory->PreviousAnimationMode);
 		}
 	}
 }
 
-void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh)
+void URpaiActionTask_PlayAnimation::OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh)
 {
-	EAnimationMode::Type PreviousAnimationMode;
-	if (PreviousAnimationModes.RemoveAndCopyValue(CurrentState, PreviousAnimationMode))
+	FActionTaskPlayAnimationMemory* Memory = ActionMemory.Get<FActionTaskPlayAnimationMemory>();
+	if (Memory->PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
 	{
-		if (PreviousAnimationMode == EAnimationMode::AnimationBlueprint && !bPersistOnComplete)
+		if (Mesh == Memory->CachedMesh)
 		{
-			if (Mesh == GetMeshFromController(ActionInstigator))
-			{
-				Mesh->SetAnimationMode(PreviousAnimationMode);
-			}
+			Mesh->SetAnimationMode(Memory->PreviousAnimationMode);
 		}
 	}
+
 	if (!bCompleteAfterStart && !bPersistOnComplete)
 	{
-		CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }
 

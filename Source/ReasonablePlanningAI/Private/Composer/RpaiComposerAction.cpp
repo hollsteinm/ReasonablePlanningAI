@@ -8,12 +8,21 @@
 #include "Composer/RpaiComposerStateQuery.h"
 #include "Core/RpaiState.h"
 
-void URpaiComposerAction::HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, AActor* ActionTargetActor, UWorld* ActionWorld)
+FRpaiMemoryStruct URpaiComposerAction::AllocateMemorySlice(FRpaiMemory& FromMemory) const
+{
+	if (ActionTask != nullptr)
+	{
+		return ActionTask->AllocateMemorySlice(FromMemory);
+	}
+	return FRpaiMemoryStruct();
+}
+
+void URpaiComposerAction::HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	if (CompletedActionTask == ActionTask)
 	{
 		ActionTask->OnActionTaskComplete().RemoveAll(this);
-		CompleteAction(ActionInstigator, State, ActionTargetActor, ActionWorld);
+		CompleteAction(ActionInstigator, State, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }
 
@@ -23,48 +32,48 @@ float URpaiComposerAction::ReceiveExecutionWeight_Implementation(const URpaiStat
 	return WeightAlgorithm->ExecutionWeight(GivenState);
 }
 
-void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
 {
 	check(ActionTask != nullptr);
 	if (LockResourceOnStart.IsNone())
 	{
-		ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionTargetActor, ActionWorld);
-		ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
+		ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 	else
 	{
 		if (CurrentState->LockResource(LockResourceOnStart, this))
 		{
-			ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionTargetActor, ActionWorld);
-			ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+			ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
+			ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 		}
 		else
 		{
-			CancelAction(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+			CancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 		}
 	}
 }
 
-void URpaiComposerAction::ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiComposerAction::ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionTask != nullptr);
-	ActionTask->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor, ActionWorld);
+	ActionTask->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor, ActionWorld);
 }
 
-void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
 {
 	check(ActionTask != nullptr);
-	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	if (!LockResourceOnStart.IsNone())
 	{
 		CurrentState->UnlockResource(LockResourceOnStart, this);
 	}
 }
 
-void URpaiComposerAction::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiComposerAction::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionTask != nullptr);
-	ActionTask->CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+	ActionTask->CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	if (!LockResourceOnStart.IsNone())
 	{
 		CurrentState->UnlockResource(LockResourceOnStart, this);

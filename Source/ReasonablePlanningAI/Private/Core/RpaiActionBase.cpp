@@ -7,6 +7,12 @@
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
 
+URpaiActionBase::URpaiActionBase()
+	: ActionMemoryStructType(nullptr)
+{
+
+}
+
 void URpaiActionBase::ApplyToState(URpaiState* GivenState) const
 {
 	check(GivenState != nullptr);
@@ -25,7 +31,16 @@ float URpaiActionBase::ExecutionWeight(const URpaiState* GivenState) const
 	return ReceiveExecutionWeight(GivenState);
 }
 
-void URpaiActionBase::StartAction(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+FRpaiMemoryStruct URpaiActionBase::AllocateMemorySlice(FRpaiMemory& FromMemory) const
+{
+	if (ActionMemoryStructType == nullptr)
+	{
+		return FRpaiMemoryStruct();
+	}
+	return FRpaiMemoryStruct(&FromMemory, ActionMemoryStructType);
+}
+
+void URpaiActionBase::StartAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
@@ -33,28 +48,28 @@ void URpaiActionBase::StartAction(AAIController* ActionInstigator, URpaiState* C
 	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Start Action: %s"), *ActionName);
-	ReceiveStartAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveStartAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionStarted.IsBound())
 	{
 		OnActionStarted.Broadcast(this, ActionInstigator, CurrentState);
 	}
 }
 
-void URpaiActionBase::UpdateAction(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::UpdateAction(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
 	check(ActionTargetActor != nullptr);
 	check(ActionWorld != nullptr);
 
-	ReceiveUpdateAction(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveUpdateAction(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionUpdated.IsBound())
 	{
 		OnActionUpdated.Broadcast(this, ActionInstigator, CurrentState, DeltaSeconds);
 	}
 }
 
-void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
@@ -62,14 +77,14 @@ void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* 
 	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Cancel Action: %s"), *ActionName);
-	ReceiveCancelAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveCancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionCancelled.IsBound())
 	{
 		OnActionCancelled.Broadcast(this, ActionInstigator, CurrentState);
 	}
 }
 
-void URpaiActionBase::CompleteAction(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::CompleteAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
@@ -77,21 +92,21 @@ void URpaiActionBase::CompleteAction(AAIController* ActionInstigator, URpaiState
 	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Complete Action: %s"), *ActionName);
-	ReceiveCompleteAction(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveCompleteAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionComplete.IsBound())
 	{
 		OnActionComplete.Broadcast(this, ActionInstigator, CurrentState);
 	}
 }
 
-bool URpaiActionBase::IsActionComplete(const AAIController* ActionInstigator, const URpaiState* CurrentState, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
+bool URpaiActionBase::IsActionComplete(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
 	check(ActionTargetActor != nullptr);
 	check(ActionWorld != nullptr);
 
-	return ReceiveIsActionComplete(ActionInstigator, CurrentState, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	return ReceiveIsActionComplete(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 }
 
 void URpaiActionBase::ReceiveApplyToState_Implementation(URpaiState* GivenState) const
@@ -109,27 +124,27 @@ float URpaiActionBase::ReceiveExecutionWeight_Implementation(const URpaiState* G
 	return TNumericLimits<float>::Max();
 }
 
-void URpaiActionBase::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//NOOP
 }
 
-void URpaiActionBase::ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//NOOP
 }
 
-void URpaiActionBase::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//NOOP
 }
 
-void URpaiActionBase::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//NOOP
 }
 
-bool URpaiActionBase::ReceiveIsActionComplete_Implementation(const AAIController* ActionInstigator, const URpaiState* CurrentState, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
+bool URpaiActionBase::ReceiveIsActionComplete_Implementation(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
 {
 	return true; //Always auto complete to avoid blocking
 }

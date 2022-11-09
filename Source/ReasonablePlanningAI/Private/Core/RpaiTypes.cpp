@@ -48,7 +48,7 @@ uint8* FRpaiMemory::Block::Allocate(FRpaiMemory::MemorySizeType SizeInBytes, FRp
 		if (NextToAllocEnd <= End)
 		{
 			uint8* AllocationToReturn = Next;
-			Next = Next + AllocationSize;
+			Next = Next + AllocationSize + 1;
 			return AllocationToReturn;
 		}
 	}
@@ -59,6 +59,11 @@ uint8* FRpaiMemory::Block::Allocate(FRpaiMemory::MemorySizeType SizeInBytes, FRp
 void FRpaiMemory::Block::Free(uint8* Memory, FRpaiMemory::MemorySizeType SizeInBytes, FRpaiMemory::MemorySizeType Alignment)
 {
 	FreeList.Add(MakeTuple(Memory, SizeInBytes));
+}
+
+FRpaiMemory::FRpaiMemory()
+	: FRpaiMemory(32)
+{
 }
 
 FRpaiMemory::FRpaiMemory(FRpaiMemory::MemorySizeType BlockSize)
@@ -106,37 +111,108 @@ FRpaiMemory::MemorySizeType FRpaiMemory::GetTotalBytesAvailable() const
 	return Total;
 }
 
-FRpaiMemorySlice::FRpaiMemorySlice(FRpaiMemory* FromMemory, FRpaiMemorySlice::MemorySizeType SizeInBytes, FRpaiMemorySlice::MemorySizeType AlignmentInBytes)
+FRpaiMemoryStruct::FRpaiMemoryStruct()
+	: Source(nullptr)
+	, Refs(nullptr)
+	, Type(nullptr)
+	, MemoryStart(nullptr)
+{
+}
+
+FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType)
 	: Source(FromMemory)
-	, ObjectSizeInBytes(SizeInBytes)
-	, ObjectAlignmentInBytes(AlignmentInBytes)
-	, ActualSizeInBytes(SizeInBytes + (SizeInBytes % AlignmentInBytes))
+	, Refs(static_cast<uint32*>(FMemory::Malloc(sizeof(uint32))))
+	, Type(FromStructType)
 {
-	MemoryStart = FromMemory->Allocate(ObjectSizeInBytes, ObjectAlignmentInBytes);
+	*Refs = 0;
+	MemoryStart = FromMemory->Allocate(Type->GetStructureSize(), Type->GetMinAlignment());
+	FMemory::Memzero(MemoryStart, Type->GetStructureSize());
+
+	auto CppOpts = Type->GetCppStructOps();
+	if (CppOpts != nullptr && !CppOpts->HasZeroConstructor())
+	{
+		CppOpts->Construct(MemoryStart);
+	}
+	AddRef();
 }
 
-FRpaiMemorySlice::~FRpaiMemorySlice()
+FRpaiMemoryStruct::FRpaiMemoryStruct(const FRpaiMemoryStruct& OtherSlice)
+	: Source(OtherSlice.Source)
+	, MemoryStart(OtherSlice.MemoryStart)
+	, Refs(OtherSlice.Refs)
+	, Type(OtherSlice.Type)
 {
-	Source->Free(MemoryStart, ObjectSizeInBytes, ObjectAlignmentInBytes);
+	AddRef();
 }
 
-FRpaiMemoryView::FRpaiMemoryView(const FRpaiMemoryView& OtherView)
-	: MemoryStart(OtherView.MemoryStart)
-	, ActualSizeInBytes(OtherView.ActualSizeInBytes)
+FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemoryStruct&& OtherSlice)
+	: FRpaiMemoryStruct()
 {
-
+	Swap(Source, OtherSlice.Source);
+	Swap(MemoryStart, OtherSlice.MemoryStart);
+	Swap(Refs, OtherSlice.Refs);
+	Swap(Type, OtherSlice.Type);
 }
 
-FRpaiMemoryView::FRpaiMemoryView(const FRpaiMemoryView&& OtherView) noexcept
-	: MemoryStart(OtherView.MemoryStart)
-	, ActualSizeInBytes(OtherView.ActualSizeInBytes)
+FRpaiMemoryStruct& FRpaiMemoryStruct::operator=(const FRpaiMemoryStruct& OtherSlice)
 {
+	if (this != &OtherSlice)
+	{
+		if (Release() == 0)
+		{
+			FMemory::Free(Refs);
+			Refs = nullptr;
+			if (LIKELY(Source != nullptr))
+			{
+				if (LIKELY(Type != nullptr))
+				{
+					Type->DestroyStruct(MemoryStart);
+				}
+				Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
+				Source = nullptr;
+			}
+		}
 
+		Source = OtherSlice.Source;
+		MemoryStart = OtherSlice.MemoryStart;
+		Refs = OtherSlice.Refs;
+		Type = OtherSlice.Type;
+		AddRef();
+	}
+	return *this;
 }
 
-FRpaiMemoryView::FRpaiMemoryView(const FRpaiMemorySlice* FromSlice)
-	: MemoryStart(FromSlice->MemoryStart)
-	, ActualSizeInBytes(FromSlice->ActualSizeInBytes)
+void FRpaiMemoryStruct::AddRef()
 {
+	if (Refs != nullptr)
+	{
+		++(*Refs);
+	}
+}
 
+uint32 FRpaiMemoryStruct::Release()
+{
+	return Refs == nullptr ? INDEX_NONE : --(*Refs);
+}
+
+FRpaiMemoryStruct::~FRpaiMemoryStruct()
+{
+	if (Release() == 0)
+	{
+		FMemory::Free(Refs);
+		Refs = nullptr;
+		if (LIKELY(Source != nullptr))
+		{
+			if (LIKELY(Type != nullptr))
+			{
+				auto* CppOpts = Type->GetCppStructOps();
+				if (CppOpts != nullptr && CppOpts->HasDestructor())
+				{
+					CppOpts->Destruct(MemoryStart);
+				}
+			}
+			Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
+			Source = nullptr;
+		}
+	}
 }

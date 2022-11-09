@@ -1,5 +1,7 @@
 #include "Misc/AutomationTest.h"
 #include "Core/RpaiTypes.h"
+#include "ReasonablePlanningAITestTypes.h"
+
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningMemoryTests, "ReasonablePlanningAI.Core.Memory", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 END_DEFINE_SPEC(ReasonablePlanningMemoryTests)
@@ -44,26 +46,8 @@ void ReasonablePlanningMemoryTests::Define()
 			It("should create a slice with appropriate allocations", [this]()
 				{
 					FRpaiMemory GivenMemory(128);
-					FRpaiMemorySlice ClassUnderTest(&GivenMemory, 56, 16);
+					FRpaiMemoryStruct ClassUnderTest(&GivenMemory, FTestStruct::StaticStruct());
 
-					TestEqual("ActualSizeInBytes", ClassUnderTest.ActualSizeInBytes, 64);
-					TestEqual("ObjectSizeInBytes", ClassUnderTest.ObjectSizeInBytes, 56);
-					TestEqual("ObjectAlignmentInBytes", ClassUnderTest.ObjectAlignmentInBytes, 16);
-					TestNotNull("Memory Not Null", ClassUnderTest.GetRaw());
-				});
-		});
-
-	Describe("Memory View", [this]()
-		{
-			It("should create a slice with appropriate allocations", [this]()
-				{
-					FRpaiMemory GivenMemory(128);
-					FRpaiMemorySlice GivenSlice(&GivenMemory, 56, 16);
-					FRpaiMemoryView ClassUnderTest(&GivenSlice);
-
-					const uint8* SliceRaw = GivenSlice.GetRaw();
-					TestEqual("ActualSizeInBytes", ClassUnderTest.ActualSizeInBytes, GivenSlice.ActualSizeInBytes);
-					TestEqual("Data Location", ClassUnderTest.MemoryStart, SliceRaw);
 					TestNotNull("Memory Not Null", ClassUnderTest.GetRaw());
 				});
 		});

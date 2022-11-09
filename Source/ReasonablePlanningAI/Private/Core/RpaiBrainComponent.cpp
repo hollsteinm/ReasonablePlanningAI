@@ -12,12 +12,15 @@
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
 
+static const FRpaiMemory::MemorySizeType DefaultBlockSize = 256;
+
 URpaiBrainComponent::URpaiBrainComponent()
 	: CurrentAction(nullptr)
 	, PlannedActions({})
 	, CurrentGoal(nullptr)
 	, CachedStateInstance(nullptr)
 	, bIsPaused(false)
+	, ComponentActionMemory(DefaultBlockSize)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -53,6 +56,7 @@ void URpaiBrainComponent::RegisterNewAction(URpaiActionBase* NewAction)
 		return;
 	}
 
+	CurrentActionMemory = NewAction->AllocateMemorySlice(ComponentActionMemory);
 	NewAction->OnActionComplete.AddUniqueDynamic(this, &URpaiBrainComponent::OnActionCompleted);
 	NewAction->OnActionCancelled.AddUniqueDynamic(this, &URpaiBrainComponent::OnActionCancelled);
 }
@@ -65,7 +69,7 @@ void URpaiBrainComponent::PopNextAction()
 		CurrentAction = PlannedActions.Pop();
 		check(CurrentAction != nullptr);
 		RegisterNewAction(CurrentAction);
-		CurrentAction->StartAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->StartAction(AIOwner, LoadOrCreateStateFromAi(), CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 		UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Action Started %s"), *CurrentAction->GetActionName());
 	}
 }
@@ -128,7 +132,7 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 	if (CurrentAction != nullptr)
 	{
-		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	else if (PlannedActions.Num() <= 0)
 	{
@@ -217,7 +221,7 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 	if (CurrentAction != nullptr)
 	{
 		UnregisterOldAction(CurrentAction);
-		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), AIOwner->GetPawn(), AIOwner->GetWorld());
+		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	CurrentAction = nullptr;
 }

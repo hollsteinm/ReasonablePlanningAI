@@ -4,6 +4,11 @@
 #include "Composer/ActionTasks/RpaiActionTask_Composite.h"
 #include "Algo/AllOf.h"
 
+FActionTaskCompositeMemory::FActionTaskCompositeMemory()
+{
+
+}
+
 bool operator==(const FRpaiCompositeActionTaskEntry& LHS, const FRpaiCompositeActionTaskEntry& RHS)
 {
 	return LHS.Action == RHS.Action;
@@ -26,132 +31,124 @@ FRpaiCompositeActionTaskEntry::FRpaiCompositeActionTaskEntry(const FRpaiComposit
 }
 
 URpaiActionTask_Composite::URpaiActionTask_Composite()
+	: CompositeMemoryPool(256)
 {
 	bCompleteAfterStart = false;
+	ActionTaskMemoryStructType = FActionTaskCompositeMemory::StaticStruct();
 }
 
-void URpaiActionTask_Composite::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Composite::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//Lazy initialization
 	for (auto& Entry : ActionEntries)
 	{
 		if (!Entry.Action->OnActionTaskComplete().IsBoundToObject(this))
 		{
-			Entry.Action->OnActionTaskComplete().AddUObject(this, &URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled);
+			Entry.Action->OnActionTaskComplete().AddUObject(this, &URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled, ActionMemory);
 		}
 
 		if (!Entry.Action->OnActionTaskCancelled().IsBoundToObject(this))
 		{
-			Entry.Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled);
+			Entry.Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled, ActionMemory);
 		}
 	}
 
-	auto& GivenControllerActions = ActiveActions.FindOrAdd(ActionInstigator);
-	auto CurrentCount = GivenControllerActions.Num();
-	if (CurrentCount > 0)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+
+	if (!Memory->ActionActionTasks.IsEmpty())
 	{
-		for (auto Idx = 0; Idx < CurrentCount; ++Idx)
+		auto Num = Memory->ActionActionTasks.Num();
+		for (auto Idx = 0; Idx < Num; ++Idx)
 		{
-			GivenControllerActions[Idx].Action->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+			Memory->ActionActionTasks[Idx].Action->CancelActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Idx], ActionTargetActor, ActionWorld);
 		}
+		
 	}
-	GivenControllerActions.Reset(ActionEntries.Num());
+
+	Memory->ActionActionTasks.Reset(ActionEntries.Num());
+	Memory->CompositeActionTaskSlices.Reset(ActionEntries.Num());
+	int32 Index = 0;
 	for (auto& Entry : ActionEntries)
 	{
-		GivenControllerActions.Add(Entry);
-		Entry.Action->StartActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
+		Memory->ActionActionTasks.Add(Entry);
+		Memory->CompositeActionTaskSlices.Add(Entry.Action->AllocateMemorySlice(CompositeMemoryPool));
+		Entry.Action->StartActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index], ActionTargetActor, ActionWorld);
+		++Index;
 	}
 }
 
-void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto AIActiveEntries = ActiveActions.Find(ActionInstigator);
-	if (AIActiveEntries != nullptr)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	int32 Index = 0;
+	for (auto& Entry : Memory->ActionActionTasks)
 	{
-		for (auto& Entry : (*AIActiveEntries))
-		{
-			Entry.Action->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionTargetActor, ActionWorld);
-		}
-		FlushForController(ActionInstigator);
-		if (AIActiveEntries->Num() == 0 || Algo::AllOf(*AIActiveEntries, [](const auto& Entry) { return Entry.bIgnoredForCompositeCompletion; }))
-		{
-			CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-		}
+		Entry.Action->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+	}
+	Flush(ActionMemory);
+	if (Memory->ActionActionTasks.IsEmpty() || Algo::AllOf(Memory->ActionActionTasks, [](const auto& Entry) { return Entry.bIgnoredForCompositeCompletion; }))
+	{
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }
 
-void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto AIActiveEntries = ActiveActions.Find(ActionInstigator);
-	if (AIActiveEntries != nullptr)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	int32 Index = 0;
+	for (auto& Entry : Memory->ActionActionTasks)
 	{
-		for (auto& Entry : (*AIActiveEntries))
-		{
-			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-		}
-		FlushForController(ActionInstigator);
-		ActiveActions.Remove(ActionInstigator);
+		Entry.Action->CancelActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
 	}
+	Flush(ActionMemory);
 }
 
-void URpaiActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	auto AIActiveEntries = ActiveActions.Find(ActionInstigator);
-	if (AIActiveEntries != nullptr)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	int32 Index = 0;
+	for (auto Entry : Memory->ActionActionTasks)
 	{
-		for (auto Entry : (*AIActiveEntries))
+		if (Entry.bPreferCancelOnCompositeCompletion)
 		{
-			if (Entry.bPreferCancelOnCompositeCompletion)
-			{
-				Entry.Action->CancelActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-			}
-			else
-			{
-				Entry.Action->CompleteActionTask(ActionInstigator, CurrentState, ActionTargetActor, ActionWorld);
-			}
+			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
 		}
-		FlushForController(ActionInstigator);
-		ActiveActions.Remove(ActionInstigator);
+		else
+		{
+			Entry.Action->CompleteActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+		}
 	}
+	Flush(ActionMemory);
 }
 
-void URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState)
+void URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory)
 {
-	auto AIActiveEntries = ActiveActions.Find(ActionInstigator);
-	auto& AIFlush = FlushActionIndices.FindOrAdd(ActionInstigator);
-	if(AIActiveEntries != nullptr)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	FRpaiCompositeActionTaskEntry SearchCriteria;
+	SearchCriteria.Action = ActionTask;
+	int32 Idx = INDEX_NONE;
+	if (Memory->ActionActionTasks.Find(SearchCriteria, Idx))
 	{
-		FRpaiCompositeActionTaskEntry SearchCriteria;
-		SearchCriteria.Action = ActionTask;
-		int32 Idx = INDEX_NONE;
-		if (AIActiveEntries->Find(SearchCriteria, Idx))
-		{
-			AIFlush.Add(Idx);
-		}
+		Memory->FlushActionIndices.Add(Idx);
 	}
 }
 
-void URpaiActionTask_Composite::FlushForController(AAIController* ActionInstigator)
+void URpaiActionTask_Composite::Flush(FRpaiMemoryStruct ActionMemory)
 {
 	static auto const SetSorter = TGreater<int32>();
-	auto AIActiveActions = ActiveActions.Find(ActionInstigator);
-	auto AIFlush = FlushActionIndices.Find(ActionInstigator);
-	if (AIFlush != nullptr && AIActiveActions != nullptr)
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+
+	if(!Memory->FlushActionIndices.IsEmpty())
 	{
-		AIFlush->Sort(SetSorter);
-		for (const auto RemoveIdx : (*AIFlush))
+		Memory->FlushActionIndices.Sort(SetSorter);
+		for (const auto RemoveIdx : Memory->FlushActionIndices)
 		{
-			AIActiveActions->RemoveAt(RemoveIdx, 1, false);
+			Memory->ActionActionTasks.RemoveAt(RemoveIdx, 1, false);
+			Memory->CompositeActionTaskSlices.RemoveAt(RemoveIdx, 1, false);
 		}
+		Memory->FlushActionIndices.Empty();
 	}
 
-	if (AIFlush != nullptr)
-	{
-		AIFlush->Empty();
-	}
-
-	if(AIActiveActions != nullptr)
-	{
-		AIActiveActions->Shrink();
-	}
+	Memory->CompositeActionTaskSlices.Shrink();
+	Memory->ActionActionTasks.Shrink();
 }

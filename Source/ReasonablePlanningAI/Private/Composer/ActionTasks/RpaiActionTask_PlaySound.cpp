@@ -12,7 +12,7 @@ URpaiActionTask_PlaySound::URpaiActionTask_PlaySound()
 
 }
 
-void URpaiActionTask_PlaySound::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_PlaySound::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	if (SoundToPlay != nullptr)
 	{

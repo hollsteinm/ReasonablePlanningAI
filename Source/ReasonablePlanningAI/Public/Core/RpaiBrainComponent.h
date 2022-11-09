@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BrainComponent.h"
+#include "RpaiTypes.h"
 #include "RpaiBrainComponent.generated.h"
 
 /**
@@ -95,6 +96,10 @@ private:
 	bool bIsPaused;
 
 	FTimerHandle PlanningDebounce;
+
+	FRpaiMemory ComponentActionMemory;
+
+	FRpaiMemoryStruct CurrentActionMemory;
 	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }

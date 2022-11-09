@@ -12,66 +12,66 @@
 #include "BrainComponent.h"
 #include "AISystem.h"
 
+FActionTaskEnvQueryMemory::FActionTaskEnvQueryMemory()
+	: RequestId(INDEX_NONE)
+{
+
+}
+
 URpaiActionTask_EnvQuery::URpaiActionTask_EnvQuery()
 {
 	bCompleteAfterStart = false;
+	ActionTaskMemoryStructType = FActionTaskEnvQueryMemory::StaticStruct();
 }
 
-void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
 
-	auto& RequestId = QueryRequestToState.FindOrAdd(CurrentState, INDEX_NONE);
-	if (RequestId == INDEX_NONE)
-	{
-		//Execute
-		if (QueryTemplate != nullptr)
-		{
-			FEnvQueryRequest Request(QueryTemplate, ActionInstigator->GetPawn());
-			if (QueryConfig.Num() > 0)
-			{
-				for (auto& Param : QueryConfig)
-				{
-					Request.SetDynamicParam(Param);
-				}
-			}
+	FActionTaskEnvQueryMemory* Memory = ActionMemory.Get<FActionTaskEnvQueryMemory>();
+	Memory->RequestId = INDEX_NONE;
 
-			RequestId = Request.Execute(RunMode, FQueryFinishedSignature::CreateUObject(this, &URpaiActionTask_EnvQuery::OnQueryFinished, ActionInstigator, CurrentState));
-			if (RequestId >= 0)
+	if (QueryTemplate != nullptr)
+	{
+		FEnvQueryRequest Request(QueryTemplate, ActionInstigator->GetPawn());
+		if (QueryConfig.Num() > 0)
+		{
+			for (auto& Param : QueryConfig)
 			{
-				if (UBrainComponent* AIBrain = ActionInstigator->GetBrainComponent())
+				Request.SetDynamicParam(Param);
+			}
+		}
+
+		Memory->RequestId = Request.Execute(RunMode, FQueryFinishedSignature::CreateUObject(this, &URpaiActionTask_EnvQuery::OnQueryFinished, ActionInstigator, CurrentState, ActionMemory));
+		if (Memory->RequestId >= 0)
+		{
+			if (UBrainComponent* AIBrain = ActionInstigator->GetBrainComponent())
+			{
+				if (ObserverCache.Num() <= Memory->RequestId)
 				{
-					if (ObserverCache.Num() <= RequestId)
-					{
-						ObserverCache.SetNum(RequestId + 8 /*Arbitrarily grow by this amount*/, false);
-					}
-					ObserverCache[RequestId] = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_QueryFinished, RequestId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_EnvQuery::OnAIMessage, ActionInstigator, CurrentState));
+					ObserverCache.SetNum(Memory->RequestId + 8 /*Arbitrarily grow by this amount*/, false);
 				}
+				ObserverCache[Memory->RequestId] = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_QueryFinished, Memory->RequestId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_EnvQuery::OnAIMessage, ActionInstigator, CurrentState, ActionMemory));
 			}
 		}
 	}
 }
 
-void URpaiActionTask_EnvQuery::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_EnvQuery::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	int32 RequestId;
-	if (QueryRequestToState.RemoveAndCopyValue(CurrentState, RequestId))
+	FActionTaskEnvQueryMemory* Memory = ActionMemory.Get<FActionTaskEnvQueryMemory>();
+	if (Memory->RequestId != INDEX_NONE)
 	{
 		auto World = ActionInstigator->GetWorld();
 		if (auto QueryManager = UEnvQueryManager::GetCurrent(World))
 		{
-			QueryManager->AbortQuery(RequestId);
+			QueryManager->AbortQuery(Memory->RequestId);
 		}
 	}
 }
 
-void URpaiActionTask_EnvQuery::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, AActor* ActionTargetActor, UWorld* ActionWorld)
-{
-	QueryRequestToState.Remove(CurrentState);
-}
-
-void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Result, AAIController* ActionInstigator, URpaiState* CurrentState)
+void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Result, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory)
 {
 	if (Result->IsAborted())
 	{
@@ -127,15 +127,15 @@ void URpaiActionTask_EnvQuery::OnQueryFinished(TSharedPtr<FEnvQueryResult> Resul
 	}
 }
 
-void URpaiActionTask_EnvQuery::OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState)
+void URpaiActionTask_EnvQuery::OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory)
 {
 	if (Message.Status == FAIMessage::Success)
 	{
-		CompleteActionTask(ActionInstigator, CurrentState);
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 	else
 	{
-		CancelActionTask(ActionInstigator, CurrentState);
+		CancelActionTask(ActionInstigator, CurrentState, ActionMemory);
 	}
 	ObserverCache.RemoveAt(Message.RequestID);
 }
