@@ -28,6 +28,13 @@ URpaiBrainComponent::URpaiBrainComponent()
 void URpaiBrainComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	if (AIOwner == nullptr)
+	{
+		if (APawn* OwnerPawn = CastChecked<APawn>(GetOwner()))
+		{
+			AIOwner = CastChecked<AAIController>(OwnerPawn->GetController());
+		}
+	}
 }
 
 void URpaiBrainComponent::EndPlay(EEndPlayReason::Type Reason)
