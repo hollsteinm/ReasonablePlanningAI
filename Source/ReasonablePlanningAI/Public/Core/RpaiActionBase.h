@@ -118,7 +118,7 @@ public:
     FString GetActionName() const;
 
 	UFUNCTION(BlueprintPure, Category = "Rpai")
-	virtual FRpaiMemoryStruct AllocateMemorySlice(FRpaiMemory& FromMemory) const;
+	virtual FRpaiMemoryStruct AllocateMemorySlice(UPARAM(Ref) FRpaiMemory& FromMemory) const;
 
 protected:
 	/**

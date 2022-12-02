@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Troll Purse, Inc. All Rights Reserved.
 
 namespace UnrealBuildTool.Rules
 {

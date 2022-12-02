@@ -79,6 +79,7 @@ void URpaiActionTask_Composite::ReceiveStartActionTask_Implementation(AAIControl
 
 void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	Flush(ActionMemory);
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto& Entry : Memory->ActionActionTasks)

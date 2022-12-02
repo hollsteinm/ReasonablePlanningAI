@@ -81,7 +81,7 @@ public:
 	*/
 	FActionTaskUpdated& OnActionTaskUpdated() { return ActionTaskUpdatedEvent; }
 
-	FRpaiMemoryStruct AllocateMemorySlice(FRpaiMemory& FromMemory) const;
+	FRpaiMemoryStruct AllocateMemorySlice(UPARAM(Ref) FRpaiMemory& FromMemory) const;
 
 	uint64 EstimateMemorySize() const;
 
