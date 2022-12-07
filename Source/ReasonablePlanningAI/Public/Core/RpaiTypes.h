@@ -108,10 +108,24 @@ struct REASONABLEPLANNINGAI_API FRpaiMemoryStruct
 	GENERATED_BODY()
 
 	typedef typename FRpaiMemory::MemorySizeType MemorySizeType;
+
 private:
-	FRpaiMemory* Source;
-	UScriptStruct* Type;
+	/**
+	* This MUST be first.
+	* Allows the following to be equivalent:
+	* FRpaiMemoryStruct Instance;
+	* void* Container = &Instance;
+	* void* ContainerByFirstProperty = &(Instance.MemoryStart)
+	* assert(Container == ContainerByFirstProperty
+	* 
+	* Allows us to abuse pointers to "just hook into" K2Node struct casting using mechanisms similar to the enum casting.
+	**/
 	uint8* MemoryStart;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UScriptStruct* Type;
+
+	FRpaiMemory* Source;
 	uint32* Refs;
 
 public:

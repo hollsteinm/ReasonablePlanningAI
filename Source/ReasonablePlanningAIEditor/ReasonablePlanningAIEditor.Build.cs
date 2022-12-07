@@ -9,7 +9,7 @@ namespace UnrealBuildTool.Rules
 			PublicIncludePaths.AddRange(
 				new[] {
                 	"ReasonablePlanningAIEditor/Public"
-            	}
+                }
 			);
 				
 		
