@@ -27,7 +27,7 @@
 		},
 		{
 			"Name": "ReasonablePlanningAIEditor",
-			"Type": "Editor",
+			"Type": "UncookedOnly",
 			"LoadingPhase": "PostEngineInit"
 		}
 	]

@@ -6,7 +6,7 @@ namespace UnrealBuildTool.Rules
 	{
 		public ReasonablePlanningAIEditor(ReadOnlyTargetRules Target) : base(Target)
 		{
-			PublicIncludePaths.AddRange(
+            PublicIncludePaths.AddRange(
 				new[] {
                 	"ReasonablePlanningAIEditor/Public"
                 }
