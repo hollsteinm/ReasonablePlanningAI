@@ -122,7 +122,6 @@ private:
 	**/
 	uint8* MemoryStart;
 
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UScriptStruct* Type;
 
 	FRpaiMemory* Source;
@@ -141,6 +140,11 @@ public:
 	FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType);
 
 	~FRpaiMemoryStruct();
+
+	FORCEINLINE bool IsOfType(const UScriptStruct* TestType) const { return TestType == Type; }
+
+	template<typename TScriptStructType>
+	FORCEINLINE bool IsOf() const { return TScriptStructType::StaticStruct() == Type; }
 
 	template<typename TScriptStructType>
 	static FRpaiMemoryStruct ForType(FRpaiMemory* FromMemory) { return FRpaiMemoryStruct(FromMemory, TScriptStructType::StaticStruct()); }

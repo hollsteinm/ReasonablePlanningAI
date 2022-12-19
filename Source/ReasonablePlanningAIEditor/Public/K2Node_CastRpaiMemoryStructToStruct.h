@@ -22,6 +22,9 @@ protected:
 public:
 	static FName MemoryStructInputPin;
 
+	UPROPERTY()
+	bool bRegisterNets;
+
 	FORCEINLINE UScriptStruct* GetStructType() const { return StructType; }
 
 	//~ Begin UObject Interface
@@ -43,4 +46,6 @@ public:
 	//~ End UK2Node Interface
 
 	UEdGraphPin* GetMemoryStructInputPin() const;
+	UEdGraphPin* GetThenOutputPin() const;
+	UEdGraphPin* GetInvalidOutputPin() const;
 };

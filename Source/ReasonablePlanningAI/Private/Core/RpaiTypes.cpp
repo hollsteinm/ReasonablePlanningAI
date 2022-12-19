@@ -210,9 +210,11 @@ FRpaiMemoryStruct::~FRpaiMemoryStruct()
 				{
 					CppOpts->Destruct(MemoryStart);
 				}
+				Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
+				MemoryStart = nullptr;
 			}
-			Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
 			Source = nullptr;
 		}
+		ensure(MemoryStart == nullptr);
 	}
 }
