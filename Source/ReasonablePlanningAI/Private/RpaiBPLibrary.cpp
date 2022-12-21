@@ -5,5 +5,11 @@
 
 bool URpaiBPLibrary::IsSafeToReadAs(const FRpaiMemoryStruct& Memory, const UScriptStruct* StructType)
 {
-	return Memory.IsOfType(StructType);
+	return Memory.IsCompatibleType(StructType);
+}
+
+bool URpaiBPLibrary::ReadMemory(FRpaiMemoryStruct& Table, FRpaiPlaceholderStruct& OutStruct)
+{
+	check(false);
+	return false;
 }

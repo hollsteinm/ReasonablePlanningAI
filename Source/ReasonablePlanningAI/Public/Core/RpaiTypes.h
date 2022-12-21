@@ -141,10 +141,10 @@ public:
 
 	~FRpaiMemoryStruct();
 
-	FORCEINLINE bool IsOfType(const UScriptStruct* TestType) const { return TestType == Type; }
+	bool IsCompatibleType(const UScriptStruct* TestType) const;
 
 	template<typename TScriptStructType>
-	FORCEINLINE bool IsOf() const { return TScriptStructType::StaticStruct() == Type; }
+	FORCEINLINE bool IsCompatibleTypeOf() const { return IsCompatibleType(TScriptStructType::StaticStruct()); }
 
 	template<typename TScriptStructType>
 	static FRpaiMemoryStruct ForType(FRpaiMemory* FromMemory) { return FRpaiMemoryStruct(FromMemory, TScriptStructType::StaticStruct()); }
@@ -165,6 +165,8 @@ public:
 
 	FORCEINLINE const uint8* GetRaw() const { return MemoryStart; }
 	FORCEINLINE uint8* GetRaw() { return MemoryStart; }
+
+	FORCEINLINE UScriptStruct* GetType() const { return Type; }
 
 	template<typename T>
 	void Set(T NewValue)

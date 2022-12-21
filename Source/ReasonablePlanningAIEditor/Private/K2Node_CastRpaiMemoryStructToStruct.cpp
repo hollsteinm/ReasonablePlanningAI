@@ -72,20 +72,14 @@ FText UK2Node_CastRpaiMemoryStructToStruct::GetNodeTitle(ENodeTitleType::Type Ti
 
 void UK2Node_CastRpaiMemoryStructToStruct::AllocateDefaultPins()
 {
-	if (!bRegisterNets)
-	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
-	}
+	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute);
 	CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Struct, FRpaiMemoryStruct::StaticStruct(), MemoryStructInputPin);
 	if (StructType != nullptr)
 	{
-		if (!bRegisterNets)
-		{
-			auto Then = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
-			Then->PinFriendlyName = NSLOCTEXT("Rpai", "ThenPin", "Valid");
-			auto Else = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Else);
-			Else->PinFriendlyName = NSLOCTEXT("Rpai", "InvalidPin", "Invalid");
-		}
+		auto Then = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then);
+		Then->PinFriendlyName = NSLOCTEXT("Rpai", "ThenPin", "Valid");
+		auto Else = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Else);
+		Else->PinFriendlyName = NSLOCTEXT("Rpai", "InvalidPin", "Invalid");
 		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Struct, StructType, UEdGraphSchema_K2::PN_ReturnValue);
 	}
 }
@@ -94,49 +88,37 @@ void UK2Node_CastRpaiMemoryStructToStruct::ExpandNode(FKismetCompilerContext& Co
 {
 	Super::ExpandNode(CompilerContext, SourceGraph);
 	auto InputPin = GetMemoryStructInputPin();
-	if(StructType && InputPin != nullptr && !bRegisterNets)
+	if(StructType && InputPin != nullptr)
 	{
 		const UEdGraphSchema_K2* Schema = CompilerContext.GetSchema();
 
-		const FName ValidateFunctionName = GET_MEMBER_NAME_CHECKED(URpaiBPLibrary, IsSafeToReadAs);
-		const UFunction* Function = URpaiBPLibrary::StaticClass()->FindFunctionByName(ValidateFunctionName);
-		check(NULL != Function);
+		const FName ReadMemoryFunctionName = GET_FUNCTION_NAME_CHECKED(URpaiBPLibrary, ReadMemory);
+		const UFunction* ReadMemoryFunction = URpaiBPLibrary::StaticClass()->FindFunctionByName(ReadMemoryFunctionName);
+		check(NULL != ReadMemoryFunction);
 
-		UK2Node_CallFunction* CallValidation = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
-		CallValidation->SetFromFunction(Function);
-		CallValidation->AllocateDefaultPins();
+		UK2Node_CallFunction* ReadMemory = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
+		ReadMemory->SetFromFunction(ReadMemoryFunction);
+		ReadMemory->AllocateDefaultPins();
 
-		UEdGraphPin* IsSafeFunctionStructTypeInputPin = CallValidation->FindPinChecked(TEXT("StructType"));
-		Schema->TrySetDefaultObject(*IsSafeFunctionStructTypeInputPin, StructType);
-		check(IsSafeFunctionStructTypeInputPin->DefaultObject == StructType);
+		UEdGraphPin* OriginalOutStructPin = FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue, EGPD_Output);
+		UEdGraphPin* ReadMemoryOutParamStruct = ReadMemory->FindPinChecked(TEXT("OutStruct"));
+		ReadMemoryOutParamStruct->PinType = OriginalOutStructPin->PinType;
+		ReadMemoryOutParamStruct->PinType.PinSubCategoryObject = OriginalOutStructPin->PinType.PinSubCategoryObject;
+		CompilerContext.MovePinLinksToIntermediate(*OriginalOutStructPin, *ReadMemoryOutParamStruct);
 
-		UEdGraphPin* IsSafeFunctionMemoryInputPin = CallValidation->FindPinChecked(TEXT("Memory"));
-		CompilerContext.MovePinLinksToIntermediate(*InputPin, *IsSafeFunctionMemoryInputPin);
+		UEdGraphPin* ReadMemoryMemoryInputPin = ReadMemory->FindPinChecked(TEXT("Memory"));
+		CompilerContext.MovePinLinksToIntermediate(*InputPin, *ReadMemoryMemoryInputPin);
 
-		UEdGraphPin* IsSafeFunctionBoolOutputPin = CallValidation->FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue);
+		CompilerContext.MovePinLinksToIntermediate(*GetExecPin(), *ReadMemory->GetExecPin());
 
-		UK2Node_IfThenElse* IfThenElseNode = CompilerContext.SpawnIntermediateNode<UK2Node_IfThenElse>(this, SourceGraph);
-		IfThenElseNode->AllocateDefaultPins();
+		UK2Node_IfThenElse* IfThenElse = CompilerContext.SpawnIntermediateNode<UK2Node_IfThenElse>(this, SourceGraph);
+		IfThenElse->AllocateDefaultPins();
 
-		bool bConnected = Schema->TryCreateConnection(IsSafeFunctionBoolOutputPin, IfThenElseNode->GetConditionPin());
-		check(bConnected);
+		Schema->TryCreateConnection(ReadMemory->GetReturnValuePin(), IfThenElse->GetConditionPin());
+		Schema->TryCreateConnection(ReadMemory->GetThenPin(), IfThenElse->GetExecPin());
 
-		CompilerContext.MovePinLinksToIntermediate(*GetThenOutputPin(), *IfThenElseNode->GetThenPin());
-		CompilerContext.MovePinLinksToIntermediate(*GetInvalidOutputPin(), *IfThenElseNode->GetElsePin());
-		CompilerContext.MovePinLinksToIntermediate(*GetExecPin(), *IfThenElseNode->GetExecPin());
-
-
-		UK2Node_CastRpaiMemoryStructToStruct* ReadCastNode = CompilerContext.SpawnIntermediateNode<UK2Node_CastRpaiMemoryStructToStruct>(this, SourceGraph);
-		ReadCastNode->StructType = StructType;
-		ReadCastNode->bRegisterNets = true;
-		ReadCastNode->AllocateDefaultPins();
-
-		UEdGraphPin* CastInputPin = ReadCastNode->GetMemoryStructInputPin();
-		CompilerContext.MovePinLinksToIntermediate(*InputPin, *CastInputPin);
-
-		UEdGraphPin* OrgReturnPin = FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue);
-		UEdGraphPin* NewReturnPin = ReadCastNode->FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue);
-		CompilerContext.MovePinLinksToIntermediate(*OrgReturnPin, *NewReturnPin);
+		CompilerContext.MovePinLinksToIntermediate(*GetThenOutputPin(), *IfThenElse->GetThenPin());
+		CompilerContext.MovePinLinksToIntermediate(*GetInvalidOutputPin(), *IfThenElse->GetElsePin());
 
 		BreakAllNodeLinks();
 	}
@@ -150,7 +132,6 @@ void UK2Node_CastRpaiMemoryStructToStruct::GetMenuActions(FBlueprintActionDataba
 		{
 			UK2Node_CastRpaiMemoryStructToStruct* StructNode = CastChecked<UK2Node_CastRpaiMemoryStructToStruct>(NewNode);
 			StructNode->StructType = NonConstStructPtr.Get();
-			StructNode->bRegisterNets = false;
 		}
 
 		static void OverrideCategory(FBlueprintActionContext const& Context, IBlueprintNodeBinder::FBindingSet const& /*Bindings*/, FBlueprintActionUiSpec* UiSpecOut, TWeakObjectPtr<UScriptStruct> StructPtr)
@@ -181,43 +162,4 @@ void UK2Node_CastRpaiMemoryStructToStruct::GetMenuActions(FBlueprintActionDataba
 			}
 			return NodeSpawner;
 		}));
-}
-
-class FKCHandler_CastMemoryStructToStruct : public FNodeHandlingFunctor
-{
-public:
-	FKCHandler_CastMemoryStructToStruct(FKismetCompilerContext& InCompilerContext)
-		: FNodeHandlingFunctor(InCompilerContext)
-	{
-	}
-
-	virtual void RegisterNets(FKismetFunctionContext& Context, UEdGraphNode* Node) override
-	{
-		FNodeHandlingFunctor::RegisterNets(Context, Node); //handle literals
-
-		auto MyNode = CastChecked<UK2Node_CastRpaiMemoryStructToStruct>(Node);
-
-		auto InPin = MyNode->GetMemoryStructInputPin();
-		auto Net = FEdGraphUtilities::GetNetFromPin(InPin);
-		FBPTerminal* SourceTerm = nullptr;
-		if (Context.NetMap.Find(Net) == nullptr)
-		{
-			SourceTerm = Context.CreateLocalTerminalFromPinAutoChooseScope(Net, Context.NetNameMap->MakeValidName(Net));
-			Context.NetMap.Add(Net, SourceTerm);
-		}
-		check(SourceTerm != nullptr);
-
-		UEdGraphPin* OutPin = Node->FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue, EGPD_Output);
-		Net = FEdGraphUtilities::GetNetFromPin(OutPin);
-		if (ensure(Context.NetMap.Find(OutPin) == nullptr))
-		{
-			FBPTerminal* Term = Context.CreateLocalTerminalFromPinAutoChooseScope(OutPin, Context.NetNameMap->MakeValidName(Net));
-			Context.NetMap.Add(OutPin, Term);
-		}
-	}
-};
-
-FNodeHandlingFunctor* UK2Node_CastRpaiMemoryStructToStruct::CreateNodeHandler(FKismetCompilerContext& CompilerContext) const
-{
-	return bRegisterNets ? new FKCHandler_CastMemoryStructToStruct(CompilerContext) : new FNodeHandlingFunctor(CompilerContext);
 }

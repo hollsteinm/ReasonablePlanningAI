@@ -22,9 +22,6 @@ protected:
 public:
 	static FName MemoryStructInputPin;
 
-	UPROPERTY()
-	bool bRegisterNets;
-
 	FORCEINLINE UScriptStruct* GetStructType() const { return StructType; }
 
 	//~ Begin UObject Interface
@@ -39,7 +36,6 @@ public:
 	//~ Begin UK2Node Interface
 	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
-	virtual FNodeHandlingFunctor* UK2Node_CastRpaiMemoryStructToStruct::CreateNodeHandler(FKismetCompilerContext& CompilerContext) const override;
 	virtual void PreloadRequiredAssets() override;
 
 	virtual bool IsNodePure() const override { return true; }
