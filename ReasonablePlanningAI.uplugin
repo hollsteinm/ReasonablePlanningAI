@@ -24,6 +24,11 @@
 			"Name": "ReasonablePlanningAITestSuite",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ReasonablePlanningAINodes",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "PostEngineInit"
 		}
 	]
 }

@@ -112,10 +112,10 @@ FRpaiMemory::MemorySizeType FRpaiMemory::GetTotalBytesAvailable() const
 }
 
 FRpaiMemoryStruct::FRpaiMemoryStruct()
-	: Source(nullptr)
-	, Refs(nullptr)
+	: MemoryStart(nullptr)
 	, Type(nullptr)
-	, MemoryStart(nullptr)
+	, Source(nullptr)
+	, Refs(nullptr)
 {
 }
 
@@ -132,6 +132,10 @@ FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* Fro
 	if (CppOpts != nullptr && !CppOpts->HasZeroConstructor())
 	{
 		CppOpts->Construct(MemoryStart);
+	}
+	else
+	{
+		Type->InitializeDefaultValue(MemoryStart);
 	}
 	AddRef();
 }
@@ -164,7 +168,7 @@ FRpaiMemoryStruct& FRpaiMemoryStruct::operator=(const FRpaiMemoryStruct& OtherSl
 			Refs = nullptr;
 			if (LIKELY(Source != nullptr))
 			{
-				if (LIKELY(Type != nullptr))
+				if (LIKELY(Type != nullptr) && LIKELY(MemoryStart != nullptr))
 				{
 					Type->DestroyStruct(MemoryStart);
 				}
@@ -195,6 +199,11 @@ uint32 FRpaiMemoryStruct::Release()
 	return Refs == nullptr ? INDEX_NONE : --(*Refs);
 }
 
+bool FRpaiMemoryStruct::IsCompatibleType(const UScriptStruct* TestType) const
+{
+	return (TestType == Type) || FStructUtils::TheSameLayout(TestType, Type);
+}
+
 FRpaiMemoryStruct::~FRpaiMemoryStruct()
 {
 	if (Release() == 0)
@@ -205,14 +214,11 @@ FRpaiMemoryStruct::~FRpaiMemoryStruct()
 		{
 			if (LIKELY(Type != nullptr))
 			{
-				auto* CppOpts = Type->GetCppStructOps();
-				if (CppOpts != nullptr && CppOpts->HasDestructor())
-				{
-					CppOpts->Destruct(MemoryStart);
-				}
+				Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
+				MemoryStart = nullptr;
 			}
-			Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
 			Source = nullptr;
 		}
+		ensure(MemoryStart == nullptr);
 	}
 }
