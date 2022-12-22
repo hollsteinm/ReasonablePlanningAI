@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "K2Node.h"
 #include "BlueprintActionDatabaseRegistrar.h"
-#include "K2Node_CastRpaiMemoryStructToStruct.generated.h"
+#include "K2Node_RpaiWriteMemory.generated.h"
 
 UCLASS(MinimalAPI)
-class UK2Node_CastRpaiMemoryStructToStruct : public UK2Node
+class UK2Node_RpaiWriteMemory : public UK2Node
 {
 	GENERATED_BODY()
 
@@ -17,10 +17,12 @@ private:
 
 protected:
 	UPROPERTY()
-	UScriptStruct* StructType;
+		UScriptStruct* StructType;
 
 public:
 	static FName MemoryStructInputPin;
+
+	static FName WriteStructInputPin;
 
 	FORCEINLINE UScriptStruct* GetStructType() const { return StructType; }
 
@@ -38,7 +40,7 @@ public:
 	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
 	virtual void PreloadRequiredAssets() override;
 
-	virtual bool IsNodePure() const override { return true; }
+	virtual bool IsNodePure() const override { return false; }
 	//~ End UK2Node Interface
 
 	UEdGraphPin* GetMemoryStructInputPin() const;

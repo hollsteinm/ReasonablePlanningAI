@@ -43,6 +43,10 @@ void URpaiActionTask_Sequence::ReceiveStartActionTask_Implementation(AAIControll
 		Memory->ActiveActionTaskMemorySlice = Next->AllocateMemorySlice(SequenceMemoryPool);
 		Next->StartActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
 	}
+	else
+	{
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+	}
 }
 
 void URpaiActionTask_Sequence::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
@@ -62,8 +66,8 @@ void URpaiActionTask_Sequence::ReceiveCancelActionTask_Implementation(AAIControl
 	int32 CurrentIndex = Memory->ActiveActionTaskSequenceIndex;
 	if (Actions.IsValidIndex(CurrentIndex))
 	{
-		Actions[CurrentIndex]->CancelActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
 		Memory->ActiveActionTaskSequenceIndex = INDEX_NONE;
+		Actions[CurrentIndex]->CancelActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
 	}
 }
 
@@ -73,24 +77,22 @@ void URpaiActionTask_Sequence::ReceiveCompleteActionTask_Implementation(AAIContr
 	int32 CurrentIndex = Memory->ActiveActionTaskSequenceIndex;
 	if (Actions.IsValidIndex(CurrentIndex))
 	{
+		Memory->ActiveActionTaskSequenceIndex = CurrentIndex + 1;
 		Actions[CurrentIndex]->CompleteActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
-		Memory->ActiveActionTaskSequenceIndex = INDEX_NONE;
 	}
 }
 
 void URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();
-	int32 CurrentIndex = Memory->ActiveActionTaskSequenceIndex + 1;
-	if (Actions.IsValidIndex(CurrentIndex))
+	if (Actions.IsValidIndex(Memory->ActiveActionTaskSequenceIndex))
 	{
-		Memory->ActiveActionTaskMemorySlice = Actions[CurrentIndex]->AllocateMemorySlice(SequenceMemoryPool);
-		Memory->ActiveActionTaskSequenceIndex = CurrentIndex;
-		Actions[CurrentIndex]->StartActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
+		Memory->ActiveActionTaskMemorySlice = Actions[Memory->ActiveActionTaskSequenceIndex]->AllocateMemorySlice(SequenceMemoryPool);
+		Memory->ActiveActionTaskSequenceIndex = Memory->ActiveActionTaskSequenceIndex;
+		Actions[Memory->ActiveActionTaskSequenceIndex]->StartActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
 	}
 	else
 	{
-		Memory->ActiveActionTaskSequenceIndex = INDEX_NONE;
 		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }

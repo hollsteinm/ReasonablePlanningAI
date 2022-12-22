@@ -2,21 +2,21 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class ReasonablePlanningAIEditor : ModuleRules
+	public class ReasonablePlanningAINodes : ModuleRules
 	{
-		public ReasonablePlanningAIEditor(ReadOnlyTargetRules Target) : base(Target)
+		public ReasonablePlanningAINodes(ReadOnlyTargetRules Target) : base(Target)
 		{
             PublicIncludePaths.AddRange(
 				new[] {
-                	"ReasonablePlanningAIEditor/Public"
+                	"ReasonablePlanningAINodes/Public"
                 }
 			);
 				
 		
 			PrivateIncludePaths.AddRange(
 				new[] {
-                	"ReasonablePlanningAIEditor/Private"
-            	}
+					"ReasonablePlanningAINodes/Private"
+				}
 			);
 
 			PublicDependencyModuleNames.AddRange(

@@ -214,11 +214,6 @@ FRpaiMemoryStruct::~FRpaiMemoryStruct()
 		{
 			if (LIKELY(Type != nullptr))
 			{
-				auto* CppOpts = Type->GetCppStructOps();
-				if (CppOpts != nullptr && CppOpts->HasDestructor())
-				{
-					CppOpts->Destruct(MemoryStart);
-				}
 				Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
 				MemoryStart = nullptr;
 			}

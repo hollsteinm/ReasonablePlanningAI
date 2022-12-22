@@ -8,7 +8,7 @@
 /**
 * The public interface to this module
 */
-class IReasonablePlanningAIEditorModule : public IModuleInterface
+class IReasonablePlanningAINodesModule : public IModuleInterface
 {
 
 public:
@@ -19,9 +19,9 @@ public:
 	*
 	* @return Returns singleton instance, loading the module on demand if needed
 	*/
-	static inline IReasonablePlanningAIEditorModule& Get()
+	static inline IReasonablePlanningAINodesModule& Get()
 	{
-		return FModuleManager::LoadModuleChecked<IReasonablePlanningAIEditorModule>("IReasonablePlanningAIEditorModule");
+		return FModuleManager::LoadModuleChecked<IReasonablePlanningAINodesModule>("IReasonablePlanningAINodesModule");
 	}
 
 	/**
@@ -31,6 +31,6 @@ public:
 	*/
 	static inline bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded("IReasonablePlanningAIEditorModule");
+		return FModuleManager::Get().IsModuleLoaded("IReasonablePlanningAINodesModule");
 	}
 };
