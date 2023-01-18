@@ -85,6 +85,7 @@ void URpaiActionTask_Sequence::ReceiveCompleteActionTask_Implementation(AAIContr
 void URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();
+	Memory->ActiveActionTaskSequenceIndex += 1;
 	if (Actions.IsValidIndex(Memory->ActiveActionTaskSequenceIndex))
 	{
 		Memory->ActiveActionTaskMemorySlice = Actions[Memory->ActiveActionTaskSequenceIndex]->AllocateMemorySlice(SequenceMemoryPool);
@@ -95,4 +96,19 @@ void URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled(URpaiComposerAct
 	{
 		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
+}
+
+void URpaiActionTask_Sequence::AddActionTaskToSequence(URpaiComposerActionTaskBase* NewAction)
+{
+	Actions.Add(NewAction);
+}
+
+void URpaiActionTask_Sequence::RemoveActionTaskFromSequence(const URpaiComposerActionTaskBase* ActionToRemove)
+{
+	Actions.RemoveAll([ActionToRemove](const URpaiComposerActionTaskBase* Action) -> bool { return ActionToRemove == Action; });
+}
+
+const URpaiComposerActionTaskBase* URpaiActionTask_Sequence::ViewTaskFromSequence(int32 Index) const
+{
+	return Actions.IsValidIndex(Index) ? Actions[Index] : nullptr;
 }

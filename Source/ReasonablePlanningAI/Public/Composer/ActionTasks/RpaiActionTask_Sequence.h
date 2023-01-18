@@ -28,6 +28,21 @@ class REASONABLEPLANNINGAI_API URpaiActionTask_Sequence : public URpaiComposerAc
 public:
 	URpaiActionTask_Sequence();
 
+	/**
+	* Adds an action task to this sequence of actions. Not safe to call during execution.
+	**/
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void AddActionTaskToSequence(URpaiComposerActionTaskBase* NewAction);
+
+	/**
+	* Removes all occurences of an action task to this sequence of actions. Not safe to call during execution.
+	**/
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void RemoveActionTaskFromSequence(const URpaiComposerActionTaskBase* ActionToRemove);
+
+	UFUNCTION(BlueprintPure, Category = "Rpai")
+	const URpaiComposerActionTaskBase* ViewTaskFromSequence(int32 Index) const;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	TArray<URpaiComposerActionTaskBase*> Actions;

@@ -153,3 +153,18 @@ void URpaiActionTask_Composite::Flush(FRpaiMemoryStruct ActionMemory)
 	Memory->CompositeActionTaskSlices.Shrink();
 	Memory->ActionActionTasks.Shrink();
 }
+
+void URpaiActionTask_Composite::AddActionTaskToComposite(FRpaiCompositeActionTaskEntry NewEntry)
+{
+	ActionEntries.Add(NewEntry);
+}
+
+void URpaiActionTask_Composite::RemoveActionTaskFromComposite(FRpaiCompositeActionTaskEntry MatchingEntryToRemove)
+{
+	ActionEntries.RemoveAll([MatchingEntryToRemove](const FRpaiCompositeActionTaskEntry& Action) -> bool { return MatchingEntryToRemove == Action; });
+}
+
+const URpaiComposerActionTaskBase* URpaiActionTask_Composite::ViewTaskFromComposite(int32 Index) const
+{
+	return ActionEntries.IsValidIndex(Index) ? ActionEntries[Index].Action : nullptr;
+}

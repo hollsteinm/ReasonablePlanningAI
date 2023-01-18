@@ -549,7 +549,7 @@ void ReasonablePlanningMutatorCopyStateSpec::Define()
 					TestEqual("Target value changed", B, A);
 				});
 
-			It("Should copy the boolean values", [this]()
+			It("should copy the boolean values", [this]()
 				{
 					ClassUnderTest->SetMutatedStateValue("BB", EStatePropertyType::Bool);
 					ClassUnderTest->SetCopiedFromStateValue("BA", EStatePropertyType::Bool);
@@ -566,7 +566,7 @@ void ReasonablePlanningMutatorCopyStateSpec::Define()
 					TestEqual("Target value changed", bB, bA);
 				});
 
-			It("Should copy the boolean values", [this]()
+			It("should copy the integer values", [this]()
 				{
 					ClassUnderTest->SetMutatedStateValue("IB", EStatePropertyType::Int);
 					ClassUnderTest->SetCopiedFromStateValue("IA", EStatePropertyType::Int);

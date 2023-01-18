@@ -50,6 +50,21 @@ class REASONABLEPLANNINGAI_API URpaiActionTask_Composite : public URpaiComposerA
 public:
 	URpaiActionTask_Composite();
 
+	/**
+	* Adds an action task to this composite of actions. Not safe to call during execution.
+	**/
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void AddActionTaskToComposite(FRpaiCompositeActionTaskEntry NewEntry);
+
+	/**
+	* Removes all occurences of an action task configuration to this sequence of actions. Not safe to call during execution.
+	**/
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void RemoveActionTaskFromComposite(FRpaiCompositeActionTaskEntry MatchingEntryToRemove);
+
+	UFUNCTION(BlueprintPure, Category = "Rpai")
+	const URpaiComposerActionTaskBase* ViewTaskFromComposite(int32 Index) const;
+
 protected:
 	/**
 	* A list of actions to execute in a batch. All will start at the same time and will complete when all actions have been completed or cancelled unless indicated otherwhise in 'IgnoreIndicesForCompletion'.
