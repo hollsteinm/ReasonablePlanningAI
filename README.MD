@@ -1,6 +1,6 @@
 # Reasonable Planning AI
 
-Discuss the future of this project with us in real time on our [Discord](https://discord.com/invite/Tv7uMsMh).
+Discuss the future of this project with us in real time on our [Discord](https://discord.gg/fKFhN2NwjC)
 
 ![Icon](./Resources/Icon128.png)
 
