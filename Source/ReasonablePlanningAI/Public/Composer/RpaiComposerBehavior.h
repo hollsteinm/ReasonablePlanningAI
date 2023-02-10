@@ -47,5 +47,15 @@ public:
 
 	FORCEINLINE TArray<URpaiGoalBase*> GetGoals() const { return Goals; }
 
-	FORCEINLINE TArray<URpaiActionBase*> GetActions() { return Actions; }
+	FORCEINLINE TArray<URpaiActionBase*> GetActions() const { return Actions; }
+
+	FORCEINLINE void SetReasoner(URpaiReasonerBase* NewReasoner) { Reasoner = NewReasoner; }
+
+	FORCEINLINE void SetPlanner(URpaiPlannerBase* NewPlanner) { Planner = NewPlanner; }
+
+	FORCEINLINE void SetConstructedStateType(TSubclassOf<URpaiState> NewStateType) { ConstructedStateType = NewStateType; }
+
+	FORCEINLINE void SetGoals(const TArray<URpaiGoalBase*>& NewGoals) { Goals = NewGoals; }
+
+	FORCEINLINE void SetActions(TArray<URpaiActionBase*> NewActions) { Actions = NewActions; }
 };

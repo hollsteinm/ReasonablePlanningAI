@@ -29,12 +29,12 @@ void URpaiComposerBrainComponent::SetReasonablePlanningBehavior(URpaiComposerBeh
 
 const URpaiReasonerBase* URpaiComposerBrainComponent::AcquireReasoner_Implementation()
 {
-	return ReasonablePlanningBehavior->GetReasoner();
+	return ReasonablePlanningBehavior == nullptr ? nullptr : ReasonablePlanningBehavior->GetReasoner();
 }
 
 const URpaiPlannerBase* URpaiComposerBrainComponent::AcquirePlanner_Implementation()
 {
-	return ReasonablePlanningBehavior->GetPlanner();
+	return ReasonablePlanningBehavior == nullptr ? nullptr : ReasonablePlanningBehavior->GetPlanner();
 }
 
 void URpaiComposerBrainComponent::AcquireGoals_Implementation(TArray<URpaiGoalBase*>& OutGoals)

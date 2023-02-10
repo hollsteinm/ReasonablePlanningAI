@@ -16,10 +16,12 @@ class REASONABLEPLANNINGAI_API URpaiComposerActionTask : public URpaiComposerAct
 {
 	GENERATED_BODY()
 
-public:
-	URpaiComposerActionTask();
-
 protected:
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	FStateKeyValueReference ActionTaskStateKeyValueReference;
+
+public:
+	URpaiComposerActionTask();
+
+	FORCEINLINE void SetStateKeyValueReference(const FStateKeyValueReference& Reference) { ActionTaskStateKeyValueReference = Reference; }
 };

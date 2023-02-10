@@ -18,9 +18,16 @@ namespace UnrealBuildTool.Rules
 					"Engine",
 					"GameplayTasks",
 					"AIModule",
-					"ReasonablePlanningAI",
-				}
+					"ReasonablePlanningAI"
+                }
 			);
-		}
+
+            PrivateDependencyModuleNames.AddRange(
+                new[] {
+                    "UnrealEd"
+                }
+            );
+
+        }
 	}
 }

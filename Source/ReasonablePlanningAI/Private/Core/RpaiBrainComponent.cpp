@@ -183,6 +183,10 @@ void URpaiBrainComponent::StartLogic()
 
 	auto Reasoner = AcquireReasoner();
 	auto Planner = AcquirePlanner();
+	if (Reasoner == nullptr || Planner == nullptr)
+	{
+		return;
+	}
 
 	TArray<URpaiGoalBase*> Goals;
 	AcquireGoals(Goals);

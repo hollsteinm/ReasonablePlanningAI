@@ -45,8 +45,8 @@ void ReasonablePlanningMemoryTests::Define()
 		{
 			It("should create a slice with appropriate allocations", [this]()
 				{
-					FRpaiMemory GivenMemory(128);
-					FRpaiMemoryStruct ClassUnderTest(&GivenMemory, FTestStruct::StaticStruct());
+					FRpaiMemory TestMemory(128);
+					FRpaiMemoryStruct ClassUnderTest(&TestMemory, FTestStruct::StaticStruct());
 
 					TestNotNull("Memory Not Null", ClassUnderTest.GetRaw());
 				});

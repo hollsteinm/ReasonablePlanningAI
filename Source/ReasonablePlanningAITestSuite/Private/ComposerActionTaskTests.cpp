@@ -1,3 +1,4 @@
+#include "Misc/AutomationTest.h"
 #include "ComposerActionTaskTests.h"
 #include "AIController.h"
 #include "Composer/ActionTasks/RpaiActionTask_Sequence.h"
@@ -38,7 +39,7 @@ BEGIN_DEFINE_SPEC(ReasonablePlanningComposerActionTaskSequenceSpec, "ReasonableP
 	AAIController* GivenController;
 	URpaiActionTask_Sequence* ActionTaskUnderTest;
 	FRpaiMemory GivenPool;
-	FRpaiMemoryStruct GivenMemory;
+	FRpaiMemoryStruct GivenTestMemory;
 END_DEFINE_SPEC(ReasonablePlanningComposerActionTaskSequenceSpec)
 void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 {
@@ -55,9 +56,9 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 					ActionTaskUnderTest->AddActionTaskToSequence(NewObject<UTestComposerActionTask>(ActionTaskUnderTest));
 
 					GivenPool = FRpaiMemory(512);
-					GivenMemory = ActionTaskUnderTest->AllocateMemorySlice(GivenPool);
+					GivenTestMemory = ActionTaskUnderTest->AllocateMemorySlice(GivenPool);
 
-					ActionTaskUnderTest->StartActionTask(GivenController, nullptr, GivenMemory);
+					ActionTaskUnderTest->StartActionTask(GivenController, nullptr, GivenTestMemory);
 				});
 
 			It("should call the start method of the first sequence item", [this]()
@@ -71,7 +72,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 
 			It("should call the update method of the first sequence item", [this]()
 				{
-					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
+					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
 
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasUpdateActionTaskCalledNumTimes(1));
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(1))->WasUpdateActionTaskCalledNever());
@@ -82,8 +83,8 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 
 			It("should call the update method of the second sequnce item after update completes on first item", [this]()
 				{
-					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
-					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
+					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
+					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
 
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasUpdateActionTaskCalledNumTimes(2));
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(1))->WasUpdateActionTaskCalledNever());
@@ -98,7 +99,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 					TestTrue("Complete Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(3))->WasCompleteActionTaskCalledNever());
 					TestTrue("Complete Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(4))->WasCompleteActionTaskCalledNever());
 
-					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
+					ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
 
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasUpdateActionTaskCalledNumTimes(2));
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(1))->WasUpdateActionTaskCalledNumTimes(1));
@@ -114,7 +115,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 
 					for (auto Idx = 0; Idx < 10; ++Idx)
 					{
-						ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
+						ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
 					}
 
 					TestTrue("Update Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasUpdateActionTaskCalledNumTimes(2));
@@ -136,7 +137,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 				{
 					uint32 CancelCalls = 0U;
 					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*) -> void { ++CancelCalls; });
-					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenMemory);
+					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenTestMemory);
 
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasCancelActionTaskCalledNumTimes(1));
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(1))->WasCancelActionTaskCalledNever());
@@ -154,9 +155,9 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 					
 					for (auto Idx = 0; Idx < 4; ++Idx)
 					{
-						ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenMemory);
+						ActionTaskUnderTest->UpdateActionTask(GivenController, nullptr, 0.33f, GivenTestMemory);
 					}
-					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenMemory);
+					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenTestMemory);
 
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasCancelActionTaskCalledNever());
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(1))->WasCancelActionTaskCalledNever());
