@@ -1,5 +1,5 @@
-#include "Misc/AutomationTest.h"
 #include "ComposerActionTaskTests.h"
+#include "Misc/AutomationTest.h"
 #include "AIController.h"
 #include "Composer/ActionTasks/RpaiActionTask_Sequence.h"
 #include "Composer/ActionTasks/RpaiActionTask_Composite.h"

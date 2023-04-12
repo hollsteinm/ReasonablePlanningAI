@@ -22,7 +22,18 @@ void URpaiComposerAction::HandleActionTaskCompleted(URpaiComposerActionTaskBase*
 	if (CompletedActionTask == ActionTask)
 	{
 		ActionTask->OnActionTaskComplete().RemoveAll(this);
+		ActionTask->OnActionTaskCancelled().RemoveAll(this);
 		CompleteAction(ActionInstigator, State, ActionMemory, ActionTargetActor, ActionWorld);
+	}
+}
+
+void URpaiComposerAction::HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+{
+	if (CompletedActionTask == ActionTask)
+	{
+		ActionTask->OnActionTaskComplete().RemoveAll(this);
+		ActionTask->OnActionTaskCancelled().RemoveAll(this);
+		CancelAction(ActionInstigator, State, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }
 
@@ -38,6 +49,7 @@ void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* Actio
 	if (LockResourceOnStart.IsNone())
 	{
 		ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
+		ActionTask->OnActionTaskCancelled().AddUObject(this, &URpaiComposerAction::HandleActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
 		ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 	else
@@ -45,6 +57,7 @@ void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* Actio
 		if (CurrentState->LockResource(LockResourceOnStart, this))
 		{
 			ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
+			ActionTask->OnActionTaskCancelled().AddUObject(this, &URpaiComposerAction::HandleActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
 			ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 		}
 		else

@@ -25,6 +25,7 @@ public:
 
 private:
 	void HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld);
+	void HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld);
 
 protected:
 	/** Start URpaiActionBase*/

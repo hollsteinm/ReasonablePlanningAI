@@ -20,7 +20,7 @@ protected:
     /**
     * Right hand state key reference to use
     */
-    UPROPERTY(EditDefaultsOnly, Category = "Rpai", meta = (DisplayName = "Right Hand Side State Reference Key"))
+    UPROPERTY(EditAnywhere, Category = "Rpai", meta = (DisplayName = "Right Hand Side State Reference Key"))
     FStateKeyValueReference RHS;
     
 public:

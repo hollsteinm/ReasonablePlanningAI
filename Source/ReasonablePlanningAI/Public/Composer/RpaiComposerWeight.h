@@ -19,7 +19,7 @@ public:
 	URpaiComposerWeight();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Rpai")
+	UPROPERTY(EditAnywhere, Category = "Rpai")
 	FStateKeyValueReference WeightStateKeyValueReference;
 
 public:

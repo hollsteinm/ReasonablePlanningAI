@@ -121,8 +121,8 @@ FRpaiMemoryStruct::FRpaiMemoryStruct()
 
 FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType)
 	: Source(FromMemory)
-	, Refs(static_cast<uint32*>(FMemory::Malloc(sizeof(uint32))))
 	, Type(FromStructType)
+	, Refs(static_cast<uint32*>(FMemory::Malloc(sizeof(uint32))))
 {
 	*Refs = 0;
 	MemoryStart = FromMemory->Allocate(Type->GetStructureSize(), Type->GetMinAlignment());
