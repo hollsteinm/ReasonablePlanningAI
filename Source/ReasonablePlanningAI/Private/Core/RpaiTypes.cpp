@@ -120,12 +120,12 @@ FRpaiMemoryStruct::FRpaiMemoryStruct()
 }
 
 FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType)
-	: Source(FromMemory)
+	: MemoryStart(FromMemory->Allocate(FromStructType->GetStructureSize(), FromStructType->GetMinAlignment()))
+	, Source(FromMemory)
 	, Type(FromStructType)
 	, Refs(static_cast<uint32*>(FMemory::Malloc(sizeof(uint32))))
 {
-	*Refs = 0;
-	MemoryStart = FromMemory->Allocate(Type->GetStructureSize(), Type->GetMinAlignment());
+	FMemory::Memzero(Refs, sizeof(uint32));
 	FMemory::Memzero(MemoryStart, Type->GetStructureSize());
 
 	auto CppOpts = Type->GetCppStructOps();
@@ -137,12 +137,13 @@ FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* Fro
 	{
 		Type->InitializeDefaultValue(MemoryStart);
 	}
+
 	AddRef();
 }
 
 FRpaiMemoryStruct::FRpaiMemoryStruct(const FRpaiMemoryStruct& OtherSlice)
 	: Source(OtherSlice.Source)
-	, MemoryStart(OtherSlice.MemoryStart)
+	, MemoryStart(OtherSlice.MemoryStart) 
 	, Refs(OtherSlice.Refs)
 	, Type(OtherSlice.Type)
 {
@@ -191,12 +192,25 @@ void FRpaiMemoryStruct::AddRef()
 	if (Refs != nullptr)
 	{
 		++(*Refs);
+		ensure(*Refs < TNumericLimits<uint32>::Max());
+	}
+	else
+	{
+		ensure(MemoryStart == nullptr);
+		ensure(Source == nullptr);
+		ensure(Type == nullptr);
+		ensure(Refs == nullptr);
 	}
 }
 
 uint32 FRpaiMemoryStruct::Release()
 {
-	return Refs == nullptr ? INDEX_NONE : --(*Refs);
+	//Defualt Ctor allows uninitalized reference. A reference to nothing. This can occur during smoke tests.
+	if (Refs != nullptr)
+	{
+		return --(*Refs);
+	}
+	return TNumericLimits<uint32>::Max();
 }
 
 bool FRpaiMemoryStruct::IsCompatibleType(const UScriptStruct* TestType) const
@@ -206,7 +220,8 @@ bool FRpaiMemoryStruct::IsCompatibleType(const UScriptStruct* TestType) const
 
 FRpaiMemoryStruct::~FRpaiMemoryStruct()
 {
-	if (Release() == 0)
+	uint32 RemainingRefs = Release();
+	if (RemainingRefs == 0)
 	{
 		FMemory::Free(Refs);
 		Refs = nullptr;
@@ -216,9 +231,16 @@ FRpaiMemoryStruct::~FRpaiMemoryStruct()
 			{
 				Source->Free(MemoryStart, Type->GetStructureSize(), Type->GetMinAlignment());
 				MemoryStart = nullptr;
+				Type = nullptr;
 			}
 			Source = nullptr;
 		}
+	}
+	if (RemainingRefs == TNumericLimits<uint32>::Max() || RemainingRefs == 0)
+	{
 		ensure(MemoryStart == nullptr);
+		ensure(Source == nullptr);
+		ensure(Type == nullptr);
+		ensure(Refs == nullptr);
 	}
 }

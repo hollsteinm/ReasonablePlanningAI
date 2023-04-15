@@ -12,6 +12,7 @@ struct REASONABLEPLANNINGAI_API FActionTaskSequence
 	GENERATED_BODY()
 
 	FActionTaskSequence();
+	~FActionTaskSequence();
 
 	int32 ActiveActionTaskSequenceIndex;
 	FRpaiMemoryStruct ActiveActionTaskMemorySlice;

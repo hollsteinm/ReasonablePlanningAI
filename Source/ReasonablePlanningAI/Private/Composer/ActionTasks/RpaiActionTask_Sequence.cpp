@@ -11,6 +11,11 @@ FActionTaskSequence::FActionTaskSequence()
 
 }
 
+FActionTaskSequence::~FActionTaskSequence()
+{
+	
+}
+
 URpaiActionTask_Sequence::URpaiActionTask_Sequence()
 	: SequenceMemoryPool(256)
 {
