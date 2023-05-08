@@ -95,29 +95,45 @@ void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIContro
 
 void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	for (auto& Entry : ActionEntries)
+	{
+		Entry.Action->OnActionTaskComplete().RemoveAll(this);
+		Entry.Action->OnActionTaskCancelled().RemoveAll(this);
+	}
+
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto& Entry : Memory->ActionActionTasks)
 	{
-		Entry.Action->CancelActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+		FRpaiMemoryStruct CompositeActionMemory = Memory->CompositeActionTaskSlices[Index++];
+		Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld);
+		OnActionTaskCompletedOrCancelled(Entry.Action, ActionInstigator, CurrentState, ActionMemory);
 	}
 	Flush(ActionMemory);
 }
 
 void URpaiActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
+	for (auto& Entry : ActionEntries)
+	{
+		Entry.Action->OnActionTaskComplete().RemoveAll(this);
+		Entry.Action->OnActionTaskCancelled().RemoveAll(this);
+	}
+
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto Entry : Memory->ActionActionTasks)
 	{
+		FRpaiMemoryStruct CompositeActionMemory = Memory->CompositeActionTaskSlices[Index++];
 		if (Entry.bPreferCancelOnCompositeCompletion)
 		{
-			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld);
 		}
 		else
 		{
-			Entry.Action->CompleteActionTask(ActionInstigator, CurrentState, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+			Entry.Action->CompleteActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld);
 		}
+		OnActionTaskCompletedOrCancelled(Entry.Action, ActionInstigator, CurrentState, ActionMemory);
 	}
 	Flush(ActionMemory);
 }

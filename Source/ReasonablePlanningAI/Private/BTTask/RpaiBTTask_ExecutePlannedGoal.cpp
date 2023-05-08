@@ -63,7 +63,7 @@ EBTNodeResult::Type URpaiBTTask_ExecutePlannedGoal::ExecuteTask(UBehaviorTreeCom
 		PlannedGoalMemory->CurrentAction->OnActionComplete.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCompleted);
 		PlannedGoalMemory->CurrentAction->OnActionCancelled.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCancelled);
 		PlannedGoalMemory->ActionMemory = PlannedGoalMemory->CurrentAction->AllocateMemorySlice(PlannedGoalMemory->ExecutionMemory);
-		PlannedGoalMemory->CurrentAction->StartAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, FRpaiMemoryStruct(), OwnerComp.GetOwner(), OwnerComp.GetWorld());
+		PlannedGoalMemory->CurrentAction->StartAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, PlannedGoalMemory->ActionMemory, OwnerComp.GetOwner(), OwnerComp.GetWorld());
 		return EBTNodeResult::InProgress;
 	}
 
@@ -94,7 +94,7 @@ EBTNodeResult::Type URpaiBTTask_ExecutePlannedGoal::AbortTask(UBehaviorTreeCompo
 	FExecutePlannedGoalMemory* PlannedGoalMemory = (FExecutePlannedGoalMemory*)NodeMemory;
 	if (PlannedGoalMemory->CurrentAction != nullptr)
 	{
-		PlannedGoalMemory->CurrentAction->CancelAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, FRpaiMemoryStruct(), OwnerComp.GetOwner(), OwnerComp.GetWorld());
+		PlannedGoalMemory->CurrentAction->CancelAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, PlannedGoalMemory->ActionMemory, OwnerComp.GetOwner(), OwnerComp.GetWorld());
 	}
 
 	PlannedGoalMemory->CurrentAction = nullptr;
@@ -127,7 +127,7 @@ void URpaiBTTask_ExecutePlannedGoal::TickTask(UBehaviorTreeComponent& OwnerComp,
 	FExecutePlannedGoalMemory* PlannedGoalMemory = (FExecutePlannedGoalMemory*)NodeMemory;
 	if (PlannedGoalMemory->CurrentAction != nullptr)
 	{
-		PlannedGoalMemory->CurrentAction->UpdateAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, DeltaSeconds, FRpaiMemoryStruct(), OwnerComp.GetOwner(), OwnerComp.GetWorld());
+		PlannedGoalMemory->CurrentAction->UpdateAction(OwnerComp.GetAIOwner(), BlackboardAdapterState, DeltaSeconds, PlannedGoalMemory->ActionMemory, OwnerComp.GetOwner(), OwnerComp.GetWorld());
 	}
 
 	if (PlannedGoalMemory->CurrentAction == nullptr && PlannedGoalMemory->RemainingPlan.IsEmpty())
@@ -218,7 +218,7 @@ void URpaiBTTask_ExecutePlannedGoal::OnActionEvent(URpaiActionBase* CompletedAct
 		TaskMemory->CurrentAction->OnActionComplete.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCompleted);
 		TaskMemory->CurrentAction->OnActionCancelled.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCancelled);
 		TaskMemory->ActionMemory = TaskMemory->CurrentAction->AllocateMemorySlice(TaskMemory->ExecutionMemory);
-		TaskMemory->CurrentAction->StartAction(ActionInstigator, CompletedOnState, FRpaiMemoryStruct(), ActionInstigator->GetOwner(), ActionInstigator->GetWorld());
+		TaskMemory->CurrentAction->StartAction(ActionInstigator, CompletedOnState, TaskMemory->ActionMemory, ActionInstigator->GetOwner(), ActionInstigator->GetWorld());
 	}
 	else
 	{

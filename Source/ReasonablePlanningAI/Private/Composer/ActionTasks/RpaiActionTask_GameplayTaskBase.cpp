@@ -10,6 +10,7 @@
 
 FActionTaskGameplayTaskBaseMemory::FActionTaskGameplayTaskBaseMemory()
 	: AITask(nullptr)
+	, State(nullptr)
 {
 
 }
@@ -28,6 +29,7 @@ void URpaiActionTask_GameplayTaskBase::ReceiveCancelActionTask_Implementation(AA
 		if (TheTask != nullptr && !TheTask->IsFinished())
 		{
 			TheTask->ExternalCancel();
+			ControllerToMemory.Remove(ActionInstigator);
 		}
 	}
 }
@@ -86,27 +88,49 @@ void URpaiActionTask_GameplayTaskBase::OnGameplayTaskInitialized(UGameplayTask& 
 	}
 }
 
+bool URpaiActionTask_GameplayTaskBase::GetMemoryForController(AAIController* ControllerToQuery, FRpaiMemoryStruct& OutMemoryStruct)
+{
+	if (ControllerToMemory.Contains(ControllerToQuery))
+	{
+		OutMemoryStruct = ControllerToMemory[ControllerToQuery];
+		return true;
+	}
+	return false;
+}
+
 void URpaiActionTask_GameplayTaskBase::OnGameplayTaskDeactivated(UGameplayTask& Task)
 {
 	UAITask* AITask = Cast<UAITask>(&Task);
 	if (AITask && AITask->GetAIController() && AITask->GetState() != EGameplayTaskState::Paused)
 	{
-		// UMMMMMM.....
-		//auto StateKey = TaskToState.FindKey(AITask);
-		//if (StateKey != nullptr)
-		//{
-		//	//naughty
-		//	CompleteActionTask(AITask->GetAIController(), const_cast<URpaiState*>(*StateKey));
-		//}
+		AAIController* TaskController = AITask->GetAIController();
+		if (TaskController == nullptr)
+		{
+			UE_LOG(LogRpai, Error, TEXT("Missing AIController in AITask %s"), *AITask->GetName());
+			return;
+		}
+
+		FRpaiMemoryStruct TaskMemory;
+		if (GetMemoryForController(TaskController, TaskMemory))
+		{
+			CompleteActionTask(TaskController, TaskMemory.Get<FActionTaskGameplayTaskBaseMemory>()->State, TaskMemory, TaskController->GetOwner(), TaskController->GetWorld());
+			ControllerToMemory.Remove(TaskController);
+		}
 	}
 }
 
 void URpaiActionTask_GameplayTaskBase::StartTask(URpaiState* CurrentState, UAITask* TaskToStart, FRpaiMemoryStruct ActionMemory)
 {
 	ActionMemory.Get<FActionTaskGameplayTaskBaseMemory>()->AITask = TaskToStart;
+	ActionMemory.Get<FActionTaskGameplayTaskBaseMemory>()->State = CurrentState;
+	AAIController* Owner = Cast<AAIController>(GetGameplayTaskOwner(TaskToStart));
 	TaskToStart->ReadyForActivation();
 	if (TaskToStart->GetState() == EGameplayTaskState::Finished)
 	{
-		CompleteActionTask(Cast<AAIController>(GetGameplayTaskOwner(TaskToStart)), CurrentState, ActionMemory);
+		CompleteActionTask(Owner, CurrentState, ActionMemory);
+	}
+	else
+	{
+		ControllerToMemory.Emplace(Owner, ActionMemory);
 	}
 }

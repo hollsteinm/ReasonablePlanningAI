@@ -76,17 +76,6 @@ void URpaiActionTask_Sequence::ReceiveCancelActionTask_Implementation(AAIControl
 	}
 }
 
-void URpaiActionTask_Sequence::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
-{
-	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();
-	int32 CurrentIndex = Memory->ActiveActionTaskSequenceIndex;
-	if (Actions.IsValidIndex(CurrentIndex))
-	{
-		Memory->ActiveActionTaskSequenceIndex = CurrentIndex + 1;
-		Actions[CurrentIndex]->CompleteActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
-	}
-}
-
 void URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();

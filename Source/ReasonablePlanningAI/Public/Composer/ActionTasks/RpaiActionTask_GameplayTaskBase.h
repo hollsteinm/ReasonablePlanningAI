@@ -17,6 +17,7 @@ struct REASONABLEPLANNINGAI_API FActionTaskGameplayTaskBaseMemory
 	FActionTaskGameplayTaskBaseMemory();
 
 	UAITask* AITask;
+	URpaiState* State;
 };
 
 /**
@@ -44,5 +45,14 @@ public:
 protected:
 	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
+	UFUNCTION(BlueprintCallable, Category=Rpai)
 	void StartTask(URpaiState* CurrentState, UAITask* TaskToStart, FRpaiMemoryStruct ActionMemory);
+
+	// Gets the Rpai Memory associated to a controller. This should be rarely used, but may be required by child classes. Returns true if memory found, false otherwise.
+	UFUNCTION(BlueprintCallable, Category = Rpai)
+	bool GetMemoryForController(AAIController* ControllerToQuery, FRpaiMemoryStruct& OutMemoryStruct);
+
+private:
+	// Find Rpai Memory associated with a given task.
+	TMap<AAIController*, FRpaiMemoryStruct> ControllerToMemory;
 };

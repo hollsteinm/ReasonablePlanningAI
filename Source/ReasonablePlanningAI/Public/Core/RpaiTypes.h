@@ -143,6 +143,8 @@ public:
 
 	bool IsCompatibleType(const UScriptStruct* TestType) const;
 
+	FORCEINLINE bool IsValid() const { return Refs != nullptr && MemoryStart != nullptr; }
+
 	template<typename TScriptStructType>
 	FORCEINLINE bool IsCompatibleTypeOf() const { return IsCompatibleType(TScriptStructType::StaticStruct()); }
 
@@ -152,6 +154,7 @@ public:
 	template<typename T>
 	const T* Get() const
 	{
+		check(IsValid());
 		check(T::StaticStruct() == Type);
 		return reinterpret_cast<T*>(MemoryStart);
 	}
@@ -159,6 +162,7 @@ public:
 	template<typename T>
 	T* Get()
 	{
+		check(IsValid());
 		check(T::StaticStruct() == Type);
 		return reinterpret_cast<T*>(MemoryStart);
 	}

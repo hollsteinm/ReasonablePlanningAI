@@ -16,6 +16,10 @@ FRpaiMemory::Block::Block(FRpaiMemory::MemorySizeType Size)
 
 bool FRpaiMemory::Block::Contains(uint8* Memory) const
 {
+	if (AllocatedMemory.IsEmpty())
+	{
+		return false;
+	}
 	return Memory >= &AllocatedMemory[0] && Memory <= &AllocatedMemory[AllocatedMemory.Num() - 1];
 }
 
