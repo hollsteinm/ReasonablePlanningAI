@@ -95,12 +95,6 @@ void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIContro
 
 void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	for (auto& Entry : ActionEntries)
-	{
-		Entry.Action->OnActionTaskComplete().RemoveAll(this);
-		Entry.Action->OnActionTaskCancelled().RemoveAll(this);
-	}
-
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto& Entry : Memory->ActionActionTasks)
@@ -114,12 +108,6 @@ void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIContro
 
 void URpaiActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	for (auto& Entry : ActionEntries)
-	{
-		Entry.Action->OnActionTaskComplete().RemoveAll(this);
-		Entry.Action->OnActionTaskCancelled().RemoveAll(this);
-	}
-
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto Entry : Memory->ActionActionTasks)
