@@ -41,7 +41,7 @@ protected:
 	virtual void OnActionCompleted(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
 
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	virtual void OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
+	virtual void OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState,bool bCancelShouldExitPlan);
 
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void UnregisterOldAction(URpaiActionBase* OldAction);

@@ -58,7 +58,7 @@ void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIControll
 	}
 }
 
-void URpaiActionTask_EnvQuery::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_EnvQuery::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	FActionTaskEnvQueryMemory* Memory = ActionMemory.Get<FActionTaskEnvQueryMemory>();
 	if (Memory->RequestId != INDEX_NONE)

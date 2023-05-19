@@ -133,7 +133,7 @@ void URpaiBTTask_ExecutePlannedGoal::TickTask(UBehaviorTreeComponent& OwnerComp,
 	if (PlannedGoalMemory->CurrentAction == nullptr && PlannedGoalMemory->RemainingPlan.IsEmpty())
 	{
 		ControllerToMemory.Remove(OwnerComp.GetAIOwner());
-		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+		FinishLatentTask(OwnerComp, PlannedGoalMemory->bShouldFail ? EBTNodeResult::Failed : EBTNodeResult::Succeeded);
 	}
 }
 
@@ -192,16 +192,16 @@ FName URpaiBTTask_ExecutePlannedGoal::GetNodeIconName() const
 void URpaiBTTask_ExecutePlannedGoal::OnActionCompleted(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState)
 {
 	auto Memory = ControllerToMemory.FindChecked(ActionInstigator);
-	OnActionEvent(CompletedAction, ActionInstigator, CompletedOnState, true, Memory);
+	OnActionEvent(CompletedAction, ActionInstigator, CompletedOnState, true, Memory, false);
 }
 
-void URpaiBTTask_ExecutePlannedGoal::OnActionCancelled(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState)
+void URpaiBTTask_ExecutePlannedGoal::OnActionCancelled(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCancelShouldExitPlan)
 {
 	auto Memory = ControllerToMemory.FindChecked(ActionInstigator);
-	OnActionEvent(CompletedAction, ActionInstigator, CompletedOnState, false, Memory);
+	OnActionEvent(CompletedAction, ActionInstigator, CompletedOnState, false, Memory, bCancelShouldExitPlan);
 }
 
-void URpaiBTTask_ExecutePlannedGoal::OnActionEvent(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCompleted, FExecutePlannedGoalMemory* TaskMemory)
+void URpaiBTTask_ExecutePlannedGoal::OnActionEvent(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCompleted, FExecutePlannedGoalMemory* TaskMemory, bool bShouldFail)
 {
 	check(TaskMemory != nullptr)
 	check(CompletedAction == TaskMemory->CurrentAction);
@@ -212,16 +212,25 @@ void URpaiBTTask_ExecutePlannedGoal::OnActionEvent(URpaiActionBase* CompletedAct
 		CompletedAction->OnActionComplete.RemoveAll(this);
 	}
 
-	if (bCompleted && !TaskMemory->RemainingPlan.IsEmpty())
+	TaskMemory->bShouldFail = bShouldFail;
+	if (TaskMemory->bShouldFail)
 	{
-		TaskMemory->CurrentAction = TaskMemory->RemainingPlan.Pop();
-		TaskMemory->CurrentAction->OnActionComplete.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCompleted);
-		TaskMemory->CurrentAction->OnActionCancelled.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCancelled);
-		TaskMemory->ActionMemory = TaskMemory->CurrentAction->AllocateMemorySlice(TaskMemory->ExecutionMemory);
-		TaskMemory->CurrentAction->StartAction(ActionInstigator, CompletedOnState, TaskMemory->ActionMemory, ActionInstigator->GetOwner(), ActionInstigator->GetWorld());
+		TaskMemory->CurrentAction = nullptr;
+		TaskMemory->RemainingPlan.Empty();
 	}
 	else
 	{
-		TaskMemory->CurrentAction = nullptr;
+		if (bCompleted && !TaskMemory->RemainingPlan.IsEmpty())
+		{
+			TaskMemory->CurrentAction = TaskMemory->RemainingPlan.Pop();
+			TaskMemory->CurrentAction->OnActionComplete.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCompleted);
+			TaskMemory->CurrentAction->OnActionCancelled.AddUniqueDynamic(this, &URpaiBTTask_ExecutePlannedGoal::OnActionCancelled);
+			TaskMemory->ActionMemory = TaskMemory->CurrentAction->AllocateMemorySlice(TaskMemory->ExecutionMemory);
+			TaskMemory->CurrentAction->StartAction(ActionInstigator, CompletedOnState, TaskMemory->ActionMemory, ActionInstigator->GetOwner(), ActionInstigator->GetWorld());
+		}
+		else
+		{
+			TaskMemory->CurrentAction = nullptr;
+		}
 	}
 }

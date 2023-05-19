@@ -68,7 +68,7 @@ void URpaiActionTask_PlayAnimation::ReceiveStartActionTask_Implementation(AAICon
 	}
 }
 
-void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_PlayAnimation::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	FActionTaskPlayAnimationMemory* Memory = ActionMemory.Get<FActionTaskPlayAnimationMemory>();
 	ActionWorld->GetTimerManager().ClearTimer(Memory->AnimationTimerHandle);

@@ -105,7 +105,7 @@ void URpaiBrainComponent::OnActionCompleted(URpaiActionBase* CompletedAction, AA
 	PopNextAction();
 }
 
-void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState)
+void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCancelShouldExitPlan)
 {
 	if (CompletedOnState != LoadOrCreateStateFromAi())
 	{
@@ -126,7 +126,14 @@ void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AA
 	}
 
 	UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Action Cancelled %s"), *CancelledAction->GetActionName());
-	PopNextAction();
+	if (bCancelShouldExitPlan)
+	{
+		PlannedActions.Empty();
+	}
+	else
+	{
+		PopNextAction();
+	}
 }
 
 void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

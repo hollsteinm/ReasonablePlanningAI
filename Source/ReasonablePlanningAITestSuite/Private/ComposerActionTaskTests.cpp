@@ -25,7 +25,7 @@ void UTestComposerActionTask::ReceiveUpdateActionTask_Implementation(AAIControll
 	}
 }
 
-void UTestComposerActionTask::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void UTestComposerActionTask::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	++CancelActionTaskCallsTotal;
 }
@@ -136,7 +136,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 			It("should only call the cancel action task function on the current task.", [this]()
 				{
 					uint32 CancelCalls = 0U;
-					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*) -> void { ++CancelCalls; });
+					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*, bool) -> void { ++CancelCalls; });
 					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenTestMemory);
 
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromSequence(0))->WasCancelActionTaskCalledNumTimes(1));
@@ -151,7 +151,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 			It("should only call the cancel action task function on the current task after updates.", [this]()
 				{
 					uint32 CancelCalls = 0U;
-					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*) -> void { ++CancelCalls; });
+					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*, bool) -> void { ++CancelCalls; });
 					
 					for (auto Idx = 0; Idx < 4; ++Idx)
 					{
@@ -275,7 +275,7 @@ void ReasonablePlanningComposerActionTaskComposerSpec::Define()
 			It("should call the cancel action task function on all entreis.", [this]()
 				{
 					uint32 CancelCalls = 0U;
-					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*) -> void { ++CancelCalls; });
+					ActionTaskUnderTest->OnActionTaskCancelled().AddLambda([&CancelCalls](URpaiComposerActionTaskBase*, AAIController*, URpaiState*, bool) -> void { ++CancelCalls; });
 					ActionTaskUnderTest->CancelActionTask(GivenController, nullptr, GivenMemory);
 
 					TestTrue("Cancel Action Task", CastChecked<UTestComposerActionTask>(ActionTaskUnderTest->ViewTaskFromComposite(0))->WasCancelActionTaskCalledNumTimes(1));

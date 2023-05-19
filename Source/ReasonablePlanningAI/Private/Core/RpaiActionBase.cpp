@@ -69,7 +69,7 @@ void URpaiActionBase::UpdateAction(AAIController* ActionInstigator, URpaiState* 
 	}
 }
 
-void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
@@ -77,10 +77,10 @@ void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* 
 	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Cancel Action: %s"), *ActionName);
-	ReceiveCancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveCancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld, bCancelShouldExitPlan);
 	if (OnActionCancelled.IsBound())
 	{
-		OnActionCancelled.Broadcast(this, ActionInstigator, CurrentState);
+		OnActionCancelled.Broadcast(this, ActionInstigator, CurrentState, bCancelShouldExitPlan);
 	}
 }
 
@@ -97,16 +97,6 @@ void URpaiActionBase::CompleteAction(AAIController* ActionInstigator, URpaiState
 	{
 		OnActionComplete.Broadcast(this, ActionInstigator, CurrentState);
 	}
-}
-
-bool URpaiActionBase::IsActionComplete(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
-{
-	check(ActionInstigator != nullptr);
-	check(CurrentState != nullptr);
-	check(ActionTargetActor != nullptr);
-	check(ActionWorld != nullptr);
-
-	return ReceiveIsActionComplete(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 }
 
 void URpaiActionBase::ReceiveApplyToState_Implementation(URpaiState* GivenState) const
@@ -134,7 +124,7 @@ void URpaiActionBase::ReceiveUpdateAction_Implementation(AAIController* ActionIn
 	//NOOP
 }
 
-void URpaiActionBase::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionBase::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	//NOOP
 }
@@ -142,11 +132,6 @@ void URpaiActionBase::ReceiveCancelAction_Implementation(AAIController* ActionIn
 void URpaiActionBase::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	//NOOP
-}
-
-bool URpaiActionBase::ReceiveIsActionComplete_Implementation(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor, const UWorld* ActionWorld) const
-{
-	return true; //Always auto complete to avoid blocking
 }
 
 FString URpaiActionBase::GetActionName() const

@@ -47,12 +47,12 @@ void URpaiComposerActionTaskBase::UpdateActionTask(AAIController* ActionInstigat
 	}
 }
 
-void URpaiComposerActionTaskBase::CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiComposerActionTaskBase::CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
-	ReceiveCancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
+	ReceiveCancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld, bCancelShouldExitPlan);
 	if (ActionTaskCancelledEvent.IsBound())
 	{
-		ActionTaskCancelledEvent.Broadcast(this, ActionInstigator, CurrentState);
+		ActionTaskCancelledEvent.Broadcast(this, ActionInstigator, CurrentState, bCancelShouldExitPlan);
 	}
 }
 
@@ -75,7 +75,7 @@ void URpaiComposerActionTaskBase::ReceiveUpdateActionTask_Implementation(AAICont
 	//NOOP
 }
 
-void URpaiComposerActionTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiComposerActionTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	//NOOP
 }

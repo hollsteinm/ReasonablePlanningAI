@@ -15,7 +15,7 @@ class UWorld;
 
 DECLARE_EVENT_ThreeParams(URpaiState, FActionTaskStarted, URpaiComposerActionTaskBase*, AAIController*, URpaiState*);
 DECLARE_EVENT_ThreeParams(URpaiState, FActionTaskCompleted, URpaiComposerActionTaskBase*, AAIController*, URpaiState*);
-DECLARE_EVENT_ThreeParams(URpaiState, FActionTaskCancelled, URpaiComposerActionTaskBase*, AAIController*, URpaiState*);
+DECLARE_EVENT_FourParams(URpaiState, FActionTaskCancelled, URpaiComposerActionTaskBase*, AAIController*, URpaiState*, bool);
 DECLARE_EVENT_FourParams(URpaiState, FActionTaskUpdated, URpaiComposerActionTaskBase*, AAIController*, URpaiState*, float);
 
 /**
@@ -53,7 +53,7 @@ public:
 	* Immediately terminate the current action and apply any state changes needed to revert this action (if desired).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void CancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
 
 	/**
 	* Called immediately after IsActionComplete returns true. Use this to update the state
@@ -104,8 +104,8 @@ protected:
 	* Override this to implement CancelAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	void ReceiveCancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveCancelActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
+	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
 
 	/**
 	* Override this to implement CompleteAction

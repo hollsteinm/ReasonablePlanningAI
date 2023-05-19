@@ -39,7 +39,7 @@ void URpaiActionTask_MoveTo::ReceiveUpdateActionTask_Implementation(AAIControlle
 	}
 }
 
-void URpaiActionTask_MoveTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_MoveTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	UPathFollowingComponent* PathFollowingComponent = ActionInstigator->GetPathFollowingComponent();
 	if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
