@@ -29,6 +29,11 @@
 			"Name": "ReasonablePlanningAINodes",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "PostEngineInit"
-		}
+		},
+		{
+            		"Name": "ReasonablePlanningAIEditor",
+            		"Type": "Editor",
+            		"LoadingPhase":  "PostEngineInit"
+        	}
 	]
 }
