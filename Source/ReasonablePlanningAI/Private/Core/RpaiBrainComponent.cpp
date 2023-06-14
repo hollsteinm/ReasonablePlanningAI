@@ -17,10 +17,14 @@ static const FRpaiMemory::MemorySizeType DefaultBlockSize = 256;
 URpaiBrainComponent::URpaiBrainComponent()
 	: CurrentAction(nullptr)
 	, PlannedActions({})
+	, bUseMultiTickPlanning(true)
 	, CurrentGoal(nullptr)
 	, CachedStateInstance(nullptr)
 	, bIsPaused(false)
 	, ComponentActionMemory(DefaultBlockSize)
+	, CurrentActionMemory()
+	, CurrentPlannerMemory()
+	, LastPlannerResultForMultiTick(ERpaiPlannerResult::Invalid)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -144,11 +148,43 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 		return;
 	}
 
+	if (bUseMultiTickPlanning && LastPlannerResultForMultiTick == ERpaiPlannerResult::RequiresTick)
+	{
+		auto Planner = AcquirePlanner();
+		check(Planner != nullptr);
+
+		TArray<URpaiActionBase*> Actions;
+		AcquireActions(Actions);
+
+		auto State = GetLastCachedState();
+		check(State != nullptr);
+
+		LastPlannerResultForMultiTick = Planner->TickGoalPlanning(CurrentGoal, State, Actions, PlannedActions, CurrentPlannerMemory);
+		switch (LastPlannerResultForMultiTick)
+		{
+		case ERpaiPlannerResult::RequiresTick:
+			UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received RequiresTick."), ANSI_TO_TCHAR(__FUNCTION__));
+			break;
+		case ERpaiPlannerResult::CompletedSuccess:
+			UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Goal Planned %s"), ANSI_TO_TCHAR(__FUNCTION__), *CurrentGoal->GetGoalName());
+			PopNextAction();
+			break;
+		case ERpaiPlannerResult::CompletedFailure:
+		case ERpaiPlannerResult::CompletedCancelled:
+			UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received CompletedFailure or CompletedCancelled Result."), ANSI_TO_TCHAR(__FUNCTION__));
+		case ERpaiPlannerResult::Invalid:
+			UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received Invalid Result."), ANSI_TO_TCHAR(__FUNCTION__));
+		default:
+			UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Unhandled enum value."), ANSI_TO_TCHAR(__FUNCTION__));
+			break;
+		}
+	}
+
 	if (CurrentAction != nullptr)
 	{
 		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
-	else if (PlannedActions.Num() <= 0)
+	else if (PlannedActions.Num() <= 0 && LastPlannerResultForMultiTick != ERpaiPlannerResult::RequiresTick)
 	{
 		StartLogic();
 	}
@@ -201,33 +237,75 @@ void URpaiBrainComponent::StartLogic()
 	TArray<URpaiActionBase*> Actions;
 	AcquireActions(Actions);
 
+	auto State = LoadOrCreateStateFromAi();
+
 	check(Reasoner != nullptr);
 	check(Planner != nullptr);
-	CurrentGoal = Reasoner->ReasonNextGoal(Goals, LoadOrCreateStateFromAi());
+	CurrentGoal = Reasoner->ReasonNextGoal(Goals, State);
 
-	if (CurrentGoal != nullptr && Planner->PlanChosenGoal(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions))
+	if (CurrentGoal != nullptr)
 	{
-		UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Goal Planned %s"), *CurrentGoal->GetGoalName());
-		PopNextAction();
+		UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Goal Reasoned %s"), ANSI_TO_TCHAR(__FUNCTION__), *CurrentGoal->GetGoalName());
+		if (bUseMultiTickPlanning)
+		{
+			CurrentPlannerMemory = Planner->AllocateMemorySlice(ComponentActionMemory);
+			LastPlannerResultForMultiTick = Planner->StartGoalPlanning(CurrentGoal, State, Actions, PlannedActions, CurrentPlannerMemory);
+			switch (LastPlannerResultForMultiTick)
+			{
+				case ERpaiPlannerResult::RequiresTick:
+					UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received RequiresTick."), ANSI_TO_TCHAR(__FUNCTION__));
+					break;
+				case ERpaiPlannerResult::CompletedSuccess:
+					UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Goal Planned %s"), ANSI_TO_TCHAR(__FUNCTION__), *CurrentGoal->GetGoalName());
+					PopNextAction();
+					break;
+				case ERpaiPlannerResult::CompletedFailure:
+				case ERpaiPlannerResult::CompletedCancelled:
+					UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received CompletedFailure or CompletedCancelled Result. Debouncing."), ANSI_TO_TCHAR(__FUNCTION__));
+				case ERpaiPlannerResult::Invalid:
+					UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Received Invalid Result. Debouncing."), ANSI_TO_TCHAR(__FUNCTION__));
+				default:
+					UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Unhandled enum value. Debouncing."), ANSI_TO_TCHAR(__FUNCTION__));
+					StartDebounceTimer();
+					break;
+			}
+		}
+		else
+		{
+			if (Planner->PlanChosenGoal(CurrentGoal, State, Actions, PlannedActions))
+			{
+				UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s: Goal Planned %s"), ANSI_TO_TCHAR(__FUNCTION__), *CurrentGoal->GetGoalName());
+				PopNextAction();
+			}
+			else
+			{
+				StartDebounceTimer();
+			}
+		}
 	}
 	else
 	{
-		auto& TimerManager = GetWorld()->GetTimerManager();
-
-		if (TimerManager.GetTimerRemaining(PlanningDebounce) > 0.f)
-		{
-			return;
-		}
-
-		TimerManager.ClearTimer(PlanningDebounce);
-		TimerManager.SetTimer(PlanningDebounce, this, &URpaiBrainComponent::StartLogic, 1.f);
+		StartDebounceTimer();
 	}
+}
+
+void URpaiBrainComponent::StartDebounceTimer()
+{
+	auto& TimerManager = GetWorld()->GetTimerManager();
+
+	if (TimerManager.GetTimerRemaining(PlanningDebounce) > 0.f)
+	{
+		return;
+	}
+
+	TimerManager.ClearTimer(PlanningDebounce);
+	TimerManager.SetTimer(PlanningDebounce, this, &URpaiBrainComponent::StartLogic, 1.f);
 }
 
 void URpaiBrainComponent::RestartLogic()
 {
 	UE_VLOG(GetOwner(), LogRpai, Log, TEXT("%s"), ANSI_TO_TCHAR(__FUNCTION__));
-	StopLogic("Restart Logic");
+	StopLogic("Restart Logic"); 
 	Cleanup();
 	StartLogic();
 }
@@ -242,6 +320,14 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 		CurrentAction->CancelAction(AIOwner, LoadOrCreateStateFromAi(), CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	CurrentAction = nullptr;
+
+	if (bUseMultiTickPlanning)
+	{
+		TArray<URpaiActionBase*> Actions;
+		AcquireActions(Actions);
+		AcquirePlanner()->CancelGoalPlanning(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions, CurrentPlannerMemory);
+		LastPlannerResultForMultiTick = ERpaiPlannerResult::CompletedCancelled;
+	}
 }
 
 void URpaiBrainComponent::Cleanup()
@@ -268,6 +354,11 @@ EAILogicResuming::Type URpaiBrainComponent::ResumeLogic(const FString& Reason)
 	return EAILogicResuming::Continue;
 }
 
+URpaiState* URpaiBrainComponent::GetLastCachedState() const
+{
+	return CachedStateInstance;
+}
+
 URpaiState* URpaiBrainComponent::LoadOrCreateStateFromAi()
 {
 	if (CachedStateInstance == nullptr)
@@ -290,10 +381,19 @@ FString URpaiBrainComponent::GetDebugInfoString() const
 {
 	FString DebugInfo = Super::GetDebugInfoString();
 
-	auto CurrentGoalString = CurrentGoal == nullptr ? "none" : CurrentGoal->GetName().Append(":").Append(CurrentGoal->GetGoalName());
-	auto CurrentActionString = CurrentAction == nullptr ? "none" : CurrentAction->GetName().Append(":").Append(CurrentAction->GetActionName());
+	FString CurrentGoalString = CurrentGoal == nullptr ? "none" : CurrentGoal->GetName().Append(":").Append(CurrentGoal->GetGoalName());
+	FString CurrentActionString = CurrentAction == nullptr ? "none" : CurrentAction->GetName().Append(":").Append(CurrentAction->GetActionName());
+	FString UsingMultiTickPlanning = bUseMultiTickPlanning ? "Yes" : "No";
 
+	DebugInfo += FString::Printf(TEXT("Multi Tick: %s\n"), *UsingMultiTickPlanning);
 	DebugInfo += FString::Printf(TEXT("Goal: %s\n"), *CurrentGoalString);
+	if (bUseMultiTickPlanning)
+	{
+		static const UEnum* RpaiPlannerResultEnumType = FindObject<UEnum>(ANY_PACKAGE, TEXT("ERpaiPlannerResult"));
+		check(RpaiPlannerResultEnumType != nullptr);
+		FString LastPlannerResultForMultiTickString = RpaiPlannerResultEnumType->GetNameStringByIndex(static_cast<uint8>(LastPlannerResultForMultiTick));
+		DebugInfo += FString::Printf(TEXT("Last Planning Result: %s\n"), *LastPlannerResultForMultiTickString);
+	}
 	DebugInfo += FString::Printf(TEXT("Action: %s\n"), *CurrentActionString);
 	DebugInfo += FString::Printf(TEXT("Remaining Planned Actions (%i):\n"), PlannedActions.Num());
 	for (const auto PlannedAction : PlannedActions)

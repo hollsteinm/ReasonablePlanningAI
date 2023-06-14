@@ -36,7 +36,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	URpaiState* LoadOrCreateStateFromAi();
 
+	UFUNCTION(BlueprintPure, Category = "Rpai")
+	URpaiState* GetLastCachedState() const;
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rpai")
+	bool bUseMultiTickPlanning;
+
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	virtual void OnActionCompleted(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
 
@@ -79,6 +85,9 @@ protected:
 	TSubclassOf<URpaiState> GetStateType();
 	virtual TSubclassOf<URpaiState> GetStateType_Implementation();
 
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void StartDebounceTimer();
+
 private:
 	UPROPERTY(Transient)
 	URpaiActionBase* CurrentAction;
@@ -100,6 +109,10 @@ private:
 	FRpaiMemory ComponentActionMemory;
 
 	FRpaiMemoryStruct CurrentActionMemory;
+
+	FRpaiMemoryStruct CurrentPlannerMemory;
+
+	ERpaiPlannerResult LastPlannerResultForMultiTick;
 	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }
