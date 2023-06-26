@@ -11,8 +11,11 @@ struct FExecutePlannedGoalMemory
 	TArray<URpaiActionBase*> RemainingPlan;
 	URpaiActionBase* CurrentAction;
 	FRpaiMemoryStruct ActionMemory;
+	FRpaiMemoryStruct PlanMemory;
 	FRpaiMemory ExecutionMemory;
+	ERpaiPlannerResult LastPlanningResult;
 	bool bShouldFail;
+	FORCEINLINE bool IsExecuting() const { return LastPlanningResult == ERpaiPlannerResult::CompletedSuccess; }
 };
 
 /*

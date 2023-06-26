@@ -325,7 +325,12 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 	{
 		TArray<URpaiActionBase*> Actions;
 		AcquireActions(Actions);
-		AcquirePlanner()->CancelGoalPlanning(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions, CurrentPlannerMemory);
+
+		auto Planner = AcquirePlanner();
+		if (Planner != nullptr)
+		{
+			Planner->CancelGoalPlanning(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions, CurrentPlannerMemory);
+		}
 		LastPlannerResultForMultiTick = ERpaiPlannerResult::CompletedCancelled;
 	}
 }
