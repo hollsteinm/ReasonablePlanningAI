@@ -11,7 +11,11 @@ struct FExecutePlannedGoalMemory
 	TArray<URpaiActionBase*> RemainingPlan;
 	URpaiActionBase* CurrentAction;
 	FRpaiMemoryStruct ActionMemory;
+	FRpaiMemoryStruct PlanMemory;
 	FRpaiMemory ExecutionMemory;
+	ERpaiPlannerResult LastPlanningResult;
+	bool bShouldFail;
+	FORCEINLINE bool IsExecuting() const { return LastPlanningResult == ERpaiPlannerResult::CompletedSuccess; }
 };
 
 /*
@@ -50,13 +54,13 @@ private:
 	* When the currently running action is cancelled, this event will be triggered.
 	*/
 	UFUNCTION()
-	void OnActionCancelled(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState);
+	void OnActionCancelled(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCancelShouldExitPlan);
 
 protected:
 	/*
 	* When any action completes, this will be triggered. Removes state management complexity from any children.
 	*/
-	virtual void OnActionEvent(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCompleted, FExecutePlannedGoalMemory* TaskMemory);
+	virtual void OnActionEvent(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCompleted, FExecutePlannedGoalMemory* TaskMemory, bool bShouldFail);
 
 
 public:

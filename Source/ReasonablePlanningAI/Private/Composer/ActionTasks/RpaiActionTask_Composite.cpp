@@ -5,6 +5,7 @@
 #include "Algo/AllOf.h"
 
 FActionTaskCompositeMemory::FActionTaskCompositeMemory()
+	: bDoDefferedCancellationNextTick(false)
 {
 
 }
@@ -49,11 +50,12 @@ void URpaiActionTask_Composite::ReceiveStartActionTask_Implementation(AAIControl
 
 		if (!Entry.Action->OnActionTaskCancelled().IsBoundToObject(this))
 		{
-			Entry.Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled, ActionMemory);
+			Entry.Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Composite::OnCompositeActionTaskCancelled, ActionMemory);
 		}
 	}
 
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	Memory->bDoDefferedCancellationNextTick = false;
 
 	if (!Memory->ActionActionTasks.IsEmpty())
 	{
@@ -81,26 +83,40 @@ void URpaiActionTask_Composite::ReceiveUpdateActionTask_Implementation(AAIContro
 {
 	Flush(ActionMemory);
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
-	int32 Index = 0;
-	for (auto& Entry : Memory->ActionActionTasks)
+	if (Memory->bDoDefferedCancellationNextTick)
 	{
-		Entry.Action->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+		CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
-	Flush(ActionMemory);
-	if (Memory->ActionActionTasks.IsEmpty() || Algo::AllOf(Memory->ActionActionTasks, [](const auto& Entry) { return Entry.bIgnoredForCompositeCompletion; }))
+	else
 	{
-		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+		int32 Index = 0;
+		for (auto& Entry : Memory->ActionActionTasks)
+		{
+			Entry.Action->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, Memory->CompositeActionTaskSlices[Index++], ActionTargetActor, ActionWorld);
+		}
+		Flush(ActionMemory);
+		if (Memory->ActionActionTasks.IsEmpty() || Algo::AllOf(Memory->ActionActionTasks, [](const auto& Entry) { return Entry.bIgnoredForCompositeCompletion; }))
+		{
+			if (Memory->bDoDefferedCancellationNextTick)
+			{
+				CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+			}
+			else
+			{
+				CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+			}
+		}
 	}
 }
 
-void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Composite::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
 	int32 Index = 0;
 	for (auto& Entry : Memory->ActionActionTasks)
 	{
 		FRpaiMemoryStruct CompositeActionMemory = Memory->CompositeActionTaskSlices[Index++];
-		Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld);
+		Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
 		OnActionTaskCompletedOrCancelled(Entry.Action, ActionInstigator, CurrentState, ActionMemory);
 	}
 	Flush(ActionMemory);
@@ -115,7 +131,7 @@ void URpaiActionTask_Composite::ReceiveCompleteActionTask_Implementation(AAICont
 		FRpaiMemoryStruct CompositeActionMemory = Memory->CompositeActionTaskSlices[Index++];
 		if (Entry.bPreferCancelOnCompositeCompletion)
 		{
-			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld);
+			Entry.Action->CancelActionTask(ActionInstigator, CurrentState, CompositeActionMemory, ActionTargetActor, ActionWorld, false);
 		}
 		else
 		{
@@ -136,6 +152,13 @@ void URpaiActionTask_Composite::OnActionTaskCompletedOrCancelled(URpaiComposerAc
 	{
 		Memory->FlushActionIndices.Add(Idx);
 	}
+}
+
+void URpaiActionTask_Composite::OnCompositeActionTaskCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory)
+{
+	FActionTaskCompositeMemory* Memory = ActionMemory.Get<FActionTaskCompositeMemory>();
+	Memory->bDoDefferedCancellationNextTick = bCancelShouldExitPlan;
+	OnActionTaskCompletedOrCancelled(ActionTask, ActionInstigator, CurrentState, ActionMemory);
 }
 
 void URpaiActionTask_Composite::Flush(FRpaiMemoryStruct ActionMemory)

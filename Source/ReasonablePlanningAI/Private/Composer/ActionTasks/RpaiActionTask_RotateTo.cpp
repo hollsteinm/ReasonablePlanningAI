@@ -105,7 +105,7 @@ void URpaiActionTask_RotateTo::ReceiveUpdateActionTask_Implementation(AAIControl
 	}
 }
 
-void URpaiActionTask_RotateTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_RotateTo::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	ActionInstigator->ClearFocus(EAIFocusPriority::Gameplay);
 }

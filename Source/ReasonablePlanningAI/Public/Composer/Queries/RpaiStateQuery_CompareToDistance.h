@@ -6,6 +6,8 @@
 #include "Composer/Queries/RpaiStateQuery_CompareTo.h"
 #include "RpaiStateQuery_CompareToDistance.generated.h"
 
+class URpaiComposerDistance;
+
 /**
  * Compares the queried state value to the distance calculated by the distance algorithm applied to the same given state
  */

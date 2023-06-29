@@ -25,7 +25,7 @@ void URpaiActionTask_Wait::ReceiveStartActionTask_Implementation(AAIController* 
 	ActionWorld->GetTimerManager().SetTimer(WaitMemory->ActiveHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_Wait::CompleteActionTask, ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld), WaitTime, false);
 }
 
-void URpaiActionTask_Wait::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiActionTask_Wait::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	ActionWorld->GetTimerManager().ClearTimer(ActionMemory.Get<FActionTaskWait>()->ActiveHandle);
 }

@@ -180,3 +180,12 @@ public:
 	}
 };
 
+UENUM(BlueprintType)
+enum class ERpaiPlannerResult : uint8
+{
+	CompletedFailure,
+	CompletedCancelled,
+	CompletedSuccess,
+	RequiresTick,
+	Invalid
+};

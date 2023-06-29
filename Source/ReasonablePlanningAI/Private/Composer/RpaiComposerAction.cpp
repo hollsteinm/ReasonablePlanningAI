@@ -27,13 +27,13 @@ void URpaiComposerAction::HandleActionTaskCompleted(URpaiComposerActionTaskBase*
 	}
 }
 
-void URpaiComposerAction::HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiComposerAction::HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	if (CompletedActionTask == ActionTask)
 	{
 		ActionTask->OnActionTaskComplete().RemoveAll(this);
 		ActionTask->OnActionTaskCancelled().RemoveAll(this);
-		CancelAction(ActionInstigator, State, ActionMemory, ActionTargetActor, ActionWorld);
+		CancelAction(ActionInstigator, State, ActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
 	}
 }
 
@@ -43,7 +43,7 @@ float URpaiComposerAction::ReceiveExecutionWeight_Implementation(const URpaiStat
 	return WeightAlgorithm->ExecutionWeight(GivenState);
 }
 
-void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	check(ActionTask != nullptr);
 	if (LockResourceOnStart.IsNone())
@@ -73,10 +73,10 @@ void URpaiComposerAction::ReceiveUpdateAction_Implementation(AAIController* Acti
 	ActionTask->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor, ActionWorld);
 }
 
-void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld )
+void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	check(ActionTask != nullptr);
-	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
 	if (!LockResourceOnStart.IsNone())
 	{
 		CurrentState->UnlockResource(LockResourceOnStart, this);

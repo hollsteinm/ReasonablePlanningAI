@@ -21,7 +21,7 @@ URpaiActionTask_GameplayTaskBase::URpaiActionTask_GameplayTaskBase()
 	ActionTaskMemoryStructType = FActionTaskGameplayTaskBaseMemory::StaticStruct();
 }
 
-void URpaiActionTask_GameplayTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_GameplayTaskBase::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	if (!bCompleteAfterStart)
 	{

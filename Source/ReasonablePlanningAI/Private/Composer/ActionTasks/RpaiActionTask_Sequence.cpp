@@ -7,6 +7,7 @@
 FActionTaskSequence::FActionTaskSequence()
 	: ActiveActionTaskSequenceIndex(INDEX_NONE)
 	, ActiveActionTaskMemorySlice()
+	, bCancelledFromSequence(false)
 {
 
 }
@@ -35,7 +36,7 @@ void URpaiActionTask_Sequence::ReceiveStartActionTask_Implementation(AAIControll
 
 		if (!Action->OnActionTaskCancelled().IsBoundToObject(this))
 		{
-			Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Sequence::OnActionTaskCompletedOrCancelled, ActionMemory, ActionTargetActor, ActionWorld);
+			Action->OnActionTaskCancelled().AddUObject(this, &URpaiActionTask_Sequence::OnSequenceActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
 		}
 	}
 
@@ -65,14 +66,28 @@ void URpaiActionTask_Sequence::ReceiveUpdateActionTask_Implementation(AAIControl
 	}
 }
 
-void URpaiActionTask_Sequence::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+void URpaiActionTask_Sequence::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
 	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();
 	int32 CurrentIndex = Memory->ActiveActionTaskSequenceIndex;
 	if (Actions.IsValidIndex(CurrentIndex))
 	{
 		Memory->ActiveActionTaskSequenceIndex = INDEX_NONE;
+		Memory->bCancelledFromSequence = true;
 		Actions[CurrentIndex]->CancelActionTask(ActionInstigator, CurrentState, Memory->ActiveActionTaskMemorySlice, ActionTargetActor, ActionWorld);
+	}
+}
+
+void URpaiActionTask_Sequence::OnSequenceActionTaskCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
+{
+	FActionTaskSequence* Memory = ActionMemory.Get<FActionTaskSequence>();
+	if (bCancelShouldExitPlan && !Memory->bCancelledFromSequence)
+	{
+		CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
+	}
+	else
+	{
+		OnActionTaskCompletedOrCancelled(ActionTask, ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
 	}
 }
 

@@ -20,7 +20,10 @@ void URpaiComposerBrainComponent::SetReasonablePlanningBehavior(URpaiComposerBeh
 		}
 		else
 		{
-			StopLogic("New Behavior");
+			if (ReasonablePlanningBehavior != nullptr)
+			{
+				StopLogic("New Behavior");
+			}
 			ReasonablePlanningBehavior = NewBehavior;
 			StartLogic();
 		}
@@ -40,16 +43,22 @@ const URpaiPlannerBase* URpaiComposerBrainComponent::AcquirePlanner_Implementati
 void URpaiComposerBrainComponent::AcquireGoals_Implementation(TArray<URpaiGoalBase*>& OutGoals)
 {
 	OutGoals.Empty();
-	OutGoals = ReasonablePlanningBehavior->GetGoals();
+	if (ReasonablePlanningBehavior != nullptr)
+	{
+		OutGoals = ReasonablePlanningBehavior->GetGoals();
+	}
 }
 
 void URpaiComposerBrainComponent::AcquireActions_Implementation(TArray<URpaiActionBase*>& OutActions)
 {
 	OutActions.Empty();
-	OutActions = ReasonablePlanningBehavior->GetActions();
+	if (ReasonablePlanningBehavior != nullptr)
+	{
+		OutActions = ReasonablePlanningBehavior->GetActions();
+	}
 }
 
 TSubclassOf<URpaiState> URpaiComposerBrainComponent::GetStateType_Implementation()
 {
-	return ReasonablePlanningBehavior->GetConstructedStateType();
+	return ReasonablePlanningBehavior == nullptr ? URpaiState::StaticClass() : ReasonablePlanningBehavior->GetConstructedStateType();
 }

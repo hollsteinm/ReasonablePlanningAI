@@ -15,7 +15,7 @@ class UWorld;
 
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FActionStartedSignature, URpaiActionBase, OnActionStarted, URpaiActionBase*, StartedAction, AAIController*, ActionInstigator, URpaiState*, CurrentState);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FActionCompletedSignature, URpaiActionBase, OnActionComplete, URpaiActionBase*, CompletedAction, AAIController*, ActionInstigator, URpaiState*, CurrentState);
-DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_ThreeParams(FActionCancelledSignature, URpaiActionBase, OnActionCancelled, URpaiActionBase*, CancelledAction, AAIController*, ActionInstigator, URpaiState*, CurrentState);
+DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FActionCancelledSignature, URpaiActionBase, OnActionCancelled, URpaiActionBase*, CancelledAction, AAIController*, ActionInstigator, URpaiState*, CurrentState, bool, bCancelShouldExitPlan);
 DECLARE_DYNAMIC_MULTICAST_SPARSE_DELEGATE_FourParams(FActionUpdatedSignature, URpaiActionBase, OnActionUpdated, URpaiActionBase*, UpdatedAction, AAIController*, ActionInstigator, URpaiState*, CurrentState, float, DeltaSeconds);
 
 /**
@@ -71,19 +71,13 @@ public:
 	* Immediately terminate the current action and apply any state changes needed to revert this action (if desired).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void CancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
 
 	/**
 	* Called immediately after IsActionComplete returns true. Use this to update the state
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void CompleteAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-
-	/**
-	* Determines if the current action should be exited successfully and call CompleteAction
-	*/
-	UFUNCTION(BlueprintPure, Category = "Rpai")
-	bool IsActionComplete(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor = nullptr, const UWorld* ActionWorld = nullptr) const;
 
 	/**
 	* Event indicating that the action has started.
@@ -166,8 +160,8 @@ protected:
 	* Override this to implement CancelAction
 	*/
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	void ReceiveCancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-	virtual void ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
+	void ReceiveCancelAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
+	virtual void ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true);
 
 	/**
 	* Override this to implement CompleteAction
@@ -175,11 +169,4 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
 	void ReceiveCompleteAction(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
 	virtual void ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr);
-
-	/**
-	* Override this to implement IsActionComplete
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Rpai")
-	bool ReceiveIsActionComplete(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor = nullptr, const UWorld* ActionWorld = nullptr) const;
-	virtual bool ReceiveIsActionComplete_Implementation(const AAIController* ActionInstigator, const URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, const AActor* ActionTargetActor = nullptr, const UWorld* ActionWorld = nullptr) const;
 };

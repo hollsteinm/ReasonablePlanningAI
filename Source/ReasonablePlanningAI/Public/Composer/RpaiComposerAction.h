@@ -13,7 +13,7 @@ class URpaiComposerStateMutator;
 class URpaiComposerStateQuery;
 
 /**
- * Composition class for creating composable actions and weight algorithms
+ * Data drive composition class for creating composable actions and weight algorithms for planning and execution of actions.
  */
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiComposerAction : public URpaiActionBase
@@ -25,14 +25,14 @@ public:
 
 private:
 	void HandleActionTaskCompleted(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld);
-	void HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld);
+	void HandleActionTaskCancelled(URpaiComposerActionTaskBase* CompletedActionTask, AAIController* ActionInstigator, URpaiState* State, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld);
 
 protected:
 	/** Start URpaiActionBase*/
 	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 	virtual void ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 	virtual void ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+	virtual void ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
 	virtual void ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
     virtual void ReceiveApplyToState_Implementation(URpaiState* GivenState) const override;
     virtual bool ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const override;
