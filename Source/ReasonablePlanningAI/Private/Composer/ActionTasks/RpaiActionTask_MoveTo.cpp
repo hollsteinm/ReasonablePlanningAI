@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "BrainComponent.h"
 #include "AISystem.h"
+#include "Navigation/PathFollowingComponent.h"
 
 URpaiActionTask_MoveTo::URpaiActionTask_MoveTo()
 	: AcceptableRadius(GET_AI_CONFIG_VAR(AcceptanceRadius))

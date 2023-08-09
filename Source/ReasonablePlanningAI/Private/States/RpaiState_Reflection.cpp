@@ -639,7 +639,11 @@ void URpaiState_Reflection::CopyStateForPredictionTo(URpaiState* OtherState) con
 			}
 			else if (Piter->IsA<FObjectProperty>())
 			{
-				OtherState->SetValueOfType(Piter->NamePrivate, CastField<FObjectProperty>(*Piter)->GetPropertyValue_InContainer(this));
+				TObjectPtr<UObject> Member = CastField<FObjectProperty>(*Piter)->GetPropertyValue_InContainer(this);
+				if (Member != nullptr)
+				{
+					OtherState->SetValueOfType(Piter->NamePrivate, Member.Get());
+				}
 			}
 			else if (Piter->IsA<FStructProperty>())
 			{

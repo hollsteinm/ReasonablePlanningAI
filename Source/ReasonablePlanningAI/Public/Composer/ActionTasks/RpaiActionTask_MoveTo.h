@@ -7,7 +7,17 @@
 #include "NavFilters/NavigationQueryFilter.h"
 #include "BrainComponent.h"
 #include "GameplayTask.h"
+#include "AITypes.h"
 #include "RpaiActionTask_MoveTo.generated.h"
+
+
+/**
+* GetTypeHash implementation for UE5.2.1 fix because it will not resolve for TMap
+**/
+FORCEINLINE uint32 GetTypeHash(const FAIRequestID& AIRequestID)
+{
+	return AIRequestID.GetID();
+}
 
 /**
  * Will attempt a move to a defined location. Can use either the navigation system or
