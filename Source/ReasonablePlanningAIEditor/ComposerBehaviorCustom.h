@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 /**
- * 
+ * Basic custom Composer behavior registry
  */
 class REASONABLEPLANNINGAIEDITOR_API ComposerBehaviorCustom
 {

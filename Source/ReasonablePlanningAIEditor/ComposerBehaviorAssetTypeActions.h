@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 /**
- * 
+ * Basic asset action registry
  */
 class REASONABLEPLANNINGAIEDITOR_API ComposerBehaviorAssetTypeActions
 {
