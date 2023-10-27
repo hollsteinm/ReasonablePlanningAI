@@ -243,10 +243,12 @@ FString URpaiBTTask_ExecutePlannedGoal::GetStaticDescription() const
 	return FString::Printf(TEXT("%s: use %s state to determine plan for goal %s using planner %s"), *Super::GetStaticDescription(), *KeyDesc, *InputKeyDesc, *PlannerDesc);
 }
 
+#if WITH_EDITOR
 FName URpaiBTTask_ExecutePlannedGoal::GetNodeIconName() const
 {
 	return FName("BTEditor.Graph.BTNode.Task.RunBehavior.Icon");
 }
+#endif
 
 void URpaiBTTask_ExecutePlannedGoal::OnActionCompleted(URpaiActionBase* CompletedAction, AAIController* ActionInstigator, URpaiState* CompletedOnState)
 {
