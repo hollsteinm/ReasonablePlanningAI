@@ -14,10 +14,9 @@ class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareToBool : public URpaiState
 {
 	GENERATED_BODY()
 
-public:
-	virtual EStateQueryResult Query(const URpaiState* StateToQuery) const override;
-	
 protected:
+	virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
+	
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	bool bValueToCompare;
 

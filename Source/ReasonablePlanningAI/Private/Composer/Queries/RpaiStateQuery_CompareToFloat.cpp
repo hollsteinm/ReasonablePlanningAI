@@ -4,7 +4,7 @@
 #include "Composer/Queries/RpaiStateQuery_CompareToFloat.h"
 #include "Core/RpaiState.h"
 
-EStateQueryResult URpaiStateQuery_CompareToFloat::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_CompareToFloat::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
 	if (QueriedState.ExpectedValueType != EStatePropertyType::Float && QueriedState.ExpectedValueType != EStatePropertyType::Int)
 	{

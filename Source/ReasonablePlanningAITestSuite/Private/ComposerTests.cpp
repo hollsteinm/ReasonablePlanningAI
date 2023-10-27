@@ -560,15 +560,15 @@ void ReasonablePlanningComposerSpec::Define()
 									TArray<URpaiActionBase*> ActualActions;
 									bool bSuccess = GivenPlanner->PlanChosenGoal(ActualGoal, GivenState, GivenActions, ActualActions);
 
-									TestTrue("Success", bSuccess);
+									if (TestTrue("Success", bSuccess) && TestEqual("Number of Actions", ActualActions.Num(), 4))
+									{
 
-									TestEqual("Number of Actions", ActualActions.Num(), 4);
-
-									// Output plan is meant to be popped. Thus invert the expected order.
-									TestEqual("Go To Tree", ActualActions[3], GivenActions[0]);
-									TestEqual("Chop Wood", ActualActions[2], GivenActions[1]);
-									TestEqual("Go To Wood Pile", ActualActions[1], GivenActions[2]);
-									TestEqual("Drop Off Wood", ActualActions[0], GivenActions[3]);
+										// Output plan is meant to be popped. Thus invert the expected order.
+										TestEqual("Go To Tree", ActualActions[3], GivenActions[0]);
+										TestEqual("Chop Wood", ActualActions[2], GivenActions[1]);
+										TestEqual("Go To Wood Pile", ActualActions[1], GivenActions[2]);
+										TestEqual("Drop Off Wood", ActualActions[0], GivenActions[3]);
+									}
 								});
 						});
 

@@ -15,10 +15,10 @@ UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareToDistance : public URpaiStateQuery_CompareTo
 {
 	GENERATED_BODY()
-public:
-    virtual EStateQueryResult Query(const URpaiState* StateToQuery) const override;
-	
+
 protected:
+    virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
+	
     UPROPERTY(EditAnywhere,Category="Rpai")
     URpaiComposerDistance* Distance;
 

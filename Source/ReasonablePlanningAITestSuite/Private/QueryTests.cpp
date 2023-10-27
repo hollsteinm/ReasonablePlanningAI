@@ -454,7 +454,7 @@ void ReasonablePlanningQueryCompareToStateSpec::Define()
 				EStatePropertyType::String,
 				EStatePropertyType::Vector
 			};
-			const int32 Size = int32(std::size(Types));
+			const int32 Size = 10;
 
 			for (int32 I = 0; I < Size; ++I)
 			{

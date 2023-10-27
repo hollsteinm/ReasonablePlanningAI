@@ -4,7 +4,7 @@
 #include "Composer/Queries/RpaiStateQuery_CompareToStateValue.h"
 #include "Core/RpaiState.h"
 
-EStateQueryResult URpaiStateQuery_CompareToStateValue::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_CompareToStateValue::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
     if(StateToQuery == nullptr)
     {

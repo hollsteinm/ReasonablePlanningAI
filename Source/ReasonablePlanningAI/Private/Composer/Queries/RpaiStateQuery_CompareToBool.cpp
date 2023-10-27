@@ -4,7 +4,7 @@
 #include "Composer/Queries/RpaiStateQuery_CompareToBool.h"
 #include "Core/RpaiState.h"
 
-EStateQueryResult URpaiStateQuery_CompareToBool::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_CompareToBool::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
 	if (QueriedState.ExpectedValueType != EStatePropertyType::Bool)
 	{

@@ -4,7 +4,7 @@
 #include "Composer/Queries/RpaiStateQuery_CompareToInteger.h"
 #include "Core/RpaiState.h"
 
-EStateQueryResult URpaiStateQuery_CompareToInteger::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_CompareToInteger::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
 	if (QueriedState.ExpectedValueType != EStatePropertyType::Int && QueriedState.ExpectedValueType != EStatePropertyType::Float)
 	{

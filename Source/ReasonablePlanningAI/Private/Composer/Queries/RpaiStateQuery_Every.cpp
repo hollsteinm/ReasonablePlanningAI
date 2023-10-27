@@ -3,7 +3,7 @@
 
 #include "Composer/Queries/RpaiStateQuery_Every.h"
 
-EStateQueryResult URpaiStateQuery_Every::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_Every::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
 	for (const auto Query : SubQueries)
 	{

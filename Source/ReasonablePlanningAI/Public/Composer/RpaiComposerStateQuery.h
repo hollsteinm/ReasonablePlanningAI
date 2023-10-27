@@ -31,6 +31,10 @@ public:
      * for instances of invalid state properties, missing state values, or other such conditions.
      */
     UFUNCTION(BlueprintPure, Category = "Rpai")
-    virtual EStateQueryResult Query(const URpaiState* StateToQuery) const PURE_VIRTUAL(URpaiComposerStateQuery::Query, return EStateQueryResult::Invalid;);
+    EStateQueryResult Query(const URpaiState* StateToQuery) const;
     
+protected:
+    UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Rpai")
+    EStateQueryResult ReceiveQuery(const URpaiState* StateToQuery) const;
+    virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const;
 };
