@@ -125,8 +125,8 @@ FRpaiMemoryStruct::FRpaiMemoryStruct()
 
 FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType)
 	: MemoryStart(FromMemory->Allocate(FromStructType->GetStructureSize(), FromStructType->GetMinAlignment()))
-	, Source(FromMemory)
-	, Type(FromStructType)
+    , Type(FromStructType)
+    , Source(FromMemory)
 	, Refs(static_cast<uint32*>(FMemory::Malloc(sizeof(uint32))))
 {
 	FMemory::Memzero(Refs, sizeof(uint32));
@@ -146,10 +146,10 @@ FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* Fro
 }
 
 FRpaiMemoryStruct::FRpaiMemoryStruct(const FRpaiMemoryStruct& OtherSlice)
-	: Source(OtherSlice.Source)
-	, MemoryStart(OtherSlice.MemoryStart) 
-	, Refs(OtherSlice.Refs)
-	, Type(OtherSlice.Type)
+    : MemoryStart(OtherSlice.MemoryStart) 
+    , Type(OtherSlice.Type)
+    , Source(OtherSlice.Source)
+    , Refs(OtherSlice.Refs)
 {
 	AddRef();
 }

@@ -61,8 +61,8 @@ struct REASONABLEPLANNINGAI_API FRpaiMemory
 {
 	GENERATED_BODY()
 
-	typedef typename TArray<uint8> StorageType;
-	typedef typename StorageType::SizeType MemorySizeType;
+	using StorageType = TArray<uint8>;
+    using MemorySizeType = StorageType::SizeType;
 private:
 	struct Block
 	{
