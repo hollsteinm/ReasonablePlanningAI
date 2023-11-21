@@ -17,7 +17,7 @@ class REASONABLEPLANNINGAI_API URpaiWeight_CurveFloat : public URpaiComposerWeig
 protected:
 	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Rpai")
+	UPROPERTY(EditAnywhere, Category = "Rpai")
 	UCurveFloat* WeightFloatCurve;
 
 public:

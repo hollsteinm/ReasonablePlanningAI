@@ -20,7 +20,7 @@ protected:
     /**
     * Right hand value to use for comparison to the state value (LHS)
     */
-    UPROPERTY(EditDefaultsOnly, Category = "Rpai")
+    UPROPERTY(EditAnywhere, Category = "Rpai")
     int32 RHS;
     
 public:

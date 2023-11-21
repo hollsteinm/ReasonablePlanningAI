@@ -60,5 +60,10 @@ void URpaiComposerBrainComponent::AcquireActions_Implementation(TArray<URpaiActi
 
 TSubclassOf<URpaiState> URpaiComposerBrainComponent::GetStateType_Implementation()
 {
-	return ReasonablePlanningBehavior == nullptr ? URpaiState::StaticClass() : ReasonablePlanningBehavior->GetConstructedStateType();
+    if(ReasonablePlanningBehavior)
+    {
+        return ReasonablePlanningBehavior->GetConstructedStateType();
+    }
+    
+	return URpaiState::StaticClass();
 }

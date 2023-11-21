@@ -5,7 +5,7 @@
 #include "Composer/RpaiComposerDistance.h"
 #include "Core/RpaiState.h"
 
-EStateQueryResult URpaiStateQuery_CompareToDistance::Query(const URpaiState* StateToQuery) const
+EStateQueryResult URpaiStateQuery_CompareToDistance::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
     if (QueriedState.ExpectedValueType != EStatePropertyType::Float)
     {

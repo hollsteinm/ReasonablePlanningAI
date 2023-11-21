@@ -17,8 +17,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Rpai", Instanced)
 		TArray<URpaiComposerStateQuery*> SubQueries;
 
-public:
-	virtual EStateQueryResult Query(const URpaiState* StateToQuery) const override;
+	virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
 
+public:
 	FORCEINLINE void SetSubQueries(TArray<URpaiComposerStateQuery*> NewSubQueries) { SubQueries = NewSubQueries; }
 };

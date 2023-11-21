@@ -87,7 +87,9 @@ FString URpaiBTTask_DetermineNextGoal::GetStaticDescription() const
 	return FString::Printf(TEXT("%s: determine goal %s using reasoner %s"), *Super::GetStaticDescription(), *KeyDesc, *ReasonerDesc);
 }
 
+#if WITH_EDITOR
 FName URpaiBTTask_DetermineNextGoal::GetNodeIconName() const
 {
 	return FName("BTEditor.Graph.BTNode.Task.RunBehavior.Icon");
 }
+#endif

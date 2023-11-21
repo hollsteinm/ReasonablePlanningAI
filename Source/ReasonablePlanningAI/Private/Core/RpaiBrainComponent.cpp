@@ -15,9 +15,9 @@
 static const FRpaiMemory::MemorySizeType DefaultBlockSize = 256;
 
 URpaiBrainComponent::URpaiBrainComponent()
-	: CurrentAction(nullptr)
-	, PlannedActions({})
-	, bUseMultiTickPlanning(true)
+    : bUseMultiTickPlanning(true)
+    , CurrentAction(nullptr)
+    , PlannedActions({})
 	, CurrentGoal(nullptr)
 	, CachedStateInstance(nullptr)
 	, bIsPaused(false)

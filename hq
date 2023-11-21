@@ -1,0 +1,373 @@
+[33mcommit 05abd76ba6a5d5f8c6563e83bfeaefe45f79a9e9[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Oct 26 23:11:12 2023 -0500
+
+    Update metadata for some fields for editing in BTree node details view. Refactor State query to use same pattern as Core library with BlueprintNativeEvents to enable overridable functions for Blueprint custom functions in State Query. Will expand to other Composer object types.
+
+[33mcommit 098c68f3a16d33b6e12ea16a5dc6cca7b6267a0e[m[33m ([m[1;31mpublic/main[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Oct 26 22:18:50 2023 -0500
+
+    Fix for released packaged builds of the plugin.
+
+[33mcommit 6b36e2bc8319198295d9cd38e25ee0809471bb5a[m[33m ([m[1;33mtag: v0.0.5-5.2-alpha[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Jul 31 20:49:48 2023 -0500
+
+    Get plugin buildable on unreal engine 5.2
+
+[33mcommit 4817040d41dd2ac5e5805c6a41c5f04f533b0fc2[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Jun 26 15:47:59 2023 -0500
+
+    Fix for null pointer exception due to previous changes of multi-frame planning. Added support for multi-frame planning the built-in blueprint behavior tree task node.
+
+[33mcommit a9e489a95962a99c9f925b0a1ca4eb3944abe277[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Jun 14 00:36:25 2023 -0500
+
+    Added a multi frame process of goal planning for the default Brain Component in Rpai. This required additions to the planner interface.
+
+[33mcommit 9f1f3ae252af0f0fb79c31abbf44b4ba16e2688e[m[33m ([m[1;33mtag: v0.0.4-5.0-alpha[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri May 19 16:15:33 2023 -0500
+
+    [BREAKING CHANGE] Support bi-directional Cancel commands. A brain component can cancel an action. An action can also send a boolean signalling that it's cancellation should cancel the rest of the planned tasks.
+
+[33mcommit 9d16228ea7e59865bb5202f463b26683fa413fea[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri May 19 10:49:31 2023 -0500
+
+    [BUGFIX] Tests failing due to memory crash. Remove problem code that caused issue as well as caused logic failures.
+
+[33mcommit d4ab68d073e1ec57dd252cca9eabeafa4860ff02[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon May 8 11:44:09 2023 -0500
+
+    Added valid check to memory before accessing it. Executing a planned goal now uses the correct memory. Fix sequence for RpaiActionTask_Sequence as it was causing stuck and invalid cancellations.
+
+[33mcommit e01def56125fcb269083d14db6c5ac4a7ef03e01[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Apr 14 19:44:03 2023 -0500
+
+    Some quality of life improvements for stability of referenced struct and sequence management.
+
+[33mcommit 380bc08b7e8d98ca9f7c9b6af7d0252da693d6b4[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Apr 11 22:39:03 2023 -0500
+
+    Major feature release. Integrated Reasonable Planning AI - including composer derived action and goal classes - with the built in engine Behavior Tree framework. Reasonable Planning AI is now integrated as two seperate Behavior Tree Tasks. The first tasks is RpaiBTTask_DetermineNextGoal which outputs to a given Blackboard Key the next determined goal. This could be used independently in BTrees. The intended usage is to use the BB key as input to the RpaiBTTask_ExecutePlannedGoal which will plan and execute the actions required to acheive a goal. All the goals and actions for the respective BTree Task nodes are configurable inline as data for the respective tasks. The only requirement is that the AIController executing the BehaviorTree with the new Tasks has the following component attached as a child to the AIController: RpaiStateBlackboardComponent. This new Actor Component is a data driven configuration to select which keys to copy fron the Behavior Tree Blackboard to use as input to Goal selection and Action planning. Additional variables may be added as well outside of the Behavior tree to use as input to the goals and actions. Additionally, a fix to have the composer action to invoke CancelAction when an ActionTask is cancelled.
+
+[33mcommit 97842a3777962e887eb0be9a2a659d664aaf0598[m
+Merge: 36a19b8 2e4225e
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Feb 10 16:08:54 2023 -0600
+
+    Merge branch 'main' of https://github.com/hollsteinm/ReasonablePlanningAI
+
+[33mcommit 36a19b882031863016430b406263d57d56e8cd1b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Feb 10 16:08:42 2023 -0600
+
+    Added scaffolding for Functional testing of AI Composer Tasks. Added a simple MoveTo task test that passes.
+
+[33mcommit 2e4225e33d723144db0cc84c2f97c9de0d4b01b0[m
+Author: ◄hollsteinm► <hollsteinm@users.noreply.github.com>
+Date:   Wed Feb 8 08:37:26 2023 -0600
+
+    Update README.MD
+    
+    Fix discord invite
+
+[33mcommit ab4336e858ddf4bd9fba1377bc460eedd1d4ed31[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Jan 17 19:55:02 2023 -0600
+
+    BUGFIX: Off by one error in the Sequence Action Task. Added new methods to RpaiActionTask_Sequence and RpaiActionTask_Composite for better C++ usage. Updated the mutator tests to fix a check exception happening upon loading the tests due to duplicate entries. Add Unit Tests for the RpaiActionTask_Composite and RpaiActionTask_Sequence logic.
+
+[33mcommit 7e560edeb48a76b789e781c17c2b86b37d646d5b[m
+Merge: 9e507b2 6cff951
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Dec 22 14:52:22 2022 -0600
+
+    Merge branch 'EXPERIMENT_K2Node_BreakAndMakeRpaiMemoryStruct'
+
+[33mcommit 6cff951b55c21c929bec4374f7b825e3a3708347[m[33m ([m[1;32mEXPERIMENT_K2Node_BreakAndMakeRpaiMemoryStruct[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Dec 22 14:52:00 2022 -0600
+
+    Rename module, fix recursive deletion and have full functionality for Read and Write memory operations!
+
+[33mcommit 542fcf5a3f7398f43567bdc1e63590b866ad5cb6[m[33m ([m[1;31mpublic/EXPERIMENT_K2Node_BreakAndMakeRpaiMemoryStruct[m[33m, [m[1;31morigin/EXPERIMENT_K2Node_BreakAndMakeRpaiMemoryStruct[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Dec 21 16:23:05 2022 -0600
+
+    Refactor to match the pattern established by GetDataTableRow, which works very well. Some Minor fixes. But all seems well.
+
+[33mcommit 38063ad840d83589f0a985fde85378bd7552165f[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Dec 19 16:53:26 2022 -0600
+
+    Safe read of a memory struct as a specific struct type. Unstable - memory leaks
+
+[33mcommit c5abafb8df12f5ee6f17ef91b33acb665ba5a9a8[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Dec 12 21:27:11 2022 -0600
+
+    EXPERIMENT: Given an Rpai Action Task Memory Struct that contains an untyped pointer to memory that should contain a blueprintable struct, when the developer creates a custom event that utilizes the Rpai Action Task Memory, then the blueprint developer can read the memory as the type safe struct.
+
+[33mcommit d2febbae80fdd255c8df38b01050dd6287597e0d[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Dec 6 19:47:34 2022 -0600
+
+    Finally understanding all of this custom K2Node business. Need to figure out how to compile a new struct from data in a struct that is not natively supported. ExpandNode will be easy... but we may need to just reconfigure the memory layout and do an unsafe cast and pray
+
+[33mcommit 9e507b2600e51276daa483dc53a3cbfb45a1763b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Dec 2 15:14:23 2022 -0600
+
+    BUG_FIX: If an RpaiBrainComponent is attached to an Actor (which it very well may be, but shouldn't), the AIOwner may be null. Fix this upon Begin Play by doing checked casting to get the owning AI Controller
+
+[33mcommit 3ff0dd9434660fdb982daeb905ab18d499c2ec90[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Dec 2 14:19:06 2022 -0600
+
+    Hold here on this branch, non working, no compile
+
+[33mcommit ca93537e383706a1f0f9ceda5ff5217b57e6a4a2[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Dec 2 14:17:58 2022 -0600
+
+    Various bug fixes due to the refactor
+
+[33mcommit 4e0d30e9101c8acbf08c824c3fdb8cd631b797e6[m[33m ([m[1;31morigin/SelfContainedMemoryExecution[m[33m, [m[1;32mSelfContainedMemoryExecution[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Nov 9 11:50:56 2022 -0600
+
+    Refactor the interfaces for Actions and ActionTasks
+
+[33mcommit 712c4c8688d04135e15d77c8aeea7a43b928940b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Nov 3 16:00:58 2022 -0500
+
+    Initial commit of new raw data memory model for next iteration of actions and goal planning
+
+[33mcommit 4b57b801742e157b2a47257bbf1d173d7f43ffdc[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Nov 2 09:48:43 2022 -0500
+
+    Fix runtime logic causing null errors
+
+[33mcommit 567e8afe39ec94d777c717c917766a5d142e849c[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 22 23:01:03 2022 -0500
+
+    Allow firing off an animation and not resetting after doing so
+
+[33mcommit adcaea1db8b64ba9897fab975e7d330bcec5fa67[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 15 23:05:58 2022 -0500
+
+    Fix casing
+
+[33mcommit 7de87d9ba9f63e585844ec00f6b9dc52cff3befe[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 15 23:01:33 2022 -0500
+
+    Fix casing
+
+[33mcommit 6f2aed9ac60528b33841b4f905476487ef00078e[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 15 22:56:29 2022 -0500
+
+    Fixed AITask issue in base class where State would be nullptr. Had to be evil to do it. Added documentation on how to add Smart Object Module to a project and integrating it into Reasonable Planning AI Composer via an Action Task.
+
+[33mcommit 6e16074392ac6df74f90fb7ec960b8fc475ce523[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 15 18:54:53 2022 -0500
+
+    Update readme format and add design patterns
+
+[33mcommit 38daf348ce267866fa7aad6ff892d49d58585966[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Sep 15 15:45:02 2022 -0500
+
+    [200~Various Bug Fixes.
+    
+    Added new ActionTask, the ActionTask_Sequence. This is similar to ActionTask_Composite with the exception that it will execute the tasks one after the other, in order. ActionTask_Composite was also updated to support some control flow and allowing inifinite running actions tasks (such as a looping animation) until all non-ignored completion signals are received. Updated the Environment Query to use the appriorate UObject... but why it takes such a base class instead of the one it actually wants is a mystery to me. There must have been a change in 5.0 where the handles are auto-disposing once going out of scope and no longer cached by the BrainComponent, so had to add some management there. May need to consider relying on that wierd BT_Task memory stuff so not every 'stateful' action task needs a map or some other kind of lookup. Perhaps a manager subsystem would do well here?
+    
+    Fixed various deprecation warnings.
+    
+    Added GetDebugInfoString for the GameplayDubugger tools overlay. Of course it displays under BehaviorTree... when BrainComponent seemed too generic to be tied to that. But it works and makes plans less of a mystery when they are scheduled.
+    
+    Memory enhancements for Planner_AStar that reuses a single state for future prediction and only creates a copy when it ends up in the open list. Also, all of the objects created are parented to the Start.State and that gets destroyed after planning is complete.
+    
+    Added static assertions to state template functions to avoid runtime errors of the default false.~
+
+[33mcommit 4ab93a14e1267904ae6dbbf5157bcca55c75e561[m[33m ([m[1;33mtag: v0.0.3-5.0-alpha[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Sep 12 17:00:08 2022 -0500
+
+    Various bug fixes and breaking changes to RpaiActionTask_Composite, RpaiActionTask_PlayAnimation, RpaiComposerAction that fixed issues with how the actions were executed and proceeded via the callback system where completions call upwards and cancellations call downwards. This fixed an issue with RpaiBrainComponent not calling additional actions upon completion. Balanced the planning for RpaiBrainComponent to remove recursive calls by using a timer to debounce invocations of StartLogic. Also added a new interface to state so that a state object can act as an object that sets values for itself from a given AIController. Added a new ActionTask, RpaiActionTask_EnvQuery. This lets the AI run an environment query as a task.
+
+[33mcommit 497068b5c26985d4ba206e7f8cafd05060b01813[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Aug 24 13:09:29 2022 -0500
+
+    Refactor: Added a base Brain Component for Rpai that composer inherits from
+
+[33mcommit 4f706e2c554735a5260c309b61c70199584688b4[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Aug 23 14:53:09 2022 -0500
+
+    New Class: RpaiState_Reflection, a class that uses reflection to integrate strongly typed RpaiState children into the Reasonable Planning AI Framework. This reduces the need to force Game specific implementations to use Map structures to exchange data between Game Rpai implementations and provided Rpai Composer constructs. The game implementations can now use the strongly typed interface but maintain support for provided Rpai constructs.
+
+[33mcommit 09f787359f983f51dea56e5a5f24f1e6752f6c70[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Aug 22 11:27:49 2022 -0500
+
+    Fix spelling mistakes and image links
+
+[33mcommit 92e77ab9146d60bfc2ec5c2fbe08eb4f5bebb71f[m[33m ([m[1;33mtag: v0.0.2-5.0-alpha[m[33m, [m[1;33mtag: v0.0.2-4.27-alpha[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Aug 22 11:19:26 2022 -0500
+
+    Final documentation for creating a simple AI that walks to a given location
+
+[33mcommit 7ece3d66fbaf20f15675c968a42af70cd7312900[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Aug 21 17:14:30 2022 -0500
+
+    UE5 Compatibility
+
+[33mcommit 96ca99c428897d92f59e5eb2a6db9f5fbebf67a8[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Aug 21 16:24:49 2022 -0500
+
+    BUG FIX: The equality comparison on the A Star Planner was using the equality test of pointer values, this was not correct. URpaiState now has an added virtual function named IsEqualTo used to test the equality of states. Updated a test that originally tested for this but the test was (incorrectly) changed to support he observed behavior instead of the expected behavior.
+
+[33mcommit e0008107a604b89b8c6c2e64065fdbd8835885a9[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Aug 21 13:10:47 2022 -0500
+
+    BREAKING CHANGES. Refactor entire project to use the Rpai prefix for all classes. Composer base classes prefixed with RpaiComposer. Maintain core name of Reasonable Planning AI. Update all categories to Rpai. Mark test classes hidden from dropdown selectors.
+
+[33mcommit 975d0bf09cf01121fc1d6756d82ddafedd6b5d85[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Aug 21 13:10:38 2022 -0500
+
+    BREAKING CHANGES. Refactor entire project to use the Rpai prefix for all classes. Composer base classes prefixed with RpaiComposer. Maintain core name of Reasonable Planning AI. Update all categories to Rpai. Mark test classes hidden from dropdown selectors.
+
+[33mcommit 520c58bdd10dbee0f00dcaf7db2ecafa078a856d[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Aug 19 13:31:51 2022 -0500
+
+    Add some mild documentation
+
+[33mcommit f964b4fb08462be0ac23d66030d5d8eb303c7c4b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Aug 10 16:23:52 2022 -0500
+
+    Added license until I decide what license I really want
+
+[33mcommit 16cfc75298f0a557ba61eff8b29af3aeb8c0c0d1[m[33m ([m[1;33mtag: v0.0.1-4.27-alpha[m[33m)[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Aug 10 16:11:02 2022 -0500
+
+    Functional tests in main project are passing! Automation tests are Passing! Ready for an alpha release!
+
+[33mcommit 27ce82f56ce524f5d38ee8fe157c70757493e125[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Aug 9 16:23:23 2022 -0500
+
+    Finalized the composer tests for goal selection and planning, it makes for a good enough example despite the abuse of is applicable queries to force a specific set of actions for testing
+
+[33mcommit 74f23a81853e4e5c8599a86da6592a2094934ed6[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Aug 3 22:52:38 2022 -0500
+
+    Working on the tests, cannot get the agent to take the wood to the pile and it gets stuck on a remaining cost of 8.29e+9 once the wood is picked up
+
+[33mcommit b8ceea8f83fe94d6cad4cce4ea41c28670827e9b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Aug 3 16:49:01 2022 -0500
+
+    Added action planning tests in the composer integration tests. Determined need for selection based distances and weights and implemented those with default conditions. Added mutation tests
+
+[33mcommit 7f805e1e6cddbed7745805442d51d2d65708a26b[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Jul 31 02:17:57 2022 -0500
+
+    Added new state mutator - copy state. Still building that big lumberjack scenario test for Composer
+
+[33mcommit f12856b82250681a8f9061b53bce842730dd03aa[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Jul 28 23:55:19 2022 -0500
+
+    Start of refactor for Distance, added better queries. More Composer Tests.
+
+[33mcommit 6b3b758f36a5a6d248d266807bafa2c12b46cd56[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Tue Jul 19 05:42:39 2022 -0500
+
+    Added a few new query and weight types. Additionally included a distance type. Added more tests for the planner, reasoner, and weight tests renamed.
+
+[33mcommit 4781bf0dc0f8d59719c10f2230785c407f32c819[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Thu Jul 7 16:55:55 2022 -0500
+
+    Some renaming stuff and implemented A* planner tests
+
+[33mcommit 0fdfdb588e09c4f0d864eae2416a275d18d9e754[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Sun Jul 3 06:29:53 2022 -0500
+
+    Added State Query tests, could do with some more but I really should start on the mutator tests.
+
+[33mcommit e83bece03b72f26571fcf417cd951935d3f70fa1[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Jul 1 15:13:29 2022 -0500
+
+    Finished up the Distance tests, converted to using absolute values (negative distance didn't make sense here). Started Queries tests.
+
+[33mcommit 1541bd3d003fe0523425ed3b58e9de6fcbab61eb[m
+Author: Martin Hollstein <martin.hollstein@trollpurse.com>
+Date:   Wed Jun 29 19:40:51 2022 -0500
+
+    Added implementations and fixed build issues, adding tests for the distances
+
+[33mcommit b0ae6e5f1bb842e75d97f1ac7923938c483c51ef[m
+Author: Martin Hollstein <martin.hollstein@trollpurse.com>
+Date:   Sun Jun 26 21:39:23 2022 -0500
+
+    Implemented a lot of the stubbed out distance classes. updated queries to support distance queries, updated weights to do a distance weight.
+
+[33mcommit 195c2b286496ffe03967d3dc5a94d6f0b86fb530[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Fri Jun 24 06:54:19 2022 -0500
+
+    Started adding the Distances for the Composer
+
+[33mcommit f1387229cadbcbfb6d031f578ba5f564eafd63be[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Jun 22 23:32:46 2022 -0500
+
+    Add a bunch of state queries and set value mutators
+
+[33mcommit 9b1275b42aa656a25ef9611007dc8eb773bfd134[m
+Author: Martin Hollstein <martin.hollstein@trollpurse.com>
+Date:   Wed Jun 22 20:28:58 2022 -0500
+
+    Restructured File Structure, defined the editor driven approach to designing the Reasonable Planning AI called Composer. Will need to add a bunch of StateQuery and Set Value State Mutators to get this to a good state.
+
+[33mcommit 0fa9ac78002ca46f897a0d6fb2e81a1d4fea6552[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Wed Jun 8 15:38:19 2022 -0500
+
+    Commit changes
+
+[33mcommit 4e1fd5fd80749f087f5dc179c8c35ac147c2b916[m
+Author: Martin Hollstein <hollsteinm@users.noreply.github.com>
+Date:   Mon Jun 6 17:17:37 2022 -0500
+
+    Initial Commit
