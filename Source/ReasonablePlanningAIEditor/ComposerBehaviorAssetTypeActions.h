@@ -18,6 +18,8 @@ public:
 	virtual FText GetName() const override;
 	virtual FColor GetTypeColor() const override;
 	virtual uint32 GetCategories() override;
+    
+    void OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor) override;
 
 private:
 	EAssetTypeCategories::Type AssetCategory;

@@ -30,7 +30,6 @@ struct FReasonablePlanningAIEditorModule : public IReasonablePlanningAIEditorMod
 
 		IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 
-		// make the DlgSystem be displayed in the filters menu and in the create new menu
 		ModuleAssetCategoryBit = AssetTools.RegisterAdvancedAssetCategory(RpaiMenuCategoryKey, RpaiMenuCategoryText);
 
 		ComposerBehaviorAssetTypeActions = MakeShared<FComposerBehaviorAssetTypeActions>(ModuleAssetCategoryBit);

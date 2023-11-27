@@ -4,7 +4,7 @@
 #include "ComposerBehaviorAssetTypeActions.h"
 #include "Composer/RpaiComposerBehavior.h"
 #include "Modules/ModuleManager.h"
-#include "AIModule.h"
+#include "ComposerBehaviorEditorToolkit.h"
 
 FComposerBehaviorAssetTypeActions::FComposerBehaviorAssetTypeActions(EAssetTypeCategories::Type ModuleAssetCategory)
 	: AssetCategory(ModuleAssetCategory)
@@ -33,4 +33,9 @@ FColor FComposerBehaviorAssetTypeActions::GetTypeColor() const
 uint32 FComposerBehaviorAssetTypeActions::GetCategories()
 {
 	return AssetCategory;
+}
+
+void FComposerBehaviorAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor)
+{
+    MakeShared<FComposerBehaviorEditorToolkit>()->InitEditor(InObjects);
 }

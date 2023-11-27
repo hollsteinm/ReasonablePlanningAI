@@ -13,5 +13,8 @@ UCLASS()
 class REASONABLEPLANNINGAIEDITOR_API UComposerBehaviorFactory : public UFactory
 {
 	GENERATED_BODY()
-	
+public:
+    UComposerBehaviorFactory();
+
+    UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn);
 };

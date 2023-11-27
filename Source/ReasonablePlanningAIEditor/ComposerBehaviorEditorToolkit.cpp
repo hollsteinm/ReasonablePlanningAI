@@ -2,11 +2,81 @@
 
 
 #include "ComposerBehaviorEditorToolkit.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "Slate/SComposerBehaviorWidget.h"
+#include "Modules/ModuleManager.h"
 
-ComposerBehaviorEditorToolkit::ComposerBehaviorEditorToolkit()
+void FComposerBehaviorEditorToolkit::InitEditor(const TArray<UObject*>& InObjects)
 {
+    if(InObjects.Num() <= 0)
+    {
+        return;
+    }
+    
+    Behavior = Cast<URpaiComposerBehavior>(InObjects[0]);
+ 
+    const TSharedRef<FTabManager::FLayout> Layout = FTabManager::NewLayout("RpaiComposerBehaviorEditorLayout")
+    ->AddArea
+    (
+        FTabManager::NewPrimaryArea()->SetOrientation(Orient_Vertical)
+        ->Split
+        (
+            FTabManager::NewSplitter()
+            ->SetSizeCoefficient(0.6f)
+            ->SetOrientation(Orient_Horizontal)
+            ->Split
+            (
+                FTabManager::NewStack()
+                ->SetSizeCoefficient(0.8f)
+                ->AddTab("RpaiComposerBehaviorExperimentTab", ETabState::OpenedTab)
+            )
+            ->Split
+            (
+                FTabManager::NewStack()
+                ->SetSizeCoefficient(0.2f)
+                ->AddTab("RpaiComposerBehaviorDetailsTab", ETabState::OpenedTab)
+            )
+        )
+    );
+    FAssetEditorToolkit::InitAssetEditor(EToolkitMode::Standalone, {}, "RpaiComposerBehaviorEditor", Layout, true, true, InObjects);
 }
 
-ComposerBehaviorEditorToolkit::~ComposerBehaviorEditorToolkit()
+void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager)
 {
+    FAssetEditorToolkit::RegisterTabSpawners(TabManager);
+ 
+    WorkspaceMenuCategory = TabManager->AddLocalWorkspaceMenuCategory(INVTEXT("RPAI Composer Behavior Editor"));
+ 
+    TabManager->RegisterTabSpawner("RpaiComposerBehaviorExperimentTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+    {
+        return SNew(SDockTab)
+        [
+            SNew(SComposerBehaviorWidget)
+            .ComposerBehavior(Behavior)
+        ];
+    }))
+    .SetDisplayName(INVTEXT("Experiment"))
+    .SetGroup(WorkspaceMenuCategory.ToSharedRef());
+ 
+    FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
+    FDetailsViewArgs DetailsViewArgs;
+    DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
+    TSharedRef<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
+    DetailsView->SetObjects(TArray<UObject*>{ Behavior });
+    TabManager->RegisterTabSpawner("RpaiComposerBehaviorDetailsTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+    {
+        return SNew(SDockTab)
+        [
+            DetailsView
+        ];
+    }))
+    .SetDisplayName(INVTEXT("Details"))
+    .SetGroup(WorkspaceMenuCategory.ToSharedRef());
+}
+
+void FComposerBehaviorEditorToolkit::UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager)
+{
+    FAssetEditorToolkit::UnregisterTabSpawners(TabManager);
+    TabManager->UnregisterTabSpawner("RpaiComposerBehaviorExperimentTab");
+    TabManager->UnregisterTabSpawner("RpaiComposerBehaviorDetailsTab");
 }

@@ -12,6 +12,7 @@ namespace UnrealBuildTool.Rules
 					"Engine",
 					"AIModule",
 					"ReasonablePlanningAI",
+					"InputCore"
 				}
 			);
 
