@@ -31,10 +31,10 @@ class REASONABLEPLANNINGAI_API URpaiComposerBehavior : public UDataAsset
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	URpaiPlannerBase* Planner;
 
-	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai")
+	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "GoalName"))
 	TArray<URpaiGoalBase*> Goals;
 
-	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai")
+	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "ActionName"))
 	TArray<URpaiActionBase*> Actions;
 
 public:
