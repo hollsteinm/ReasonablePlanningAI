@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Slate/SComposerBehaviorWidget.h"
 
 /**
  * 
  */
-class REASONABLEPLANNINGAIEDITOR_API FComposerBehaviorEditorToolkit : public FAssetEditorToolkit
+class REASONABLEPLANNINGAIEDITOR_API FComposerBehaviorEditorToolkit : public FAssetEditorToolkit, FNotifyHook
 {
 public:
     void InitEditor(const TArray<UObject*>& InObjects);
@@ -20,6 +21,16 @@ public:
     FString GetWorldCentricTabPrefix() const override { return "RPAI Behavior"; }
     FLinearColor GetWorldCentricTabColorScale() const override { return {}; }
     
+    /**
+     Notify Hook Interface methods
+     */
+    virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged) override;
+    virtual void NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FEditPropertyChain* PropertyThatChanged) override;
+    virtual void NotifyPreChange(FProperty* PropertyChangedEvent) override;
+    virtual void NotifyPreChange(FEditPropertyChain* PropertyThatChanged) override;
+    
 private:
     URpaiComposerBehavior* Behavior;
+    
+    TSharedPtr<SComposerBehaviorWidget> ExperimentWidget;
 };
