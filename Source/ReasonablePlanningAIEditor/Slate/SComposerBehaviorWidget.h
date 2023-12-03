@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
 #include "Composer/RpaiComposerBehavior.h"
+#include "Core/RpaiGoalBase.h"
 
 class SComposerBehaviorWidget : public SCompoundWidget
 {
@@ -18,6 +19,7 @@ public:
     virtual void AddReferencedObjects( FReferenceCollector& Collector );
     
     void NotifyStateTypePropertyChanged();
+    void NotifyGoalsPropertyChanged();
         
 private:
     TAttribute<URpaiComposerBehavior*> ComposerBehavior;
@@ -26,13 +28,28 @@ private:
         
     TSharedPtr<IDetailsView> TestStartingStateDetailView;
     
+    // Evaluation state management
     bool bIsExperimenting;
     ERpaiPlannerResult LastPlanResult;
     FRpaiMemoryStruct CurrentPlannerMemory;
     FRpaiMemory ComponentActionMemory;
     URpaiGoalBase* CurrentGoal;
             
+    // UI elements and callbacks
     EVisibility GetSetStateMessageVisibility() const;
+    EVisibility GetSummaryVisibility() const;
     bool IsEvaluateButtonEnabled() const;
+    bool IsEvaluateGoalButtonEnabled() const;
     FReply OnEvaluateGoalAndPlan();
+    FReply OnEvaluatePlanWithGoal();
+    TSharedRef<SWidget> GoalSelectionContent();
+    TSharedRef<SWidget> OnGenerateGoalRow(URpaiGoalBase* Item);
+    FText GetCurrentGoalSelectionText() const;
+    void HandleGoalSelectionChanged(URpaiGoalBase* Selection, ESelectInfo::Type SelectInfo);
+    
+    // Assigned Slate objects
+    TSharedPtr<SComboBox<URpaiGoalBase*>> GoalComboBox;
+    
+    // Internal Copies for Slate components
+    TArray<URpaiGoalBase*> Goals;
 };

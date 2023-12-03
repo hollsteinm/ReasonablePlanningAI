@@ -31,6 +31,7 @@ void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
     TestStartingStateDetailView = TestStartingStateDetailViewRef;
     
     NotifyStateTypePropertyChanged();
+    NotifyGoalsPropertyChanged();
         
         ChildSlot
         [
@@ -44,15 +45,36 @@ void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
             +SVerticalBox::Slot()
             .AutoHeight()
             [
+              SNew(STextBlock)
+              .Visibility(this, &SComposerBehaviorWidget::GetSetStateMessageVisibility)
+              .Text(LOCTEXT("ComposerWidgetBehavior_Summary", "Modify the state details below to run experiments by using the available button actions."))
+            ]
+            +SVerticalBox::Slot()
+            .AutoHeight()
+            [
              SNew(SHorizontalBox)
              +SHorizontalBox::Slot()
              .AutoWidth()
              [
               SNew(SButton)
-              .ToolTipText(LOCTEXT("ComposerWidgetBehavior_EvaluateTip", "Using the given input state below, run a full heuristics run on a Reasoner to determine a goal, and use that goal to determine actions from the Planner."))
-              .Text(LOCTEXT("ComposerWidgetBehavior_Evaluate", "Evaluate Goal & Plan"))
+              .ToolTipText(LOCTEXT("ComposerWidgetBehavior_FullEvaluateTip", "Using the given input state below, run a full heuristics run on a Reasoner to determine a goal, and use that goal to determine actions from the Planner."))
+              .Text(LOCTEXT("ComposerWidgetBehavior_FullEvaluate", "Evaluate Goal & Plan"))
               .OnClicked(this, &SComposerBehaviorWidget::OnEvaluateGoalAndPlan)
               .IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateButtonEnabled)
+             ]
+             +SHorizontalBox::Slot()
+             .AutoWidth()
+             [
+               GoalSelectionContent()
+             ]
+             +SHorizontalBox::Slot()
+             .AutoWidth()
+             [
+              SNew(SButton)
+              .ToolTipText(LOCTEXT("ComposerWidgetBehavior_ActionsEvaluateTip", "Using the given input state below and a selected goal from the state, determine actions from the Planner."))
+              .Text(LOCTEXT("ComposerWidgetBehavior_ActionsEvaluate", "Evaluate Plan with Goal"))
+              .OnClicked(this, &SComposerBehaviorWidget::OnEvaluatePlanWithGoal)
+              .IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateGoalButtonEnabled)
              ]
             ]
             +SVerticalBox::Slot()
@@ -83,6 +105,16 @@ void SComposerBehaviorWidget::NotifyStateTypePropertyChanged()
     }
 }
 
+void SComposerBehaviorWidget::NotifyGoalsPropertyChanged()
+{
+    Goals = ComposerBehavior.Get()->GetGoals();
+    CurrentGoal = nullptr;
+    if(GoalComboBox)
+    {
+        GoalComboBox->RefreshOptions();
+    }
+}
+
 EVisibility SComposerBehaviorWidget::GetSetStateMessageVisibility() const
 {
     TSubclassOf<URpaiState> ConstructedStateType = ComposerBehavior.Get()->GetConstructedStateType();
@@ -92,6 +124,11 @@ EVisibility SComposerBehaviorWidget::GetSetStateMessageVisibility() const
 bool SComposerBehaviorWidget::IsEvaluateButtonEnabled() const
 {
     return !bIsExperimenting && GetSetStateMessageVisibility() == EVisibility::Collapsed;
+}
+
+EVisibility SComposerBehaviorWidget::GetSummaryVisibility() const
+{
+    return GetSetStateMessageVisibility() == EVisibility::Collapsed ? EVisibility::Visible : EVisibility::Collapsed;
 }
 
 FReply SComposerBehaviorWidget::OnEvaluateGoalAndPlan()
@@ -119,6 +156,7 @@ void SComposerBehaviorWidget::Tick(const FGeometry & AllottedGeometry, const dou
             case ERpaiPlannerResult::CompletedSuccess:
                 bIsExperimenting = false;
                 LastPlanResult = ERpaiPlannerResult::Invalid;
+                // Emit Actions
                 break;
             case ERpaiPlannerResult::RequiresTick:
                 LastPlanResult = Planner->TickGoalPlanning(CurrentGoal, TestStartingState, Behavior->GetActions(), PlannedActions, CurrentPlannerMemory);
@@ -131,5 +169,71 @@ void SComposerBehaviorWidget::Tick(const FGeometry & AllottedGeometry, const dou
             default:
                 break;
         }
+    }
+}
+
+bool SComposerBehaviorWidget::IsEvaluateGoalButtonEnabled() const
+{
+    return IsEvaluateButtonEnabled() && CurrentGoal != nullptr && CurrentGoal->IsValidLowLevel();
+}
+
+FReply SComposerBehaviorWidget::OnEvaluatePlanWithGoal()
+{
+    TArray<URpaiActionBase*> PlannedActions;
+    URpaiComposerBehavior* Behavior = ComposerBehavior.Get();
+    const URpaiPlannerBase* Planner = Behavior->GetPlanner();
+    CurrentPlannerMemory = Planner->AllocateMemorySlice(ComponentActionMemory);
+    LastPlanResult = Planner->StartGoalPlanning(CurrentGoal, TestStartingState, Behavior->GetActions(), PlannedActions, CurrentPlannerMemory);
+    if(LastPlanResult == ERpaiPlannerResult::RequiresTick)
+    {
+        bIsExperimenting = true;
+    }
+    else
+    {
+        // Emit Actions
+    }
+
+    return FReply::Handled();
+}
+
+TSharedRef<SWidget> SComposerBehaviorWidget::GoalSelectionContent()
+{
+    return SAssignNew(GoalComboBox, SComboBox<URpaiGoalBase*>)
+            .OptionsSource(&Goals)
+            .OnSelectionChanged(this, &SComposerBehaviorWidget::HandleGoalSelectionChanged)
+            .OnGenerateWidget(this, &SComposerBehaviorWidget::OnGenerateGoalRow)
+            .InitiallySelectedItem(CurrentGoal)
+            [
+                SNew(STextBlock)
+                .Text(this, &SComposerBehaviorWidget::GetCurrentGoalSelectionText)
+            ];
+}
+
+TSharedRef<SWidget> SComposerBehaviorWidget::OnGenerateGoalRow(URpaiGoalBase* Item)
+{
+    if(Item != nullptr && Item->IsValidLowLevel())
+    {
+        return SNew(STextBlock)
+            .Text(FText::FromString(Item->GetGoalName()));
+    }
+    return SNew(STextBlock)
+        .Text(LOCTEXT("ComposerWidgetBehavior_InvalidObject", "Invalid Object!"));
+}
+
+FText SComposerBehaviorWidget::GetCurrentGoalSelectionText() const
+{
+    if(CurrentGoal != nullptr && CurrentGoal->IsValidLowLevel())
+    {
+        return FText::FromString(CurrentGoal->GetGoalName());
+    }
+    return LOCTEXT("ComposerWidgetBehavior_SelectGoalPrompt", "Select a Goal");
+}
+
+void SComposerBehaviorWidget::HandleGoalSelectionChanged(URpaiGoalBase* Selection, ESelectInfo::Type SelectInfo)
+{
+    if(SelectInfo != ESelectInfo::OnNavigation)
+    {
+        CurrentGoal = Selection;
+        GoalComboBox->SetSelectedItem(CurrentGoal);
     }
 }

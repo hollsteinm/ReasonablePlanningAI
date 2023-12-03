@@ -90,6 +90,13 @@ void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEven
             ExperimentWidget->NotifyStateTypePropertyChanged();
         }
     }
+    else if(PropertyChangedEvent.GetPropertyName().IsEqual("Goals"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyGoalsPropertyChanged();
+        }
+    }
 }
 
 void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FEditPropertyChain* PropertyThatChanged)
@@ -99,6 +106,13 @@ void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEven
         if(ExperimentWidget)
         {
             ExperimentWidget->NotifyStateTypePropertyChanged();
+        }
+    }
+    else if(PropertyChangedEvent.GetPropertyName().IsEqual("Goals"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyGoalsPropertyChanged();
         }
     }
 }
