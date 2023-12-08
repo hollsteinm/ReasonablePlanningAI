@@ -6,7 +6,8 @@
 #include "Slate/SComposerBehaviorWidget.h"
 
 /**
- * 
+ * Toolkit that manages the custom asset editor for RpaiComposerBehavior. Provides editing data properties and
+ * running experiments.
  */
 class REASONABLEPLANNINGAIEDITOR_API FComposerBehaviorEditorToolkit : public FAssetEditorToolkit, FNotifyHook
 {
@@ -31,6 +32,5 @@ public:
     
 private:
     URpaiComposerBehavior* Behavior;
-    
     TSharedPtr<SComposerBehaviorWidget> ExperimentWidget;
 };

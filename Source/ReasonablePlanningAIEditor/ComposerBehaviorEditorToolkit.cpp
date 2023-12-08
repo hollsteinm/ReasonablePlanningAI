@@ -40,13 +40,13 @@ void FComposerBehaviorEditorToolkit::InitEditor(const TArray<UObject*>& InObject
     FAssetEditorToolkit::InitAssetEditor(EToolkitMode::Standalone, {}, "RpaiComposerBehaviorEditor", Layout, true, true, InObjects);
 }
 
-void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class FTabManager>& TabManager)
+void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
-    FAssetEditorToolkit::RegisterTabSpawners(TabManager);
+    FAssetEditorToolkit::RegisterTabSpawners(InTabManager);
  
-    WorkspaceMenuCategory = TabManager->AddLocalWorkspaceMenuCategory(INVTEXT("RPAI Composer Behavior Editor"));
+    WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(INVTEXT("RPAI Composer Behavior Editor"));
  
-    TabManager->RegisterTabSpawner("RpaiComposerBehaviorExperimentTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+    InTabManager->RegisterTabSpawner("RpaiComposerBehaviorExperimentTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
     {
         return SNew(SDockTab)
         [
@@ -63,7 +63,7 @@ void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class 
     DetailsViewArgs.NotifyHook = this;
     TSharedRef<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
     DetailsView->SetObjects(TArray<UObject*>{ Behavior });
-    TabManager->RegisterTabSpawner("RpaiComposerBehaviorDetailsTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+    InTabManager->RegisterTabSpawner("RpaiComposerBehaviorDetailsTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
     {
         return SNew(SDockTab)
         [
@@ -74,11 +74,11 @@ void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class 
     .SetGroup(WorkspaceMenuCategory.ToSharedRef());
 }
 
-void FComposerBehaviorEditorToolkit::UnregisterTabSpawners(const TSharedRef<class FTabManager>& TabManager)
+void FComposerBehaviorEditorToolkit::UnregisterTabSpawners(const TSharedRef<class FTabManager>& InTabManager)
 {
-    FAssetEditorToolkit::UnregisterTabSpawners(TabManager);
-    TabManager->UnregisterTabSpawner("RpaiComposerBehaviorExperimentTab");
-    TabManager->UnregisterTabSpawner("RpaiComposerBehaviorDetailsTab");
+    FAssetEditorToolkit::UnregisterTabSpawners(InTabManager);
+    InTabManager->UnregisterTabSpawner("RpaiComposerBehaviorExperimentTab");
+    InTabManager->UnregisterTabSpawner("RpaiComposerBehaviorDetailsTab");
 }
 
 void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
