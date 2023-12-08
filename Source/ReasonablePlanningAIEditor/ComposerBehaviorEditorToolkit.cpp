@@ -3,7 +3,6 @@
 
 #include "ComposerBehaviorEditorToolkit.h"
 #include "Widgets/Docking/SDockTab.h"
-#include "Slate/SComposerBehaviorWidget.h"
 #include "Modules/ModuleManager.h"
 
 void FComposerBehaviorEditorToolkit::InitEditor(const TArray<UObject*>& InObjects)
@@ -51,7 +50,7 @@ void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class 
     {
         return SNew(SDockTab)
         [
-            SNew(SComposerBehaviorWidget)
+            SAssignNew(ExperimentWidget, SComposerBehaviorWidget)
             .ComposerBehavior(Behavior)
         ];
     }))
@@ -61,6 +60,7 @@ void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class 
     FPropertyEditorModule& PropertyEditorModule = FModuleManager::GetModuleChecked<FPropertyEditorModule>("PropertyEditor");
     FDetailsViewArgs DetailsViewArgs;
     DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
+    DetailsViewArgs.NotifyHook = this;
     TSharedRef<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
     DetailsView->SetObjects(TArray<UObject*>{ Behavior });
     TabManager->RegisterTabSpawner("RpaiComposerBehaviorDetailsTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
@@ -79,4 +79,48 @@ void FComposerBehaviorEditorToolkit::UnregisterTabSpawners(const TSharedRef<clas
     FAssetEditorToolkit::UnregisterTabSpawners(TabManager);
     TabManager->UnregisterTabSpawner("RpaiComposerBehaviorExperimentTab");
     TabManager->UnregisterTabSpawner("RpaiComposerBehaviorDetailsTab");
+}
+
+void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FProperty* PropertyThatChanged)
+{
+    if(PropertyChangedEvent.GetPropertyName().IsEqual("ConstructedStateType"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyStateTypePropertyChanged();
+        }
+    }
+    else if(PropertyChangedEvent.GetPropertyName().IsEqual("Goals"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyGoalsPropertyChanged();
+        }
+    }
+}
+
+void FComposerBehaviorEditorToolkit::NotifyPostChange(const FPropertyChangedEvent& PropertyChangedEvent, FEditPropertyChain* PropertyThatChanged)
+{
+    if(PropertyChangedEvent.GetPropertyName().IsEqual("ConstructedStateType"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyStateTypePropertyChanged();
+        }
+    }
+    else if(PropertyChangedEvent.GetPropertyName().IsEqual("Goals"))
+    {
+        if(ExperimentWidget)
+        {
+            ExperimentWidget->NotifyGoalsPropertyChanged();
+        }
+    }
+}
+
+void FComposerBehaviorEditorToolkit::NotifyPreChange(FProperty* PropertyChangedEvent)
+{
+}
+
+void FComposerBehaviorEditorToolkit::NotifyPreChange(FEditPropertyChain* PropertyThatChanged)
+{
 }
