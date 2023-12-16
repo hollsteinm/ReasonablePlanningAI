@@ -43,12 +43,16 @@ private:
 	bool IsEvaluateGoalButtonEnabled() const;
 	FReply OnEvaluateGoalAndPlan();
 	FReply OnEvaluatePlanWithGoal();
+	FReply OnEvaluateActions();
+	FReply OnEvaluateGoals();
 	TSharedRef<SWidget> GoalSelectionContent();
 	TSharedRef<SWidget> OnGenerateGoalRow(URpaiGoalBase* Item);
 	TSharedRef<ITableRow> OnGenerateExperimentOutputRow(TSharedPtr<FText> InText, const TSharedRef<STableViewBase>& OwnerTable);
 	FText GetCurrentGoalSelectionText() const;
 	void HandleGoalSelectionChanged(URpaiGoalBase* Selection, ESelectInfo::Type SelectInfo);
 	void EmitPlanOutput(const URpaiGoalBase* Goal, const TArray<URpaiActionBase*>& Actions);
+	void EmitCurrentStateActionWeightsAndDistances();
+	void EmitCurrentStateGoalCategoryWeightDistance();
 
 	// Assigned Slate objects
 	TSharedPtr<SComboBox<URpaiGoalBase*>> GoalComboBox;
