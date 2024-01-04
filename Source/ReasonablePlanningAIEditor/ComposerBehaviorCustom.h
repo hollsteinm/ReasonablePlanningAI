@@ -3,13 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "IDetailCustomization.h"
 
 /**
- * Basic custom Composer behavior registry
+ * Provides customizations for composer behaviors. Makes coupled systems - such as state references and the state subclass
+ * more integrated and enables validation of references.
  */
-class REASONABLEPLANNINGAIEDITOR_API ComposerBehaviorCustom
+class REASONABLEPLANNINGAIEDITOR_API ComposerBehaviorCustom : public IDetailCustomization
 {
 public:
-	ComposerBehaviorCustom();
-	~ComposerBehaviorCustom();
+
+	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
+
+	static TSharedRef<IDetailCustomization> MakeInstance();
 };

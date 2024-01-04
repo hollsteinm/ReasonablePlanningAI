@@ -27,7 +27,8 @@ void StateKeyValueReferenceCustom::CustomizeHeader(TSharedRef<IPropertyHandle> S
 		[
 			SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot()
-			.FillWidth(1.0)
+			.FillWidth(1)
+			.MaxWidth(64.0f)
 			[
 				StateNamePropertyHandle->CreatePropertyValueWidget()
 			]
