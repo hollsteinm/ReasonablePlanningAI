@@ -3,6 +3,7 @@
 #include "StateQueryComparisonCustom.h"
 #include "PropertyEditing.h"
 #include "PropertyCustomizationHelpers.h"
+#include "Core/RpaiTypes.h"
 
 TSharedRef<IDetailCustomization> StateQueryComparisonCustom::MakeInstance(FName RHSFieldName)
 {
@@ -71,45 +72,115 @@ void StateQueryComparisonCustom::CustomizeChildren(TSharedRef<IPropertyHandle> S
 void StateQueryComparisonCustom::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
 {
 	IDetailCategoryBuilder& RpaiCategory = DetailBuilder.EditCategory("Rpai", FText::GetEmpty(), ECategoryPriority::Important);
-	TSharedPtr<IPropertyHandle> QueriedState = DetailBuilder.GetProperty(FName(TEXT("QueriedState")));
-	TSharedPtr<IPropertyHandle> ComparisonOperation = DetailBuilder.GetProperty(FName(TEXT("ComparisonOperation")));
+	
+	/**
+	IDetailLayoutBuilder::GetProperty() will only return the immediate class properties found on scope. Which means parent class properties will
+	not be found. Therefore we must search for them after getting the appropriate category's default properties.
+	**/
+	TArray<TSharedRef<IPropertyHandle>> DefaultProperties;
+	RpaiCategory.GetDefaultProperties(DefaultProperties);
 
-	check(QueriedState.IsValid());
-	check(ComparisonOperation.IsValid());
+	const auto FindQueriedState = [](const TSharedRef<IPropertyHandle>& Handle) -> bool { return Handle->GetProperty()->GetFName().IsEqual("QueriedState"); };
+	const auto FindComparison = [](const TSharedRef<IPropertyHandle>& Handle) -> bool { return Handle->GetProperty()->GetFName().IsEqual("ComparisonOperation"); };
 
-	DetailBuilder.HideProperty(QueriedState);
-	DetailBuilder.HideProperty(ComparisonOperation);
+	auto QueriedStateResult = DefaultProperties.FindByPredicate(FindQueriedState);
+	auto ComparisonOperationResult = DefaultProperties.FindByPredicate(FindComparison);
+
+	check(QueriedStateResult != nullptr);
+	check(ComparisonOperationResult != nullptr);
+
+	TSharedRef<IPropertyHandle> QueriedState = *QueriedStateResult;
+	TSharedRef<IPropertyHandle> ComparisonOperation = *ComparisonOperationResult;
+
+	QueriedState->MarkHiddenByCustomization();
+	ComparisonOperation->MarkHiddenByCustomization();
 
 	TSharedPtr<SHorizontalBox> Box;
 	
-	RpaiCategory.AddCustomRow(FText::GetEmpty())
-	.NameContent()
-	[
-		SNew(STextBlock)
-		.Font(IDetailLayoutBuilder::GetDetailFont())
-		.Text(NSLOCTEXT("Rpai", "ComparisonDisplayName", "Comparison"))
-	]
-	.ValueContent()
+	FDetailWidgetRow& Row = RpaiCategory.AddCustomRow(FText::GetEmpty())
+		.NameContent()
+		[
+			SNew(STextBlock)
+				.Font(IDetailLayoutBuilder::GetDetailFont())
+				.Text(NSLOCTEXT("Rpai", "ComparisonDisplayName", "Query Definition"))
+		]
+		.ValueContent()
+		.HAlign(HAlign_Fill)
 		[
 			SAssignNew(Box, SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			[
-				QueriedState->CreatePropertyValueWidget()
-			]
-			+ SHorizontalBox::Slot()
-			[
-				ComparisonOperation->CreatePropertyValueWidget()
-			]
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+						.Font(IDetailLayoutBuilder::GetDetailFont())
+						.Text_Lambda([QueriedState]() -> FText
+							{
+								TSharedRef<IPropertyHandle> StateNamePropertyHandle = QueriedState->GetChildHandle(GET_MEMBER_NAME_CHECKED(FStateKeyValueReference, StateKeyName)).ToSharedRef();
+								FText StateNameText;
+								StateNamePropertyHandle->GetValueAsDisplayText(StateNameText);
+								return StateNameText;
+							})
+				]
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+						.Font(IDetailLayoutBuilder::GetDetailFont())
+						.Margin(FMargin(8., 0., 0., 0.))
+						.Text(NSLOCTEXT("Rpai", "AsUpper", "AS"))
+				]
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+						.Font(IDetailLayoutBuilder::GetDetailFont())
+						.Margin(FMargin(8., 0., 0., 0.))
+						.Text_Lambda([QueriedState]() -> FText
+							{
+								TSharedRef<IPropertyHandle> StateTypePropertyHandle = QueriedState->GetChildHandle(GET_MEMBER_NAME_CHECKED(FStateKeyValueReference, ExpectedValueType)).ToSharedRef();
+								FText StateTypeText;
+								StateTypePropertyHandle->GetValueAsDisplayText(StateTypeText);
+								return StateTypeText;
+							})
+				]
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+				[
+					SNew(STextBlock)
+						.Font(IDetailLayoutBuilder::GetDetailFont())
+						.Margin(FMargin(8., 0., 0., 0.))
+						.Text_Lambda([ComparisonOperation]() -> FText
+							{
+								FText OperationText;
+								ComparisonOperation->GetValueAsDisplayText(OperationText);
+								return OperationText;
+							})
+				]
 		];
+
+	RpaiCategory.AddProperty(QueriedState.ToSharedPtr());
+	RpaiCategory.AddProperty(ComparisonOperation.ToSharedPtr());
 
 	if (RHSFieldName.IsValid())
 	{
 		TSharedPtr<IPropertyHandle> Rhs = DetailBuilder.GetProperty(RHSFieldName);
 		check(Rhs.IsValid());
-		DetailBuilder.HideProperty(Rhs);
+		Rhs->MarkHiddenByCustomization();
+
 		Box->AddSlot()
+		.AutoWidth()
 		[
-			Rhs->CreatePropertyValueWidget()
+			SNew(STextBlock)
+				.Font(IDetailLayoutBuilder::GetDetailFont())
+				.Margin(FMargin(8., 0., 0., 0.))
+				.Text_Lambda([Value = Rhs.ToSharedRef()]() -> FText
+					{
+						FText FieldNameText;
+						Value->GetValueAsDisplayText(FieldNameText);
+						return FieldNameText;
+					})
 		];
+
+		RpaiCategory.AddProperty(Rhs);
 	}
 }

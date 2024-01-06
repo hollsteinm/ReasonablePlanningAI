@@ -39,8 +39,10 @@ void ComposerStateQueryCustom::CustomizeChildren(TSharedRef<IPropertyHandle> Str
         else
         {
             FAddPropertyParams Params;
-            Params.AllowChildren(true);
-            Params.HideRootObjectNode(true);
+            Params.AllowChildren(true)
+                .HideRootObjectNode(true)
+                .UniqueId(StructPropertyHandle->GetProperty()->GetID())
+                ;
             StructBuilder.AddExternalObjects(TArray<UObject*> { Value }, Params);
         }
     }
