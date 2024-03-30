@@ -141,6 +141,12 @@ void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AA
 	if (bCancelShouldExitPlan)
 	{
 		PlannedActions.Empty();
+		CurrentAction = nullptr;
+	}
+	else if (PlannedActions.Num() <= 0)
+	{
+		UnregisterOldAction(CurrentAction);
+		CurrentAction = nullptr;
 	}
 	else
 	{
