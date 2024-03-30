@@ -15,5 +15,5 @@ float URpaiComposerDistanceBase::CalculateDistance(const URpaiState* GivenState)
 //Return distance as the difference between the left hand property and the right hand property.
 float URpaiComposerDistanceBase::ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const
 {
-    return TNumericLimits<float>::Max();
+    return 0.f;
 }

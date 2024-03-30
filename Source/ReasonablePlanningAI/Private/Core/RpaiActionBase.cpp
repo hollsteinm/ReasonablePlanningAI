@@ -111,7 +111,7 @@ bool URpaiActionBase::ReceiveIsApplicable_Implementation(const URpaiState* Given
 
 float URpaiActionBase::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
-	return TNumericLimits<float>::Max();
+	return 0.f;
 }
 
 void URpaiActionBase::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
