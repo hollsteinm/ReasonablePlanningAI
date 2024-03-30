@@ -106,7 +106,15 @@ void URpaiBrainComponent::OnActionCompleted(URpaiActionBase* CompletedAction, AA
 	}
 
 	UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Action Completed %s"), *CompletedAction->GetActionName());
-	PopNextAction();
+	if (PlannedActions.Num() <= 0)
+	{
+		UnregisterOldAction(CurrentAction);
+		CurrentAction = nullptr;
+	}
+	else
+	{
+		PopNextAction();
+	}
 }
 
 void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCancelShouldExitPlan)

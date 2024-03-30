@@ -24,7 +24,6 @@ private:
 public:
 	URpaiState_Reflection();
 	
-	virtual bool IsEqualTo(const URpaiState* OtherState) const override;
 	virtual void SetBool(FName ValueName, bool Value) override;
 	virtual void SetClassValue(FName ValueName, UClass* Value) override;
 	virtual void SetEnum(FName ValueName, UEnum* Type, uint8 Value) override;
@@ -63,4 +62,7 @@ public:
 	virtual bool DoesHeirarchyHaveAnyLocks(FName PathPrefix) const override;
 	virtual bool LockResource(FName ExactName, UObject* LockingObject = nullptr) override;
 	virtual bool UnlockResource(FName ExactName, UObject* LockingObject = nullptr) override;
+
+protected:
+	virtual bool IsEqualTo_Implementation(const URpaiState* OtherState) const override;
 };

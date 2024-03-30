@@ -47,7 +47,7 @@ URpaiState_Map::URpaiState_Map()
 
 }
 
-bool URpaiState_Map::IsEqualTo(const URpaiState* OtherState) const
+bool URpaiState_Map::IsEqualTo_Implementation(const URpaiState* OtherState) const
 {
 	check(OtherState != nullptr);
 	const URpaiState_Map* Other = Cast<URpaiState_Map>(OtherState);

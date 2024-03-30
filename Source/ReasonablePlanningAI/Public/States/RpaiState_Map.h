@@ -59,7 +59,6 @@ private:
 	URpaiResourceCollection* Resources;
 
 public:
-	virtual bool IsEqualTo(const URpaiState* OtherState) const override;
 	virtual void SetBool(FName ValueName, bool Value) override;
 	virtual void SetClassValue(FName ValueName, UClass* Value) override;
 	virtual void SetEnum(FName ValueName, UEnum* Type, uint8 Value) override;
@@ -100,4 +99,8 @@ public:
 	virtual bool UnlockResource(FName ExactName, UObject* LockingObject = nullptr) override;
 
 	FORCEINLINE void SetAsDynamic(bool bShouldBeDynamic) { bDynamicMapPairs = bShouldBeDynamic; }
+
+protected:
+	virtual bool IsEqualTo_Implementation(const URpaiState* OtherState) const override;
+
 };

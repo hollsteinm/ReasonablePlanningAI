@@ -3,7 +3,7 @@
 
 #include "Core/RpaiState.h"
 
-bool URpaiState::IsEqualTo(const URpaiState* OtherState) const
+bool URpaiState::IsEqualTo_Implementation(const URpaiState* OtherState) const
 {
 	return false;
 }
@@ -16,7 +16,7 @@ bool URpaiState::HasReferencedState(const FStateKeyValueReference& StateProperty
 		StatePropertyReference.ExpectedValueType == GetTypeFromName(StatePropertyReference.StateKeyName);
 }
 
-void URpaiState::SetStateFromController(const AAIController* FromController)
+void URpaiState::SetStateFromController_Implementation(const AAIController* FromController)
 {
 
 }
