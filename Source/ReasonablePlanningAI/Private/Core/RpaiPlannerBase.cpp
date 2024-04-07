@@ -5,6 +5,8 @@
 #include "Core/RpaiTypes.h"
 
 DECLARE_CYCLE_STAT(TEXT("Plan Chosen Goal"), STAT_PlanChosenGoal, STATGROUP_Rpai);
+DECLARE_CYCLE_STAT(TEXT("Start Plan Chosen Goal"), STAT_StartPlanChosenGoal, STATGROUP_Rpai);
+DECLARE_CYCLE_STAT(TEXT("Tick Plan Chosen Goal"), STAT_TickPlanChosenGoal, STATGROUP_Rpai);
 
 URpaiPlannerBase::URpaiPlannerBase()
 	: PlannerMemoryStructType(nullptr)
@@ -45,6 +47,7 @@ FRpaiMemoryStruct URpaiPlannerBase::AllocateMemorySlice(FRpaiMemory& FromMemory)
 
 ERpaiPlannerResult URpaiPlannerBase::StartGoalPlanning(const URpaiGoalBase* TargetGoal, const URpaiState* CurrentState, const TArray<URpaiActionBase*>& GivenActions, TArray<URpaiActionBase*>& OutActions, FRpaiMemoryStruct PlannerMemory) const
 {
+	SCOPE_CYCLE_COUNTER(STAT_StartPlanChosenGoal);
 	check(PlannerMemoryStructType == nullptr ? true : PlannerMemory.IsValid() && PlannerMemory.IsCompatibleType(PlannerMemoryStructType));
 	OutActions.Empty();
 	return ReceiveStartGoalPlanning(TargetGoal, CurrentState, GivenActions, OutActions, PlannerMemory);
@@ -52,6 +55,7 @@ ERpaiPlannerResult URpaiPlannerBase::StartGoalPlanning(const URpaiGoalBase* Targ
 
 ERpaiPlannerResult URpaiPlannerBase::TickGoalPlanning(const URpaiGoalBase* TargetGoal, const URpaiState* CurrentState, const TArray<URpaiActionBase*>& GivenActions, TArray<URpaiActionBase*>& OutActions, FRpaiMemoryStruct PlannerMemory) const
 {
+	SCOPE_CYCLE_COUNTER(STAT_TickPlanChosenGoal);
 	check(PlannerMemoryStructType == nullptr ? true : PlannerMemory.IsValid() && PlannerMemory.IsCompatibleType(PlannerMemoryStructType));
 	return ReceiveTickGoalPlanning(TargetGoal, CurrentState, GivenActions, OutActions, PlannerMemory);
 }

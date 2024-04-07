@@ -12,6 +12,8 @@
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
 
+DECLARE_CYCLE_STAT(TEXT("Execute Plan Actions"), STAT_ExecutePlanActions, STATGROUP_Rpai);
+
 static const FRpaiMemory::MemorySizeType DefaultBlockSize = 256;
 
 URpaiBrainComponent::URpaiBrainComponent()
@@ -76,6 +78,7 @@ void URpaiBrainComponent::PopNextAction()
 {
 	if (PlannedActions.Num() > 0)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_ExecutePlanActions);
 		UnregisterOldAction(CurrentAction);
 		CurrentAction = PlannedActions.Pop();
 		check(CurrentAction != nullptr);
@@ -196,6 +199,7 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 	if (CurrentAction != nullptr)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_ExecutePlanActions);
 		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	else if (PlannedActions.Num() <= 0 && LastPlannerResultForMultiTick != ERpaiPlannerResult::RequiresTick)
