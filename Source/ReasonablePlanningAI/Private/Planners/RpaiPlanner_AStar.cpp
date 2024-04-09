@@ -8,32 +8,9 @@
 #include "VisualLogger/VisualLoggerTypes.h"
 #include "VisualLogger/VisualLogger.h"
 
-bool operator==(const FVisitedState& LHS, const FVisitedState& RHS)
-{
-    return LHS.Id == RHS.Id;
-}
-
-bool operator==(const FVisitedState& LHS, URpaiState* RHS)
-{
-    check(LHS.State != nullptr);
-    check(RHS != nullptr);
-    return LHS.State->IsEqualTo(RHS);
-}
-
-bool operator==(const FVisitedState& LHS, const FGuid& RHS)
-{
-    return LHS.Id == RHS;
-}
-
-bool operator<(const FVisitedState& LHS, const FVisitedState& RHS)
-{
-    return LHS.Cost + LHS.Remaining < RHS.Cost + RHS.Remaining;
-}
-
 URpaiPlanner_AStar::URpaiPlanner_AStar()
     : MaxIterations(250)
     , IterationsPerTick(50)
-    , bAlwaysHaveAPlan(true)
 {
     PlannerMemoryStructType = FAStarPlannerMemory::StaticStruct();
 }
@@ -172,14 +149,6 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveCancelGoalPlanning_Implementation(
     FAStarPlannerMemory* Memory = PlannerMemory.Get<FAStarPlannerMemory>();
     Memory->OpenActions.Empty();
     Memory->ClosedActions.Empty();
-    if (IsValid(Memory->FutureState))
-    {
-        Memory->FutureState->ConditionalBeginDestroy();
-    }
-    if (IsValid(Memory->DisposableRoot))
-    {
-        Memory->DisposableRoot->ConditionalBeginDestroy();
-    }
     return ERpaiPlannerResult::CompletedCancelled;
 }
 

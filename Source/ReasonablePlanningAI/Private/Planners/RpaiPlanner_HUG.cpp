@@ -8,124 +8,126 @@
 #include "VisualLogger/VisualLoggerTypes.h"
 #include "VisualLogger/VisualLogger.h"
 
-struct FHugVisitedState
-{
-    FGuid Id;
-    FGuid ParentId;
-
-    float Cost;
-    float Remaining;
-
-    URpaiState* State;
-    URpaiActionBase* Action;
-};
-
-bool operator==(const FHugVisitedState& LHS, const FHugVisitedState& RHS)
-{
-    return LHS.Id == RHS.Id;
-}
-
-bool operator==(const FHugVisitedState& LHS, URpaiState* RHS)
-{
-    check(LHS.State != nullptr);
-    check(RHS != nullptr);
-    return LHS.State->IsEqualTo(RHS);
-}
-
-bool operator==(const FHugVisitedState& LHS, const FGuid& RHS)
-{
-    return LHS.Id == RHS;
-}
-
-bool operator<(const FHugVisitedState& LHS, const FHugVisitedState& RHS)
-{
-    return LHS.Cost + LHS.Remaining < RHS.Cost + RHS.Remaining;
-}
-
-
 URpaiPlanner_HUG::URpaiPlanner_HUG()
-    : MaxPlanningAttemptThreshold(1000U)
-    , GoalDivergenceThreshold(0.01f)
+    : MaxIterations(250)
+    , IterationsPerTick(50)
+    , GoalDivergenceThreshold(0.1f)
 {
-
+    PlannerMemoryStructType = FHugPlannerMemory::StaticStruct();
 }
 
-bool URpaiPlanner_HUG::ReceivePlanChosenGoal_Implementation(const URpaiGoalBase* TargetGoal, const URpaiState* CurrentState, const TArray<URpaiActionBase*>& GivenActions, TArray<URpaiActionBase*>& OutActions) const
+ERpaiPlannerResult URpaiPlanner_HUG::ReceiveStartGoalPlanning_Implementation(
+    const URpaiGoalBase* TargetGoal,
+    const URpaiState* CurrentState,
+    const TArray<URpaiActionBase*>& GivenActions,
+    TArray<URpaiActionBase*>& OutActions,
+    FRpaiMemoryStruct PlannerMemory
+) const
 {
+    FHugPlannerMemory* Memory = PlannerMemory.Get<FHugPlannerMemory>();
+    Memory->OpenActions.Empty();
+    Memory->ClosedActions.Empty();
+    Memory->CurrentIterations = 0;
+    Memory->FutureState = nullptr;
+    Memory->DisposableRoot = nullptr;
+    Memory->OriginalWeight = TargetGoal->GetWeight(CurrentState);
+
     if (TargetGoal->IsInDesiredState(CurrentState))
     {
-        return true; //or false?
+        return ERpaiPlannerResult::CompletedSuccess;
     }
+    Memory->DisposableRoot = NewObject<UObject>(GetTransientPackage(), CurrentState->GetClass());
 
-    TArray<FHugVisitedState> OpenActions;
-    TArray<FHugVisitedState> ClosedActions;
-
-    FHugVisitedState Start;
+    FVisitedState Start;
     Start.Id = FGuid::NewGuid();
     Start.Action = nullptr;
     Start.Cost = 0.f;
     Start.Remaining = 0.f;
     Start.ParentId.Invalidate();
-    Start.State = NewObject<URpaiState>(GetTransientPackage(), CurrentState->GetClass());
+    Start.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
 
     CurrentState->CopyStateForPredictionTo(Start.State);
 
-    OpenActions.HeapPush(Start);
-    uint32 Iterations = 0;
-    //Reusable so we are only instantiatng new states when we need to
-    URpaiState* FutureState = NewObject<URpaiState>(Start.State, CurrentState->GetClass());
+    Memory->OpenActions.HeapPush(Start);
+    Memory->FutureState = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
+    return ERpaiPlannerResult::RequiresTick;
+}
 
-    while (OpenActions.Num() > 0 && ++Iterations < MaxPlanningAttemptThreshold)
+ERpaiPlannerResult URpaiPlanner_HUG::ReceiveTickGoalPlanning_Implementation(
+    const URpaiGoalBase* TargetGoal,
+    const URpaiState* CurrentState,
+    const TArray<URpaiActionBase*>& GivenActions,
+    TArray<URpaiActionBase*>& OutActions,
+    FRpaiMemoryStruct PlannerMemory
+) const
+{
+    FHugPlannerMemory* Memory = PlannerMemory.Get<FHugPlannerMemory>();
+    int32 TickIterations = 0;
+
+    while (Memory->OpenActions.Num() > 0 && ++(Memory->CurrentIterations) < MaxIterations && ++TickIterations < IterationsPerTick)
     {
-        FHugVisitedState Current;
-        OpenActions.HeapPop(Current);
-        ClosedActions.Push(Current);
+        FVisitedState Current;
+        Memory->OpenActions.HeapPop(Current);
+        Memory->ClosedActions.Push(Current);
 
         if (TargetGoal->IsInDesiredState(Current.State))
         {
+            TArray<FVisitedState> Plan;
+            Plan.Reserve(Memory->OpenActions.Num() + Memory->ClosedActions.Num());
             do
             {
-                OutActions.Push(Current.Action);
-                auto Next = OpenActions.FindByKey(Current.ParentId);
+                Plan.Push(Current);
+                auto Next = Memory->OpenActions.FindByKey(Current.ParentId);
                 if (Next == nullptr)
                 {
-                    Next = ClosedActions.FindByKey(Current.ParentId);
+                    Next = Memory->ClosedActions.FindByKey(Current.ParentId);
                 }
                 Current = *Next;
-            } while (Current.ParentId.IsValid() && FMath::Abs(TargetGoal->GetWeight(Current.State)) < GoalDivergenceThreshold);
-            Start.State->ConditionalBeginDestroy();
-            return true;
+            } while (Current.ParentId.IsValid());
+
+            // trim out tasks that breach divergence.
+            for (const auto Task : Plan) {
+                const float Difference = TargetGoal->GetWeight(Task.State) - Memory->OriginalWeight;
+                if (Difference > GoalDivergenceThreshold)
+                {
+                    break;
+                }
+                OutActions.Push(Task.Action);
+            }
+
+            Memory->DisposableRoot->ConditionalBeginDestroy();
+            return ERpaiPlannerResult::CompletedSuccess;
         }
 
         for (const auto& Action : GivenActions)
         {
             if (Action->IsApplicable(Current.State))
             {
-                Current.State->CopyStateForPredictionTo(FutureState);
-                Action->ApplyToState(FutureState);
+                Current.State->CopyStateForPredictionTo(Memory->FutureState);
+                Action->ApplyToState(Memory->FutureState);
 
-                if (ClosedActions.FindByKey(FutureState) != nullptr)
+                if (Memory->ClosedActions.FindByKey(Memory->FutureState) != nullptr)
                 {
                     continue;
                 }
 
-                FHugVisitedState* InOpen = OpenActions.FindByKey(FutureState);
+                FVisitedState* InOpen = Memory->OpenActions.FindByKey(Memory->FutureState);
                 auto ActionCost = Action->ExecutionWeight(Current.State);
                 auto NewCost = Current.Cost + ActionCost;
-                auto NewRemaining = TargetGoal->GetDistanceToDesiredState(FutureState);
+                auto NewRemaining = TargetGoal->GetDistanceToDesiredState(Memory->FutureState);
 
                 if (InOpen == nullptr)
                 {
-                    FHugVisitedState NewNode;
+                    FVisitedState NewNode;
                     NewNode.Id = FGuid::NewGuid();
                     NewNode.Action = Action;
                     NewNode.Cost = NewCost;
                     NewNode.Remaining = NewRemaining;
                     NewNode.ParentId = Current.Id;
-                    NewNode.State = NewObject<URpaiState>(Start.State, CurrentState->GetClass());
-                    FutureState->CopyStateForPredictionTo(NewNode.State);
+                    NewNode.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
+                    Memory->FutureState->CopyStateForPredictionTo(NewNode.State);
 
-                    OpenActions.HeapPush(NewNode);
+                    Memory->OpenActions.HeapPush(NewNode);
                 }
                 else
                 {
@@ -136,12 +138,60 @@ bool URpaiPlanner_HUG::ReceivePlanChosenGoal_Implementation(const URpaiGoalBase*
                         InOpen->Action = Action;
                         InOpen->Remaining = NewRemaining;
 
-                        OpenActions.HeapSort();
+                        Memory->OpenActions.HeapSort();
                     }
                 }
             }
         }
     }
-    Start.State->ConditionalBeginDestroy();
-    return false;
+
+    if (Memory->CurrentIterations >= MaxIterations)
+    {
+        Memory->DisposableRoot->ConditionalBeginDestroy();
+        return ERpaiPlannerResult::CompletedFailure;
+    }
+    return ERpaiPlannerResult::RequiresTick;
+}
+
+ERpaiPlannerResult URpaiPlanner_HUG::ReceiveCancelGoalPlanning_Implementation(
+    const URpaiGoalBase* TargetGoal,
+    const URpaiState* CurrentState,
+    const TArray<URpaiActionBase*>& GivenActions,
+    TArray<URpaiActionBase*>& OutActions,
+    FRpaiMemoryStruct PlannerMemory
+) const
+{
+    FHugPlannerMemory* Memory = PlannerMemory.Get<FHugPlannerMemory>();
+    Memory->OpenActions.Empty();
+    Memory->ClosedActions.Empty();
+    return ERpaiPlannerResult::CompletedCancelled;
+}
+
+bool URpaiPlanner_HUG::ReceivePlanChosenGoal_Implementation(
+    const URpaiGoalBase* TargetGoal,
+    const URpaiState* CurrentState,
+    const TArray<URpaiActionBase*>& GivenActions,
+    TArray<URpaiActionBase*>& OutActions
+) const
+{
+    FRpaiMemory InlineMemory(sizeof(FHugPlannerMemory));
+    FRpaiMemoryStruct InlineMemoryStruct(&InlineMemory, FHugPlannerMemory::StaticStruct());
+    ERpaiPlannerResult Result = StartGoalPlanning(
+        TargetGoal,
+        CurrentState,
+        GivenActions,
+        OutActions,
+        InlineMemoryStruct
+    );
+    while (Result == ERpaiPlannerResult::RequiresTick)
+    {
+        Result = TickGoalPlanning(
+            TargetGoal,
+            CurrentState,
+            GivenActions,
+            OutActions,
+            InlineMemoryStruct
+        );
+    }
+    return Result == ERpaiPlannerResult::CompletedSuccess ? true : false;
 }

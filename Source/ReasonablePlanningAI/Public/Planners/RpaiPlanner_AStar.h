@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Core/RpaiPlannerBase.h"
+#include "Core/RpaiState.h"
 #include "RpaiPlanner_AStar.generated.h"
 
 USTRUCT()
@@ -18,6 +19,28 @@ struct FVisitedState
 	URpaiState* State; // the mutation of the state if this action was to be performed (high memory cost)
 	URpaiActionBase* Action; //non-unique action performed to reach the above state
 };
+
+inline bool operator==(const FVisitedState& LHS, const FVisitedState& RHS)
+{
+	return LHS.Id == RHS.Id;
+}
+
+inline bool operator==(const FVisitedState& LHS, URpaiState* RHS)
+{
+	check(LHS.State != nullptr);
+	check(RHS != nullptr);
+	return LHS.State->IsEqualTo(RHS);
+}
+
+inline bool operator==(const FVisitedState& LHS, const FGuid& RHS)
+{
+	return LHS.Id == RHS;
+}
+
+inline bool operator<(const FVisitedState& LHS, const FVisitedState& RHS)
+{
+	return LHS.Cost + LHS.Remaining < RHS.Cost + RHS.Remaining;
+}
 
 USTRUCT()
 struct FAStarPlannerMemory
@@ -40,6 +63,7 @@ class REASONABLEPLANNINGAI_API URpaiPlanner_AStar : public URpaiPlannerBase
 {
 	GENERATED_BODY()
 
+public:
 	URpaiPlanner_AStar();
 
 protected:
@@ -50,10 +74,6 @@ protected:
 	// Number of iterations to perform per tick until a plan is solved or MaxIterations is capped
 	UPROPERTY(EditAnywhere, Category = Rpai)
 	int32 IterationsPerTick;
-
-	// Will always attempt to output a plan, even if not a solution
-	UPROPERTY(EditAnywhere, Category = Rpai)
-	bool bAlwaysHaveAPlan;
 
 	virtual bool ReceivePlanChosenGoal_Implementation(
 		const URpaiGoalBase* TargetGoal,
@@ -85,5 +105,4 @@ protected:
 		TArray<URpaiActionBase*>& OutActions,
 		FRpaiMemoryStruct PlannerMemory
 	) const override;
-
 };
