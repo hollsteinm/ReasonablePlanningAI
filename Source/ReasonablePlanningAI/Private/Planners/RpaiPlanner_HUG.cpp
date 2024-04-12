@@ -145,7 +145,7 @@ ERpaiPlannerResult URpaiPlanner_HUG::ReceiveTickGoalPlanning_Implementation(
         }
     }
 
-    if (Memory->CurrentIterations >= MaxIterations)
+    if (Memory->CurrentIterations >= MaxIterations || Memory->OpenActions.IsEmpty())
     {
         Memory->DisposableRoot->ConditionalBeginDestroy();
         return ERpaiPlannerResult::CompletedFailure;
