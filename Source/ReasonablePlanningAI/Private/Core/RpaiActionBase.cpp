@@ -44,8 +44,6 @@ void URpaiActionBase::StartAction(AAIController* ActionInstigator, URpaiState* C
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
-	check(ActionTargetActor != nullptr);
-	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Start Action: %s"), *ActionName);
 	ReceiveStartAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
@@ -59,8 +57,6 @@ void URpaiActionBase::UpdateAction(AAIController* ActionInstigator, URpaiState* 
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
-	check(ActionTargetActor != nullptr);
-	check(ActionWorld != nullptr);
 
 	ReceiveUpdateAction(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);
 	if (OnActionUpdated.IsBound())
@@ -73,8 +69,6 @@ void URpaiActionBase::CancelAction(AAIController* ActionInstigator, URpaiState* 
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
-	check(ActionTargetActor != nullptr);
-	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Cancel Action: %s"), *ActionName);
 	ReceiveCancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld, bCancelShouldExitPlan);
@@ -88,8 +82,6 @@ void URpaiActionBase::CompleteAction(AAIController* ActionInstigator, URpaiState
 {
 	check(ActionInstigator != nullptr);
 	check(CurrentState != nullptr);
-	check(ActionTargetActor != nullptr);
-	check(ActionWorld != nullptr);
 
 	UE_VLOG(ActionInstigator->GetPawn(), LogRpai, Log, TEXT("Complete Action: %s"), *ActionName);
 	ReceiveCompleteAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor == nullptr ? ActionInstigator->GetPawn() : ActionTargetActor, ActionWorld == nullptr ? ActionInstigator->GetWorld() : ActionWorld);

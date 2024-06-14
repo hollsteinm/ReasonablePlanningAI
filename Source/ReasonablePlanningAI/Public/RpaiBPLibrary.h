@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Core/RpaiTypes.h"
+#include "Blueprint/BlueprintExceptionInfo.h"
 #include "RpaiBPLibrary.generated.h"
 
 class URpaiState;
