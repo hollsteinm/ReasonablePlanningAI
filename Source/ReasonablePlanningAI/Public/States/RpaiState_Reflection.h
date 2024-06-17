@@ -62,6 +62,7 @@ public:
 	virtual bool DoesHeirarchyHaveAnyLocks(FName PathPrefix) const override;
 	virtual bool LockResource(FName ExactName, UObject* LockingObject = nullptr) override;
 	virtual bool UnlockResource(FName ExactName, UObject* LockingObject = nullptr) override;
+	virtual void GatherStateKeyReferences(TArray<FStateKeyValueReference>& Output) const override;
 
 protected:
 	virtual bool IsEqualTo_Implementation(const URpaiState* OtherState) const override;

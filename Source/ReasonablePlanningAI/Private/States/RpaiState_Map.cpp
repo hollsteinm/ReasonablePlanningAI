@@ -336,3 +336,86 @@ bool URpaiState_Map::UnlockResource(FName ExactName, UObject* OptionalLockingObj
 {
 	return Resources->UnlockResource(OptionalLockingObject == nullptr ? this : OptionalLockingObject, ExactName);
 }
+
+void URpaiState_Map::GatherStateKeyReferences(TArray<FStateKeyValueReference>& Output) const
+{
+	for (const auto& Kvp : BoolValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Bool;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : ClassValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Class;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : EnumValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Enum;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : FloatValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Float;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : IntValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Int;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : NameValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Name;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : ObjectValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Object;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : RotatorValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Rotator;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : StringValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::String;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+
+	for (const auto& Kvp : VectorValues)
+	{
+		FStateKeyValueReference Reference;
+		Reference.ExpectedValueType = EStatePropertyType::Vector;
+		Reference.StateKeyName = Kvp.Key;
+		Output.Add(Reference);
+	}
+}

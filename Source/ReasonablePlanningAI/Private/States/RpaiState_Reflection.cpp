@@ -689,3 +689,102 @@ bool URpaiState_Reflection::UnlockResource(FName ExactName, UObject* OptionalLoc
 {
 	return Resources->UnlockResource(OptionalLockingObject == nullptr ? this : OptionalLockingObject, ExactName);
 }
+
+void URpaiState_Reflection::GatherStateKeyReferences(TArray<FStateKeyValueReference>& Output) const
+{
+	for (TFieldIterator<FProperty> Piter(GetClass(), EFieldIterationFlags::IncludeDeprecated); Piter; ++Piter)
+	{
+		if (Piter->IsA<FBoolProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Bool;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FClassProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Class;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FEnumProperty>())
+		{
+			auto EnumProperty = CastField<FEnumProperty>(*Piter);
+			if (EnumProperty->GetUnderlyingProperty()->IsA<FByteProperty>())
+			{
+				auto ByteProperty = CastField<FByteProperty>(EnumProperty->GetUnderlyingProperty());
+				FStateKeyValueReference Reference;
+				Reference.ExpectedValueType = EStatePropertyType::Enum;
+				Reference.StateKeyName = Piter->NamePrivate;
+				Output.Add(Reference);
+			}
+		}
+		else if (Piter->IsA<FFloatProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Float;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FDoubleProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Float;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FIntProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Int;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FNameProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::Name;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FStrProperty>())
+		{
+			FStateKeyValueReference Reference;
+			Reference.ExpectedValueType = EStatePropertyType::String;
+			Reference.StateKeyName = Piter->NamePrivate;
+			Output.Add(Reference);
+		}
+		else if (Piter->IsA<FObjectProperty>())
+		{
+			TObjectPtr<UObject> Member = CastField<FObjectProperty>(*Piter)->GetPropertyValue_InContainer(this);
+			if (Member != nullptr)
+			{
+				FStateKeyValueReference Reference;
+				Reference.ExpectedValueType = EStatePropertyType::Object;
+				Reference.StateKeyName = Piter->NamePrivate;
+				Output.Add(Reference);
+			}
+		}
+		else if (Piter->IsA<FStructProperty>())
+		{
+			if (auto StructProperty = CastField<FStructProperty>(*Piter))
+			{
+				if (StructProperty->Struct == TBaseStructure<FVector>::Get())
+				{
+					FStateKeyValueReference Reference;
+					Reference.ExpectedValueType = EStatePropertyType::Vector;
+					Reference.StateKeyName = Piter->NamePrivate;
+					Output.Add(Reference);
+				}
+				else if (StructProperty->Struct == TBaseStructure<FRotator>::Get())
+				{
+					FStateKeyValueReference Reference;
+					Reference.ExpectedValueType = EStatePropertyType::Rotator;
+					Reference.StateKeyName = Piter->NamePrivate;
+					Output.Add(Reference);
+				}
+			}
+		}
+	}
+}

@@ -16,7 +16,8 @@ struct FHugPlannerMemory
 	TArray<FVisitedState> ClosedActions; // all of the closed actions terminating
 	int32 CurrentIterations; // used the track the number of executions to plan
 	URpaiState* FutureState; // cached state scratch pad for projection
-	UObject* DisposableRoot; // used as the root for new Objects
+	URpaiState* CurrentState; // used as the root for new Objects
+	URpaiState* Scratch; // for lookups
 	float OriginalWeight; // used to detect divergence.
 };
 

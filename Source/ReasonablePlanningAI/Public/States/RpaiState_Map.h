@@ -97,6 +97,7 @@ public:
 	virtual bool DoesHeirarchyHaveAnyLocks(FName PathPrefix) const override;
 	virtual bool LockResource(FName ExactName, UObject* LockingObject = nullptr) override;
 	virtual bool UnlockResource(FName ExactName, UObject* LockingObject = nullptr) override;
+	virtual void GatherStateKeyReferences(TArray<FStateKeyValueReference>& Output) const override;
 
 	FORCEINLINE void SetAsDynamic(bool bShouldBeDynamic) { bDynamicMapPairs = bShouldBeDynamic; }
 

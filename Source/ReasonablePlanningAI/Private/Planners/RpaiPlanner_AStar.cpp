@@ -28,13 +28,20 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveStartGoalPlanning_Implementation(
     Memory->ClosedActions.Empty();
     Memory->CurrentIterations = 0;
     Memory->FutureState = nullptr;
-    Memory->DisposableRoot = nullptr;
+    Memory->CurrentState = nullptr;
+    Memory->Scratch = nullptr;
 
     if (TargetGoal->IsInDesiredState(CurrentState))
     {
         return ERpaiPlannerResult::CompletedSuccess;
     }
-    Memory->DisposableRoot = NewObject<UObject>(GetTransientPackage(), CurrentState->GetClass());
+    Memory->CurrentState = NewObject<URpaiState>(GetOuter(), CurrentState->GetClass());
+    Memory->FutureState = NewObject<URpaiState>(GetOuter(), CurrentState->GetClass());
+    Memory->Scratch = NewObject<URpaiState>(GetOuter(), CurrentState->GetClass());
+
+    Memory->CurrentState->AddToRoot();
+    Memory->FutureState->AddToRoot();
+    Memory->Scratch->AddToRoot();
 
     FVisitedState Start;
     Start.Id = FGuid::NewGuid();
@@ -42,12 +49,10 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveStartGoalPlanning_Implementation(
     Start.Cost = 0.f;
     Start.Remaining = 0.f;
     Start.ParentId.Invalidate();
-    Start.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
-
-    CurrentState->CopyStateForPredictionTo(Start.State);
+    Start.Snapshot(CurrentState);
 
     Memory->OpenActions.HeapPush(Start);
-    Memory->FutureState = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
+    
     return ERpaiPlannerResult::RequiresTick;
 }
 
@@ -67,8 +72,9 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
         FVisitedState Current;
         Memory->OpenActions.HeapPop(Current);
         Memory->ClosedActions.Push(Current);
+        Current.Materialize(Memory->CurrentState);
 
-        if (TargetGoal->IsInDesiredState(Current.State))
+        if (TargetGoal->IsInDesiredState(Memory->CurrentState))
         {
             do
             {
@@ -80,24 +86,31 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
                 }
                 Current = *Next;
             } while (Current.ParentId.IsValid());
-            Memory->DisposableRoot->ConditionalBeginDestroy();
+            Memory->CurrentState->RemoveFromRoot();
+            Memory->FutureState->RemoveFromRoot();
+            Memory->Scratch->RemoveFromRoot();
             return ERpaiPlannerResult::CompletedSuccess;
         }
 
         for (const auto& Action : GivenActions)
         {
-            if (Action->IsApplicable(Current.State))
+            Current.Materialize(Memory->CurrentState);
+            if (Action->IsApplicable(Memory->CurrentState))
             {
-                Current.State->CopyStateForPredictionTo(Memory->FutureState);
+                Memory->CurrentState->CopyStateForPredictionTo(Memory->FutureState);
                 Action->ApplyToState(Memory->FutureState);
 
-                if (Memory->ClosedActions.FindByKey(Memory->FutureState) != nullptr)
+                if (Memory->ClosedActions.FindByPredicate([Memory](const FVisitedState& LHS) -> bool {
+                    return MaterializeStateIsEqualToGivenState(Memory->Scratch, LHS, Memory->FutureState);
+                 }) != nullptr)
                 {
                     continue;
                 }
 
-                FVisitedState* InOpen = Memory->OpenActions.FindByKey(Memory->FutureState);
-                auto ActionCost = Action->ExecutionWeight(Current.State);
+                FVisitedState* InOpen = Memory->OpenActions.FindByPredicate([Memory](const FVisitedState& LHS) -> bool {
+                    return MaterializeStateIsEqualToGivenState(Memory->Scratch, LHS, Memory->FutureState);
+                });
+                auto ActionCost = Action->ExecutionWeight(Memory->CurrentState);
                 auto NewCost = Current.Cost + ActionCost;
                 auto NewRemaining = TargetGoal->GetDistanceToDesiredState(Memory->FutureState);
 
@@ -109,8 +122,7 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
                     NewNode.Cost = NewCost;
                     NewNode.Remaining = NewRemaining;
                     NewNode.ParentId = Current.Id;
-                    NewNode.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
-                    Memory->FutureState->CopyStateForPredictionTo(NewNode.State);
+                    NewNode.Snapshot(Memory->FutureState);
 
                     Memory->OpenActions.HeapPush(NewNode);
                 }
@@ -132,7 +144,9 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
 
     if (Memory->CurrentIterations >= MaxIterations || Memory->OpenActions.IsEmpty())
     {
-        Memory->DisposableRoot->ConditionalBeginDestroy();
+        Memory->CurrentState->RemoveFromRoot();
+        Memory->FutureState->RemoveFromRoot();
+        Memory->Scratch->RemoveFromRoot();
         return ERpaiPlannerResult::CompletedFailure;
     }
     return ERpaiPlannerResult::RequiresTick;

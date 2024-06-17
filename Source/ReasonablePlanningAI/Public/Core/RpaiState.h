@@ -359,6 +359,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ResonablePlanningAI")
 	virtual bool UnlockResource(FName ExactName, UObject* OptionalLockingObject = nullptr) PURE_VIRTUAL(URpaiState::UnlockResource, return false;);
 
+    /**
+    * Gathers metadata to expose all referencable properties
+    */
+    UFUNCTION(BlueprintCallable, Category = "ResonablePlanningAI")
+    virtual void GatherStateKeyReferences(TArray<FStateKeyValueReference>&Output) const PURE_VIRTUAL(URpaiState::GatherStateKeyReferences);
     // C++ Template Helpers
 
     template<typename T>
