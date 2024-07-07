@@ -8,6 +8,7 @@
 #include "Core/RpaiReasonerBase.h"
 #include "Core/RpaiPlannerBase.h"
 #include "Core/RpaiState.h"
+#include "Core/RpaiSubsystem.h"
 #include "VisualLogger/VisualLoggerTypes.h"
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
@@ -167,7 +168,7 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 	if (bUseMultiTickPlanning && LastPlannerResultForMultiTick == ERpaiPlannerResult::RequiresTick)
 	{
-		auto Planner = AcquirePlanner();
+		auto Planner = DoAcquirePlanner();
 		check(Planner != nullptr);
 
 		TArray<URpaiActionBase*> Actions;
@@ -243,7 +244,7 @@ void URpaiBrainComponent::StartLogic()
 	}
 
 	auto Reasoner = AcquireReasoner();
-	auto Planner = AcquirePlanner();
+	auto Planner = DoAcquirePlanner();
 	if (Reasoner == nullptr || Planner == nullptr)
 	{
 		return;
@@ -344,7 +345,7 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 		TArray<URpaiActionBase*> Actions;
 		AcquireActions(Actions);
 
-		auto Planner = AcquirePlanner();
+		auto Planner = DoAcquirePlanner();
 		if (Planner != nullptr)
 		{
 			Planner->CancelGoalPlanning(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions, CurrentPlannerMemory);
@@ -400,6 +401,13 @@ void URpaiBrainComponent::SetStateFromAi_Implementation(URpaiState* StateToModif
 	}
 }
 
+const URpaiPlannerBase* URpaiBrainComponent::DoAcquirePlanner()
+{
+    const URpaiPlannerBase* Planner = AcquirePlanner();
+    URpaiSubsystem* RpaiSubsystem = URpaiSubsystem::GetCurrent(GetWorld());
+    return RpaiSubsystem->DuplicateOrGetPlannerInstanceInWorldScope(Planner);
+}
+
 FString URpaiBrainComponent::GetDebugInfoString() const
 {
 	FString DebugInfo = Super::GetDebugInfoString();
@@ -412,7 +420,7 @@ FString URpaiBrainComponent::GetDebugInfoString() const
 	DebugInfo += FString::Printf(TEXT("Goal: %s\n"), *CurrentGoalString);
 	if (bUseMultiTickPlanning)
 	{
-		static const UEnum* RpaiPlannerResultEnumType = FindObject<UEnum>(ANY_PACKAGE, TEXT("ERpaiPlannerResult"));
+		static const UEnum* RpaiPlannerResultEnumType = StaticEnum<ERpaiPlannerResult>();
 		check(RpaiPlannerResultEnumType != nullptr);
 		FString LastPlannerResultForMultiTickString = RpaiPlannerResultEnumType->GetNameStringByIndex(static_cast<uint8>(LastPlannerResultForMultiTick));
 		DebugInfo += FString::Printf(TEXT("Last Planning Result: %s\n"), *LastPlannerResultForMultiTickString);

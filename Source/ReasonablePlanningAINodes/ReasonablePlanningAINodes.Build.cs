@@ -6,14 +6,7 @@ namespace UnrealBuildTool.Rules
 	{
 		public ReasonablePlanningAINodes(ReadOnlyTargetRules Target) : base(Target)
 		{
-            PublicIncludePaths.AddRange(
-				new[] {
-                	"ReasonablePlanningAINodes/Public"
-                }
-			);
-				
-		
-			PrivateIncludePaths.AddRange(
+            PrivateIncludePaths.AddRange(
 				new[] {
 					"ReasonablePlanningAINodes/Private"
 				}

@@ -113,6 +113,8 @@ private:
 	FRpaiMemoryStruct CurrentPlannerMemory;
 
 	ERpaiPlannerResult LastPlannerResultForMultiTick;
+    
+    const URpaiPlannerBase* DoAcquirePlanner();
 	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }
