@@ -32,5 +32,6 @@ public:
     }
     
 private:
-    TMap<const URpaiPlannerBase*, const URpaiPlannerBase*> InstantiatedTemplates;    
+    UPROPERTY(Transient)
+    TMap<const URpaiPlannerBase*, const URpaiPlannerBase*> InstantiatedTemplates;
 };

@@ -7,51 +7,57 @@
 #include "Core/RpaiState.h"
 #include "RpaiPlanner_AStar.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FVisitedState
 {
 	GENERATED_BODY()
 
-	FGuid Id; // identifies the Action as a unique execution of the action
-	FGuid ParentId; // the preceeding action that must occur
+	UPROPERTY()
 	float Cost; // calculated effort to perform the action
+
+	UPROPERTY()
 	float Remaining; // distance left to accomplish the goal
-	URpaiState* State; // the mutation of the state if this action was to be performed (high memory cost)
-	URpaiActionBase* Action; //non-unique action performed to reach the above state
+
+	UPROPERTY()
+	int32 StateIndex; // handle to the node state list
+
+	UPROPERTY()
+	int32 ParentIndex; // handle to parent in unordered list
+
+	UPROPERTY()
+	int32 SelfIndex; // handle to self in unordered list
+
+	UPROPERTY()
+	TObjectPtr<URpaiActionBase> Action; //non-unique action performed to reach the above state
 };
-
-inline bool operator==(const FVisitedState& LHS, const FVisitedState& RHS)
-{
-	return LHS.Id == RHS.Id;
-}
-
-inline bool operator==(const FVisitedState& LHS, URpaiState* RHS)
-{
-	check(LHS.State != nullptr);
-	check(RHS != nullptr);
-	return LHS.State->IsEqualTo(RHS);
-}
-
-inline bool operator==(const FVisitedState& LHS, const FGuid& RHS)
-{
-	return LHS.Id == RHS;
-}
 
 inline bool operator<(const FVisitedState& LHS, const FVisitedState& RHS)
 {
 	return LHS.Cost + LHS.Remaining < RHS.Cost + RHS.Remaining;
 }
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FAStarPlannerMemory
 {
 	GENERATED_BODY()
-
+	
+	UPROPERTY()
 	TArray<FVisitedState> OpenActions; // all of the open actions to be explored
+
+	UPROPERTY()
 	TArray<FVisitedState> ClosedActions; // all of the closed actions terminating
+
+	UPROPERTY()
+	TArray<TObjectPtr<URpaiState>> VisitedStates;
+
+	UPROPERTY()
+	TArray<FVisitedState> UnorderedNodes;
+
+	UPROPERTY()
 	int32 CurrentIterations; // used the track the number of executions to plan
+
+	UPROPERTY()
 	URpaiState* FutureState; // cached state scratch pad for projection
-	UObject* DisposableRoot; // used as the root for new Objects
 };
 
 /**
@@ -105,4 +111,9 @@ protected:
 		TArray<URpaiActionBase*>& OutActions,
 		FRpaiMemoryStruct PlannerMemory
 	) const override;
+
+private:
+	void CleanupInstanceMemory(FAStarPlannerMemory* Memory) const;
+
+	static int32 FindEqualNodeFromState(const URpaiState* Lookup, const TArray<TObjectPtr<URpaiState>>& States, const TArray<FVisitedState>& Nodes);
 };

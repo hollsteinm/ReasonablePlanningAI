@@ -26,28 +26,33 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveStartGoalPlanning_Implementation(
     FAStarPlannerMemory* Memory = PlannerMemory.Get<FAStarPlannerMemory>();
     Memory->OpenActions.Empty();
     Memory->ClosedActions.Empty();
+    Memory->VisitedStates.Empty();
+    Memory->UnorderedNodes.Empty();
     Memory->CurrentIterations = 0;
     Memory->FutureState = nullptr;
-    Memory->DisposableRoot = nullptr;
 
     if (TargetGoal->IsInDesiredState(CurrentState))
     {
         return ERpaiPlannerResult::CompletedSuccess;
     }
-    Memory->DisposableRoot = NewObject<UObject>(GetTransientPackage(), CurrentState->GetClass());
 
-    FVisitedState Start;
-    Start.Id = FGuid::NewGuid();
-    Start.Action = nullptr;
+    FVisitedState& Start = Memory->UnorderedNodes.AddDefaulted_GetRef();
+    Start.SelfIndex = Memory->UnorderedNodes.Num() - 1;
     Start.Cost = 0.f;
     Start.Remaining = 0.f;
-    Start.ParentId.Invalidate();
-    Start.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
+    Start.StateIndex = INDEX_NONE;
+    Start.ParentIndex = INDEX_NONE;
+    Start.Action = nullptr;
 
-    CurrentState->CopyStateForPredictionTo(Start.State);
+    const FText FormattedName = FText::Format(FText::FromString(FString("RootState_{0}")), FText::FromString(FGuid::NewGuid().ToString()));
+    URpaiState* StartState = NewObject<URpaiState>(const_cast<URpaiPlanner_AStar*>(this), CurrentState->GetClass(), FName(FormattedName.ToString()));
+    int32 RootIndex = Memory->VisitedStates.Add(StartState);
+
+    Start.StateIndex = RootIndex;
+    CurrentState->CopyStateForPredictionTo(StartState);
 
     Memory->OpenActions.HeapPush(Start);
-    Memory->FutureState = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
+    Memory->FutureState = NewObject<URpaiState>(const_cast<URpaiPlanner_AStar*>(this), CurrentState->GetClass(), TEXT("FutureState"));
     return ERpaiPlannerResult::RequiresTick;
 }
 
@@ -68,61 +73,71 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
         Memory->OpenActions.HeapPop(Current);
         Memory->ClosedActions.Push(Current);
 
-        if (TargetGoal->IsInDesiredState(Current.State))
+        check(Memory->VisitedStates.IsValidIndex(Current.StateIndex));
+        URpaiState* CurrentVisitedState = Memory->VisitedStates[Current.StateIndex];
+        if (TargetGoal->IsInDesiredState(CurrentVisitedState))
         {
-            do
+            for(;;)
             {
-                OutActions.Push(Current.Action);
-                auto Next = Memory->OpenActions.FindByKey(Current.ParentId);
-                if (Next == nullptr)
+                OutActions.Push(Memory->UnorderedNodes[Current.SelfIndex].Action);
+                if (Current.ParentIndex > 0 /*Ignore root node*/ && Memory->UnorderedNodes.IsValidIndex(Current.ParentIndex))
                 {
-                    Next = Memory->ClosedActions.FindByKey(Current.ParentId);
-                }
-                Current = *Next;
-            } while (Current.ParentId.IsValid());
-            Memory->DisposableRoot->ConditionalBeginDestroy();
-            return ERpaiPlannerResult::CompletedSuccess;
-        }
-
-        for (const auto& Action : GivenActions)
-        {
-            if (Action->IsApplicable(Current.State))
-            {
-                Current.State->CopyStateForPredictionTo(Memory->FutureState);
-                Action->ApplyToState(Memory->FutureState);
-
-                if (Memory->ClosedActions.FindByKey(Memory->FutureState) != nullptr)
-                {
-                    continue;
-                }
-
-                FVisitedState* InOpen = Memory->OpenActions.FindByKey(Memory->FutureState);
-                auto ActionCost = Action->ExecutionWeight(Current.State);
-                auto NewCost = Current.Cost + ActionCost;
-                auto NewRemaining = TargetGoal->GetDistanceToDesiredState(Memory->FutureState);
-
-                if (InOpen == nullptr)
-                {
-                    FVisitedState NewNode;
-                    NewNode.Id = FGuid::NewGuid();
-                    NewNode.Action = Action;
-                    NewNode.Cost = NewCost;
-                    NewNode.Remaining = NewRemaining;
-                    NewNode.ParentId = Current.Id;
-                    NewNode.State = NewObject<URpaiState>(Memory->DisposableRoot, CurrentState->GetClass());
-                    Memory->FutureState->CopyStateForPredictionTo(NewNode.State);
-
-                    Memory->OpenActions.HeapPush(NewNode);
+                    Current = Memory->UnorderedNodes[Current.ParentIndex];
                 }
                 else
                 {
-                    if (NewCost < InOpen->Cost)
+                    break;
+                }
+            }
+            CleanupInstanceMemory(Memory);
+            return ERpaiPlannerResult::CompletedSuccess;
+        }
+        else
+        {
+            for (const auto& Action : GivenActions)
+            {
+                if (Action->IsApplicable(CurrentVisitedState))
+                {
+                    // GC Buster
+                    if (Memory->FutureState->IsUnreachable())
                     {
-                        InOpen->ParentId = Current.Id;
-                        InOpen->Cost = NewCost;
-                        InOpen->Action = Action;
-                        InOpen->Remaining = NewRemaining;
+                        Memory->FutureState = NewObject<URpaiState>(const_cast<URpaiPlanner_AStar*>(this), CurrentState->GetClass(), TEXT("FutureState"));
+                    }
+                    CurrentVisitedState->CopyStateForPredictionTo(Memory->FutureState);
+                    Action->ApplyToState(Memory->FutureState);
 
+                    if (Memory->ClosedActions.IsValidIndex(FindEqualNodeFromState(Memory->FutureState, Memory->VisitedStates, Memory->ClosedActions)))
+                    {
+                        continue;
+                    }
+
+                    auto ActionCost = Action->ExecutionWeight(CurrentVisitedState);
+                    auto NewCost = Current.Cost + ActionCost;
+                    auto NewRemaining = TargetGoal->GetDistanceToDesiredState(Memory->FutureState);
+
+                    int32 OpenIndex = FindEqualNodeFromState(Memory->FutureState, Memory->VisitedStates, Memory->OpenActions);
+                    if (!Memory->OpenActions.IsValidIndex(OpenIndex))
+                    {
+                        FVisitedState& NewNode = Memory->UnorderedNodes.AddDefaulted_GetRef();
+                        NewNode.SelfIndex = Memory->UnorderedNodes.Num() - 1;
+                        NewNode.Action = Action;
+                        NewNode.Cost = NewCost;
+                        NewNode.Remaining = NewRemaining;
+                        NewNode.ParentIndex = Current.SelfIndex;
+
+                        auto NewState = NewObject<URpaiState>(const_cast<URpaiPlanner_AStar*>(this), CurrentState->GetClass());
+                        Memory->FutureState->CopyStateForPredictionTo(NewState);
+                        NewNode.StateIndex = Memory->VisitedStates.Add(NewState);
+
+                        // add the number of actions preceeding this action
+                        Memory->OpenActions.HeapPush(NewNode);
+                    }
+                    else if (NewCost < Memory->OpenActions[OpenIndex].Cost)
+                    {
+                        Memory->OpenActions[OpenIndex].ParentIndex = Current.SelfIndex;
+                        Memory->OpenActions[OpenIndex].Cost = NewCost;
+                        Memory->OpenActions[OpenIndex].Action = Action;
+                        Memory->OpenActions[OpenIndex].Remaining = NewRemaining;
                         Memory->OpenActions.HeapSort();
                     }
                 }
@@ -132,10 +147,23 @@ ERpaiPlannerResult URpaiPlanner_AStar::ReceiveTickGoalPlanning_Implementation(
 
     if (Memory->CurrentIterations >= MaxIterations || Memory->OpenActions.IsEmpty())
     {
-        Memory->DisposableRoot->ConditionalBeginDestroy();
+        CleanupInstanceMemory(Memory);
         return ERpaiPlannerResult::CompletedFailure;
     }
     return ERpaiPlannerResult::RequiresTick;
+}
+
+int32 URpaiPlanner_AStar::FindEqualNodeFromState(const URpaiState* Lookup, const TArray<TObjectPtr<URpaiState>>& States, const TArray<FVisitedState>& Nodes)
+{
+    for (int32 Idx = 0; Idx < Nodes.Num(); ++Idx)
+    {
+        auto NodeState = States[Nodes[Idx].StateIndex];
+        if (Lookup->IsEqualTo(NodeState))
+        {
+            return Idx;
+        }
+    }
+    return INDEX_NONE;
 }
 
 ERpaiPlannerResult URpaiPlanner_AStar::ReceiveCancelGoalPlanning_Implementation(
@@ -179,4 +207,26 @@ bool URpaiPlanner_AStar::ReceivePlanChosenGoal_Implementation(
         );
     }
     return Result == ERpaiPlannerResult::CompletedSuccess ? true : false;
+}
+
+void URpaiPlanner_AStar::CleanupInstanceMemory(FAStarPlannerMemory* Memory) const
+{
+    check(Memory != nullptr);
+    if (IsValid(Memory->FutureState))
+    {
+        Memory->FutureState->ConditionalBeginDestroy();
+    }
+
+    for (auto& State : Memory->VisitedStates)
+    {
+        if (IsValid(State))
+        {
+            State->ConditionalBeginDestroy();
+        }
+    }
+
+    Memory->OpenActions.Empty();
+    Memory->ClosedActions.Empty();
+    Memory->VisitedStates.Empty();
+    Memory->UnorderedNodes.Empty();
 }

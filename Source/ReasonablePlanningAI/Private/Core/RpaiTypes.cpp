@@ -142,6 +142,18 @@ FRpaiMemoryStruct::FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* Fro
 		Type->InitializeDefaultValue(MemoryStart);
 	}
 
+	/**
+	* The intended uses of the struct types loaded by this "memory manager" is to provide
+	* dynamic creation and storage of structs in both C++ and Blueprints. A consequence of this
+	* is that the USTRUCT never really makes an appearance in the Asset, Editor, or Game CDOs or 
+	* objects tracked for garbage collection. This means that if a USTRUCT used in this manner contains
+	* a strong pointer to a UObject (via UPROPERTY or TSharedPtr and fam) it will not actually get
+	* tracked properly by the GC, but for all intents it is a valid object. IsValid calls will be true but
+	* IsUnreachable will also be true! By post loading here we can ensure that the proper object references
+	* are tracked. This keeps it simple for compatible experience across C++ and Blueprints.
+	**/
+	Type->PostLoad();
+
 	AddRef();
 }
 
