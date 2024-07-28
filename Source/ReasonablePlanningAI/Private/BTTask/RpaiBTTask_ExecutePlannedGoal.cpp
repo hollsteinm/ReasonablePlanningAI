@@ -210,7 +210,7 @@ void URpaiBTTask_ExecutePlannedGoal::DescribeRuntimeValues(const UBehaviorTreeCo
 	{
 		FExecutePlannedGoalMemory* PlannedGoalMemory = (FExecutePlannedGoalMemory*)NodeMemory;
 
-		static const UEnum* RpaiPlannerResultEnumType = FindObject<UEnum>(ANY_PACKAGE, TEXT("ERpaiPlannerResult"));
+		static const UEnum* RpaiPlannerResultEnumType = StaticEnum<ERpaiPlannerResult>();
 		check(RpaiPlannerResultEnumType != nullptr);
 		FString LastPlannerResultForMultiTickString = RpaiPlannerResultEnumType->GetNameStringByIndex(static_cast<uint8>(PlannedGoalMemory->LastPlanningResult));
 		Values.Add(FString::Printf(TEXT("Last Planning Result: %s\n"), *LastPlannerResultForMultiTickString));

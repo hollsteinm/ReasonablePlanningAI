@@ -12,11 +12,25 @@ struct FHugPlannerMemory
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	TArray<FVisitedState> OpenActions; // all of the open actions to be explored
+
+	UPROPERTY()
 	TArray<FVisitedState> ClosedActions; // all of the closed actions terminating
+
+	UPROPERTY()
+	TArray<TObjectPtr<URpaiState>> VisitedStates;
+
+	UPROPERTY()
+	TArray<FVisitedState> UnorderedNodes;
+
+	UPROPERTY()
 	int32 CurrentIterations; // used the track the number of executions to plan
+
+	UPROPERTY()
 	URpaiState* FutureState; // cached state scratch pad for projection
-	UObject* DisposableRoot; // used as the root for new Objects
+
+	UPROPERTY()
 	float OriginalWeight; // used to detect divergence.
 };
 
@@ -80,4 +94,9 @@ protected:
 		TArray<URpaiActionBase*>& OutActions,
 		FRpaiMemoryStruct PlannerMemory
 	) const override;
+
+private:
+	void CleanupInstanceMemory(FHugPlannerMemory* Memory) const;
+
+	static int32 FindEqualNodeFromState(const URpaiState* Lookup, const TArray<TObjectPtr<URpaiState>>& States, const TArray<FVisitedState>& Nodes);
 };
