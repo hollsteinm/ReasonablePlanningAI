@@ -115,6 +115,8 @@ private:
 	ERpaiPlannerResult LastPlannerResultForMultiTick;
     
     const URpaiPlannerBase* DoAcquirePlanner();
+
+	const URpaiPlannerBase* CurrentPlanner;
 	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }

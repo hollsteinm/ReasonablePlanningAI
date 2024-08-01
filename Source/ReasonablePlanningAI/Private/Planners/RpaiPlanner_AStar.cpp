@@ -15,6 +15,19 @@ URpaiPlanner_AStar::URpaiPlanner_AStar()
     PlannerMemoryStructType = FAStarPlannerMemory::StaticStruct();
 }
 
+FString URpaiPlanner_AStar::GetDebugInfoString(FRpaiMemoryStruct PlannerMemory) const
+{
+    if (PlannerMemory.IsCompatibleType(PlannerMemoryStructType))
+    {
+        FAStarPlannerMemory* Memory = PlannerMemory.Get<FAStarPlannerMemory>();
+        return FString::Printf(TEXT("A* Planner\n\tOpen Actions: %i\n\tClosed Actions: %i\n\tVisited States: %i\n"), Memory->OpenActions.Num(), Memory->ClosedActions.Num(), Memory->VisitedStates.Num());
+    }
+    else
+    {
+        return TEXT("Invalid Planner Memory Type!\n");
+    }
+}
+
 ERpaiPlannerResult URpaiPlanner_AStar::ReceiveStartGoalPlanning_Implementation(
     const URpaiGoalBase* TargetGoal,
     const URpaiState* CurrentState,

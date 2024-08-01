@@ -56,6 +56,11 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Rpai")
 	virtual FRpaiMemoryStruct AllocateMemorySlice(UPARAM(Ref) FRpaiMemory& FromMemory) const;
 
+	/**
+	* Write debug info strings
+	**/
+	virtual FString GetDebugInfoString(FRpaiMemoryStruct PlannerMemory) const { return TEXT(""); };
+
 protected:
 	/**
 	* Struct used for runtime memory for each execution.

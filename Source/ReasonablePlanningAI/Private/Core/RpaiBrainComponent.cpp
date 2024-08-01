@@ -405,7 +405,8 @@ const URpaiPlannerBase* URpaiBrainComponent::DoAcquirePlanner()
 {
     const URpaiPlannerBase* Planner = AcquirePlanner();
     URpaiSubsystem* RpaiSubsystem = URpaiSubsystem::GetCurrent(GetWorld());
-    return RpaiSubsystem->DuplicateOrGetPlannerInstanceInWorldScope(Planner);
+    CurrentPlanner = RpaiSubsystem->DuplicateOrGetPlannerInstanceInWorldScope(Planner);
+	return CurrentPlanner;
 }
 
 FString URpaiBrainComponent::GetDebugInfoString() const
@@ -426,6 +427,11 @@ FString URpaiBrainComponent::GetDebugInfoString() const
 		DebugInfo += FString::Printf(TEXT("Last Planning Result: %s\n"), *LastPlannerResultForMultiTickString);
 	}
 	DebugInfo += FString::Printf(TEXT("Action: %s\n"), *CurrentActionString);
+
+	if (IsValid(CurrentPlanner))
+	{
+		DebugInfo += CurrentPlanner->GetDebugInfoString(CurrentPlannerMemory);
+	}
 	DebugInfo += FString::Printf(TEXT("Remaining Planned Actions (%i):\n"), PlannedActions.Num());
 	for (const auto PlannedAction : PlannedActions)
 	{

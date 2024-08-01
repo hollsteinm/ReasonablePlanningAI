@@ -16,6 +16,19 @@ URpaiPlanner_HUG::URpaiPlanner_HUG()
     PlannerMemoryStructType = FHugPlannerMemory::StaticStruct();
 }
 
+FString URpaiPlanner_HUG::GetDebugInfoString(FRpaiMemoryStruct PlannerMemory) const
+{
+    if (PlannerMemory.IsCompatibleType(PlannerMemoryStructType))
+    {
+        FHugPlannerMemory* Memory = PlannerMemory.Get<FHugPlannerMemory>();
+        return FString::Printf(TEXT("HUG Planner\n\tOriginal Goal Weight: %.10f\n\tOpen Actions: %i\n\tClosed Actions: %i\n\tVisited States: %i\n"), Memory->OriginalWeight, Memory->OpenActions.Num(), Memory->ClosedActions.Num(), Memory->VisitedStates.Num());
+    }
+    else
+    {
+        return TEXT("Invalid Planner Memory Type!\n");
+    }
+}
+
 ERpaiPlannerResult URpaiPlanner_HUG::ReceiveStartGoalPlanning_Implementation(
     const URpaiGoalBase* TargetGoal,
     const URpaiState* CurrentState,
@@ -31,6 +44,7 @@ ERpaiPlannerResult URpaiPlanner_HUG::ReceiveStartGoalPlanning_Implementation(
     Memory->UnorderedNodes.Empty();
     Memory->CurrentIterations = 0;
     Memory->FutureState = nullptr;
+    Memory->OriginalWeight = TargetGoal->GetWeight(CurrentState);
 
     if (TargetGoal->IsInDesiredState(CurrentState))
     {

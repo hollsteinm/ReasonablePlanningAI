@@ -45,6 +45,8 @@ class REASONABLEPLANNINGAI_API URpaiPlanner_HUG : public URpaiPlannerBase
 public:
 	URpaiPlanner_HUG();
 
+	virtual FString GetDebugInfoString(FRpaiMemoryStruct PlannerMemory) const override;
+
 protected:
 	// Used as a method to control planning so we don't go on an exhaustive journey
 	UPROPERTY(EditAnywhere, Category = Rpai)
