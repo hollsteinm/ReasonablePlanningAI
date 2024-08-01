@@ -7,6 +7,7 @@
 #include "Composer/Distances/RpaiDistance_Integer.h"
 #include "Composer/Distances/RpaiDistance_Rotator.h"
 #include "Composer/Distances/RpaiDistance_Vector.h"
+#include "Composer/Distances/RpaiDistance_CurveFloat.h"
 #include "States/RpaiState_Map.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec, "ReasonablePlanningAI.Distance.Bool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
@@ -653,4 +654,47 @@ void ReasonablePlanningDistanceStateSpec::Define()
 				});
 		});
 
+}
+
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceCurveFloatSpec, "ReasonablePlanningAI.Distance.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+URpaiDistance_CurveFloat* ClassUnderTest;
+URpaiDistance_Float* GivenDistance;
+URpaiState* GivenState;
+UCurveFloat* GivenCurve;
+END_DEFINE_SPEC(ReasonablePlanningDistanceCurveFloatSpec)
+void ReasonablePlanningDistanceCurveFloatSpec::Define()
+{
+	Describe("Calculating Distance for float type as an absolute value", [this]()
+		{
+			BeforeEach([this]()
+				{
+					auto MapState = NewObject<URpaiState_Map>();
+					MapState->SetAsDynamic(true);
+
+					ClassUnderTest = NewObject<URpaiDistance_CurveFloat>();
+					GivenCurve = NewObject<UCurveFloat>();
+					GivenCurve->CreateCurveFromCSVString("0,0\r\n1,2\r\n");
+					ClassUnderTest->SetCurve(GivenCurve);
+					GivenDistance = NewObject<URpaiDistance_Float>();
+					ClassUnderTest->SetDistance(GivenDistance);
+					GivenState = MapState;
+				});
+
+			It("should use the distance result from the distance applied to the curve", [this]()
+				{
+					GivenState->SetFloat("LHS", 2.0f);
+					GivenDistance->SetRHS(1.f);
+					TestEqual("URpaiDistance_CurveFloat::CalculateDistance", ClassUnderTest->CalculateDistance(GivenState), 2.f);
+				});
+
+			
+
+			AfterEach([this]()
+				{
+					ClassUnderTest->ConditionalBeginDestroy();
+					GivenState->ConditionalBeginDestroy();
+					GivenCurve->ConditionalBeginDestroy();
+					GivenDistance->ConditionalBeginDestroy();
+				});
+		});
 }

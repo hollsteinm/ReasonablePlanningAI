@@ -21,12 +21,16 @@ URpaiActionTask_Wait::URpaiActionTask_Wait()
 void URpaiActionTask_Wait::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
 	FActionTaskWait* WaitMemory = ActionMemory.Get<FActionTaskWait>();
-	float WaitTime = FMath::FRandRange(FMath::Max(0.f, WaitTimeSeconds - RandomDeviation), WaitTimeSeconds + RandomDeviation);
-	ActionWorld->GetTimerManager().SetTimer(WaitMemory->ActiveHandle, FTimerDelegate::CreateUObject(this, &URpaiActionTask_Wait::CompleteActionTask, ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld), WaitTime, false);
+	WaitMemory->RemainingSeconds = FMath::FRandRange(FMath::Max(0.f, WaitTimeSeconds - RandomDeviation), WaitTimeSeconds + RandomDeviation);
 }
 
-void URpaiActionTask_Wait::ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
+void URpaiActionTask_Wait::ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	ActionWorld->GetTimerManager().ClearTimer(ActionMemory.Get<FActionTaskWait>()->ActiveHandle);
+	FActionTaskWait* WaitMemory = ActionMemory.Get<FActionTaskWait>();
+	WaitMemory->RemainingSeconds -= DeltaSeconds;
+	if (WaitMemory->RemainingSeconds <= 0.f)
+	{
+		CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+	}
 }
 

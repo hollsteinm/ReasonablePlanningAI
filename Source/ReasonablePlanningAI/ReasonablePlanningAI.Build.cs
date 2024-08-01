@@ -7,15 +7,6 @@ public class ReasonablePlanningAI : ModuleRules
 	public ReasonablePlanningAI(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[]
-            {
-                "ReasonablePlanningAI/Public"
-            }
-			);
-				
-		
 		PrivateIncludePaths.AddRange(
 			new string[]
             {

@@ -8,9 +8,12 @@
 #include "Core/RpaiReasonerBase.h"
 #include "Core/RpaiPlannerBase.h"
 #include "Core/RpaiState.h"
+#include "Core/RpaiSubsystem.h"
 #include "VisualLogger/VisualLoggerTypes.h"
 #include "VisualLogger/VisualLogger.h"
 #include "AIController.h"
+
+DECLARE_CYCLE_STAT(TEXT("Execute Plan Actions"), STAT_ExecutePlanActions, STATGROUP_Rpai);
 
 static const FRpaiMemory::MemorySizeType DefaultBlockSize = 256;
 
@@ -76,6 +79,7 @@ void URpaiBrainComponent::PopNextAction()
 {
 	if (PlannedActions.Num() > 0)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_ExecutePlanActions);
 		UnregisterOldAction(CurrentAction);
 		CurrentAction = PlannedActions.Pop();
 		check(CurrentAction != nullptr);
@@ -106,7 +110,15 @@ void URpaiBrainComponent::OnActionCompleted(URpaiActionBase* CompletedAction, AA
 	}
 
 	UE_VLOG(GetOwner(), LogRpai, Log, TEXT("Action Completed %s"), *CompletedAction->GetActionName());
-	PopNextAction();
+	if (PlannedActions.Num() <= 0)
+	{
+		UnregisterOldAction(CurrentAction);
+		CurrentAction = nullptr;
+	}
+	else
+	{
+		PopNextAction();
+	}
 }
 
 void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AAIController* ActionInstigator, URpaiState* CompletedOnState, bool bCancelShouldExitPlan)
@@ -133,6 +145,12 @@ void URpaiBrainComponent::OnActionCancelled(URpaiActionBase* CancelledAction, AA
 	if (bCancelShouldExitPlan)
 	{
 		PlannedActions.Empty();
+		CurrentAction = nullptr;
+	}
+	else if (PlannedActions.Num() <= 0)
+	{
+		UnregisterOldAction(CurrentAction);
+		CurrentAction = nullptr;
 	}
 	else
 	{
@@ -150,7 +168,7 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 	if (bUseMultiTickPlanning && LastPlannerResultForMultiTick == ERpaiPlannerResult::RequiresTick)
 	{
-		auto Planner = AcquirePlanner();
+		auto Planner = DoAcquirePlanner();
 		check(Planner != nullptr);
 
 		TArray<URpaiActionBase*> Actions;
@@ -182,6 +200,7 @@ void URpaiBrainComponent::TickComponent(float DeltaTime, enum ELevelTick TickTyp
 
 	if (CurrentAction != nullptr)
 	{
+		SCOPE_CYCLE_COUNTER(STAT_ExecutePlanActions);
 		CurrentAction->UpdateAction(AIOwner, LoadOrCreateStateFromAi(), DeltaTime, CurrentActionMemory, AIOwner->GetPawn(), AIOwner->GetWorld());
 	}
 	else if (PlannedActions.Num() <= 0 && LastPlannerResultForMultiTick != ERpaiPlannerResult::RequiresTick)
@@ -225,7 +244,7 @@ void URpaiBrainComponent::StartLogic()
 	}
 
 	auto Reasoner = AcquireReasoner();
-	auto Planner = AcquirePlanner();
+	auto Planner = DoAcquirePlanner();
 	if (Reasoner == nullptr || Planner == nullptr)
 	{
 		return;
@@ -326,7 +345,7 @@ void URpaiBrainComponent::StopLogic(const FString& Reason)
 		TArray<URpaiActionBase*> Actions;
 		AcquireActions(Actions);
 
-		auto Planner = AcquirePlanner();
+		auto Planner = DoAcquirePlanner();
 		if (Planner != nullptr)
 		{
 			Planner->CancelGoalPlanning(CurrentGoal, LoadOrCreateStateFromAi(), Actions, PlannedActions, CurrentPlannerMemory);
@@ -382,6 +401,14 @@ void URpaiBrainComponent::SetStateFromAi_Implementation(URpaiState* StateToModif
 	}
 }
 
+const URpaiPlannerBase* URpaiBrainComponent::DoAcquirePlanner()
+{
+    const URpaiPlannerBase* Planner = AcquirePlanner();
+    URpaiSubsystem* RpaiSubsystem = URpaiSubsystem::GetCurrent(GetWorld());
+    CurrentPlanner = RpaiSubsystem->DuplicateOrGetPlannerInstanceInWorldScope(Planner);
+	return CurrentPlanner;
+}
+
 FString URpaiBrainComponent::GetDebugInfoString() const
 {
 	FString DebugInfo = Super::GetDebugInfoString();
@@ -394,12 +421,17 @@ FString URpaiBrainComponent::GetDebugInfoString() const
 	DebugInfo += FString::Printf(TEXT("Goal: %s\n"), *CurrentGoalString);
 	if (bUseMultiTickPlanning)
 	{
-		static const UEnum* RpaiPlannerResultEnumType = FindObject<UEnum>(ANY_PACKAGE, TEXT("ERpaiPlannerResult"));
+		static const UEnum* RpaiPlannerResultEnumType = StaticEnum<ERpaiPlannerResult>();
 		check(RpaiPlannerResultEnumType != nullptr);
 		FString LastPlannerResultForMultiTickString = RpaiPlannerResultEnumType->GetNameStringByIndex(static_cast<uint8>(LastPlannerResultForMultiTick));
 		DebugInfo += FString::Printf(TEXT("Last Planning Result: %s\n"), *LastPlannerResultForMultiTickString);
 	}
 	DebugInfo += FString::Printf(TEXT("Action: %s\n"), *CurrentActionString);
+
+	if (IsValid(CurrentPlanner))
+	{
+		DebugInfo += CurrentPlanner->GetDebugInfoString(CurrentPlannerMemory);
+	}
 	DebugInfo += FString::Printf(TEXT("Remaining Planned Actions (%i):\n"), PlannedActions.Num());
 	for (const auto PlannedAction : PlannedActions)
 	{

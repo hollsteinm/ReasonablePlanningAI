@@ -22,13 +22,14 @@ public:
     /**
     * In a system of N-M States to AIControllers where N exceeds M, it may be better to implement this function to support setting state rather than overriding the Brain Component method. This is what the default brain component uses to set state.
     **/
-    virtual void SetStateFromController(const AAIController* FromController);
+    UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Rpai")
+    void SetStateFromController(const AAIController* FromController);
 
     /**
     * Determine if the internal state properties are equal to each other. Answer the question of, are we already in this state?
     */
-    UFUNCTION(BlueprintPure, Category = "Rpai")
-    virtual bool IsEqualTo(const URpaiState* OtherState) const;
+    UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "Rpai")
+    bool IsEqualTo(const URpaiState* OtherState) const;
 
     /**
      * Sets the boolean value defined with the given name. Implementation determines if values can be created (new) or only ever set based on a
@@ -458,4 +459,9 @@ public:
 
     template<>
     FORCEINLINE void SetValueOfType(FName ValueName, UObject* NewValue) { SetObject(ValueName, NewValue); }
+
+protected:
+    virtual void SetStateFromController_Implementation(const AAIController* FromController);
+    virtual bool IsEqualTo_Implementation(const URpaiState* OtherState) const;
+
 };

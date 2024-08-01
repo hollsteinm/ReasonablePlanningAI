@@ -45,7 +45,7 @@ URpaiState_Reflection::URpaiState_Reflection()
 {
 }
 
-bool URpaiState_Reflection::IsEqualTo(const URpaiState* OtherState) const
+bool URpaiState_Reflection::IsEqualTo_Implementation(const URpaiState* OtherState) const
 {
 	check(OtherState != nullptr);
 	if (OtherState == this)

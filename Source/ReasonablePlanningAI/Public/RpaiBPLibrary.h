@@ -5,6 +5,10 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Core/RpaiTypes.h"
+#include "Misc/EngineVersionComparison.h"
+#if UE_VERSION_NEWER_THAN(5,3,2)
+#include "Blueprint/BlueprintExceptionInfo.h"
+#endif
 #include "RpaiBPLibrary.generated.h"
 
 class URpaiState;

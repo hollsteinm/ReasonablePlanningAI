@@ -35,7 +35,7 @@ bool URpaiGoalBase::ReceiveIsInDesiredState_Implementation(const URpaiState* Giv
 
 float URpaiGoalBase::ReceiveGetDistanceToDesiredState_Implementation(const URpaiState* GivenState) const
 {
-	return TNumericLimits<float>::Max();
+	return 0.f;
 }
 
 bool URpaiGoalBase::ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const
@@ -45,7 +45,7 @@ bool URpaiGoalBase::ReceiveIsApplicable_Implementation(const URpaiState* GivenSt
 
 float URpaiGoalBase::ReceiveGetWeight_Implementation(const URpaiState* GivenState) const
 {
-	return TNumericLimits<float>::Min();
+	return 0.f;
 }
 
 FString URpaiGoalBase::GetGoalName() const

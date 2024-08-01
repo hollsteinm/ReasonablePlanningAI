@@ -10,7 +10,7 @@
 
 FRpaiMemoryStruct URpaiComposerAction::AllocateMemorySlice(FRpaiMemory& FromMemory) const
 {
-	if (ActionTask != nullptr)
+	if (IsValid(ActionTask))
 	{
 		return ActionTask->AllocateMemorySlice(FromMemory);
 	}
@@ -39,22 +39,14 @@ void URpaiComposerAction::HandleActionTaskCancelled(URpaiComposerActionTaskBase*
 
 float URpaiComposerAction::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
-	check(WeightAlgorithm != nullptr);
-	return WeightAlgorithm->ExecutionWeight(GivenState);
+	return IsValid(WeightAlgorithm) ? WeightAlgorithm->ExecutionWeight(GivenState) : 0.f;
 }
 
 void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	check(ActionTask != nullptr);
-	if (LockResourceOnStart.IsNone())
+	if (IsValid(ActionTask))
 	{
-		ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
-		ActionTask->OnActionTaskCancelled().AddUObject(this, &URpaiComposerAction::HandleActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
-		ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
-	}
-	else
-	{
-		if (CurrentState->LockResource(LockResourceOnStart, this))
+		if (LockResourceOnStart.IsNone())
 		{
 			ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
 			ActionTask->OnActionTaskCancelled().AddUObject(this, &URpaiComposerAction::HandleActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
@@ -62,34 +54,49 @@ void URpaiComposerAction::ReceiveStartAction_Implementation(AAIController* Actio
 		}
 		else
 		{
-			CancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+			if (CurrentState->LockResource(LockResourceOnStart, this))
+			{
+				ActionTask->OnActionTaskComplete().AddUObject(this, &URpaiComposerAction::HandleActionTaskCompleted, ActionMemory, ActionTargetActor, ActionWorld);
+				ActionTask->OnActionTaskCancelled().AddUObject(this, &URpaiComposerAction::HandleActionTaskCancelled, ActionMemory, ActionTargetActor, ActionWorld);
+				ActionTask->StartActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+			}
+			else
+			{
+				CancelAction(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+			}
 		}
 	}
 }
 
 void URpaiComposerAction::ReceiveUpdateAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	check(ActionTask != nullptr);
-	ActionTask->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor, ActionWorld);
+	if (IsValid(ActionTask))
+	{
+		ActionTask->UpdateActionTask(ActionInstigator, CurrentState, DeltaSeconds, ActionMemory, ActionTargetActor, ActionWorld);
+	}
 }
 
 void URpaiComposerAction::ReceiveCancelAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, bool bCancelShouldExitPlan)
 {
-	check(ActionTask != nullptr);
-	ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
-	if (!LockResourceOnStart.IsNone())
+	if (IsValid(ActionTask))
 	{
-		CurrentState->UnlockResource(LockResourceOnStart, this);
+		ActionTask->CancelActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld, bCancelShouldExitPlan);
+		if (!LockResourceOnStart.IsNone())
+		{
+			CurrentState->UnlockResource(LockResourceOnStart, this);
+		}
 	}
 }
 
 void URpaiComposerAction::ReceiveCompleteAction_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	check(ActionTask != nullptr);
-	ActionTask->CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
-	if (!LockResourceOnStart.IsNone())
+	if (IsValid(ActionTask))
 	{
-		CurrentState->UnlockResource(LockResourceOnStart, this);
+		ActionTask->CompleteActionTask(ActionInstigator, CurrentState, ActionMemory, ActionTargetActor, ActionWorld);
+		if (!LockResourceOnStart.IsNone())
+		{
+			CurrentState->UnlockResource(LockResourceOnStart, this);
+		}
 	}
 }
 
@@ -97,13 +104,15 @@ void URpaiComposerAction::ReceiveApplyToState_Implementation(URpaiState* GivenSt
 {
     for(const auto Mutator : ApplyToStateMutators)
     {
-        Mutator->Mutate(GivenState);
+		if (IsValid(Mutator))
+		{
+			Mutator->Mutate(GivenState);
+		}
     }
 }
 
 bool URpaiComposerAction::ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const
 {
 	check(GivenState != nullptr);
-	check(IsApplicableQuery != nullptr);
-	return IsApplicableQuery->Query(GivenState) == EStateQueryResult::Succeeded;
+	return IsValid(IsApplicableQuery) ? IsApplicableQuery->Query(GivenState) == EStateQueryResult::Succeeded : false;
 }
