@@ -26,7 +26,7 @@ private:
 	TAttribute<URpaiComposerBehavior*> ComposerBehavior;
 
 	// Internal state
-	URpaiState* TestStartingState;
+	TObjectPtr<URpaiState> TestStartingState;
 	TSharedPtr<IDetailsView> TestStartingStateDetailView;
 
 	// Evaluation state management

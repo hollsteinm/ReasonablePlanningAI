@@ -46,7 +46,7 @@ void FComposerBehaviorEditorToolkit::RegisterTabSpawners(const TSharedRef<class 
  
     WorkspaceMenuCategory = InTabManager->AddLocalWorkspaceMenuCategory(INVTEXT("RPAI Composer Behavior Editor"));
  
-    InTabManager->RegisterTabSpawner("RpaiComposerBehaviorExperimentTab", FOnSpawnTab::CreateLambda([=](const FSpawnTabArgs&)
+    InTabManager->RegisterTabSpawner("RpaiComposerBehaviorExperimentTab", FOnSpawnTab::CreateLambda([this](const FSpawnTabArgs&)
     {
         return SNew(SDockTab)
         [
