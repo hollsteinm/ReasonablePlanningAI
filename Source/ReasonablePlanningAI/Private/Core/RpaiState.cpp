@@ -18,5 +18,5 @@ bool URpaiState::HasReferencedState(const FStateKeyValueReference& StateProperty
 
 void URpaiState::SetStateFromController_Implementation(const AAIController* FromController)
 {
-
+   
 }

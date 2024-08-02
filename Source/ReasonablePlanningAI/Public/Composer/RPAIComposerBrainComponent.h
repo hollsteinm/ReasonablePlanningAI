@@ -25,12 +25,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void SetReasonablePlanningBehavior(URpaiComposerBehavior* NewBehavior);
 
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+	// Component Lifecycle
+	virtual void OnRegister() override;
+
 protected:
-	virtual const URpaiReasonerBase* AcquireReasoner_Implementation();
-	virtual const URpaiPlannerBase* AcquirePlanner_Implementation();
-	virtual void AcquireGoals_Implementation(TArray<URpaiGoalBase*>& OutGoals);
-	virtual void AcquireActions_Implementation(TArray<URpaiActionBase*>& OutActions);
-	virtual TSubclassOf<URpaiState> GetStateType_Implementation();
+	virtual const URpaiReasonerBase* AcquireReasoner_Implementation() override;
+	virtual const URpaiPlannerBase* AcquirePlanner_Implementation() override;
+	virtual void AcquireGoals_Implementation(TArray<URpaiGoalBase*>& OutGoals) override;
+	virtual void AcquireActions_Implementation(TArray<URpaiActionBase*>& OutActions) override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Rpai")

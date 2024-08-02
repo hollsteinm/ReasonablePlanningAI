@@ -23,6 +23,7 @@ public class ReasonablePlanningAI : ModuleRules
 				"GameplayTags",
 				"GameplayTasks",
 				"NavigationSystem",
+                "PropertyPath"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -34,8 +35,7 @@ public class ReasonablePlanningAI : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
-				"PropertyPath"
+				"SlateCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
