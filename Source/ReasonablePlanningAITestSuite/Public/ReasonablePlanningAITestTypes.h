@@ -111,5 +111,19 @@ struct FTestStruct
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	int32 Value;
+};
+
+
+USTRUCT(BlueprintType)
+struct FComplexTestStruct
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	float Value;
+
+	UPROPERTY()
+	FTestStruct Inner;
 };

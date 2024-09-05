@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PropertyPathHelpers.h"
 #include "RpaiTypes.generated.h"
 
 DECLARE_STATS_GROUP(TEXT("Rpai"), STATGROUP_Rpai, STATCAT_Advanced);
@@ -188,4 +189,133 @@ enum class ERpaiPlannerResult : uint8
 	CompletedSuccess,
 	RequiresTick,
 	Invalid
+};
+
+// V2
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FStateSourcePropertyHandle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 Handle;
+
+	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FStateSourceTypeHandle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 Handle;
+
+	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FStateTargetPropertyHandle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 Handle;
+
+	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FStateTargetTypeHandle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 Handle;
+
+	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FStateBindingHandle
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FStateSourceTypeHandle StateSourceTypeHandle;
+
+	UPROPERTY()
+	FStateSourcePropertyHandle StateSourcePropertyHandle;
+
+	UPROPERTY()
+	FStateTargetTypeHandle StateTargetTypeHandle;
+
+	UPROPERTY()
+	FStateTargetPropertyHandle StateTargetPropertyHandle;
+
+	UPROPERTY()
+	int32 Handle;
+
+	FORCEINLINE bool IsValid() const {
+		return
+			Handle != INDEX_NONE &&
+			StateSourceTypeHandle.IsValid() &&
+			StateSourcePropertyHandle.IsValid() &&
+			StateTargetTypeHandle.IsValid() &&
+			StateTargetPropertyHandle.IsValid();
+	}
+
+	// TODO: Add C++ notification callbacks for rebinds and resorts
+};
+
+USTRUCT(BlueprintType)
+struct FRpaiCachedPropertyPath : public FCachedPropertyPath
+{
+    GENERATED_BODY()
+    
+    REASONABLEPLANNINGAI_API FRpaiCachedPropertyPath();
+
+    REASONABLEPLANNINGAI_API FRpaiCachedPropertyPath(const FString& Path);
+
+    REASONABLEPLANNINGAI_API FRpaiCachedPropertyPath(const TArray<FString>& PropertyChain);
+
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FRpaiStateTypePropertyMultiBind
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category=Rpai)
+	TObjectPtr<UStruct> TargetBindingClass;
+
+    UPROPERTY(EditAnywhere, Category=Rpai)
+	TArray<FRpaiCachedPropertyPath> BoundProperties;
+
+	int32 AddBinding(const FString& PropertyName);
+
+	void RemoveBinding(int32 BindingHandle);
+};
+
+USTRUCT(BlueprintType)
+struct REASONABLEPLANNINGAI_API FRpaiStateBinding
+{
+	GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, Category=Rpai)
+	TArray<FRpaiStateTypePropertyMultiBind> SourceBindings;
+    
+    UPROPERTY(EditAnywhere, Category=Rpai)
+	TArray<FRpaiStateTypePropertyMultiBind> TargetBindings;
+
+	UPROPERTY(EditAnywhere, Category=Rpai)
+	TArray<FStateBindingHandle> BindingHandles;
+
+	FStateBindingHandle AddBinding(TObjectPtr<UStruct> SourceType, const FString& SourcePropertyName, TObjectPtr<UStruct> TargetType, const FString& TargetPropertyName);
+	void RemoveBinding(const FStateBindingHandle& Handle);
+	
+	bool Transfer(const UObject* Source, FRpaiMemoryStruct& Target) const;
+    bool Transfer(const UObject* Source, uint8* TargetData, UScriptStruct* TargetStructType) const;
+    bool Transfer(const UObject* Source, UObject* Target) const;
+    bool Transfer(const AActor* Source, UObject* Target) const;
 };

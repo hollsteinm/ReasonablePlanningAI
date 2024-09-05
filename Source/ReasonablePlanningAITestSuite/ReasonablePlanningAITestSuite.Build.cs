@@ -24,7 +24,8 @@ namespace UnrealBuildTool.Rules
 
             PrivateDependencyModuleNames.AddRange(
                 new[] {
-                    "UnrealEd"
+                    "UnrealEd",
+                    "PropertyPath"
                 }
             );
 

@@ -30,6 +30,7 @@ URpaiBrainComponent::URpaiBrainComponent()
 	, LastPlannerResultForMultiTick(ERpaiPlannerResult::Invalid)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+    DefaultStateType = URpaiState::StaticClass();
 }
 
 void URpaiBrainComponent::BeginPlay()
@@ -229,9 +230,9 @@ void URpaiBrainComponent::AcquireActions_Implementation(TArray<URpaiActionBase*>
 	OutActions.Empty();
 }
 
-TSubclassOf<URpaiState> URpaiBrainComponent::GetStateType_Implementation()
+TSubclassOf<URpaiState> URpaiBrainComponent::GetStateType_Implementation() const
 {
-	return URpaiState::StaticClass();
+	return DefaultStateType;
 }
 
 void URpaiBrainComponent::StartLogic()
@@ -387,18 +388,22 @@ URpaiState* URpaiBrainComponent::LoadOrCreateStateFromAi()
 {
 	if (CachedStateInstance == nullptr)
 	{
-		CachedStateInstance = NewObject<URpaiState>(GetAIOwner(), *GetStateType());
+		auto StateType = GetStateType();
+		CachedStateInstance = NewObject<URpaiState>(GetAIOwner(), *StateType);
 	}
 	SetStateFromAi(CachedStateInstance);
 	return CachedStateInstance;
 }
 
-void URpaiBrainComponent::SetStateFromAi_Implementation(URpaiState* StateToModify) const
+void URpaiBrainComponent::SetStateFromAi(URpaiState* StateToModify) const
 {
-	if (auto AI = GetAIOwner())
-	{
-		StateToModify->SetStateFromController(AI);
-	}
+    const AAIController* AI = GetAIOwner();
+    if(FAISystem::IsValidControllerAndHasValidPawn(AI))
+    {
+        StateCopyBindings.Transfer(AI, StateToModify);
+        StateCopyBindings.Transfer(AI->GetPawn(), StateToModify);
+        StateToModify->SetStateFromController(AI);
+    }
 }
 
 const URpaiPlannerBase* URpaiBrainComponent::DoAcquirePlanner()
@@ -439,3 +444,49 @@ FString URpaiBrainComponent::GetDebugInfoString() const
 	}
 	return DebugInfo;
 }
+
+void URpaiBrainComponent::ClearCachedStateInstance()
+{
+	if (IsValid(CachedStateInstance))
+	{
+		CachedStateInstance->ConditionalBeginDestroy();
+		CachedStateInstance = nullptr;
+	}
+}
+
+#if WITH_EDITOR
+void URpaiBrainComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+    Super::PostEditChangeProperty(PropertyChangedEvent);
+    static const FName NAME_StateBindingConfigurations = GET_MEMBER_NAME_CHECKED(URpaiBrainComponent,StateBindingConfigurations);
+    static const FName NAME_TargetStateStructType = GET_MEMBER_NAME_CHECKED(URpaiBrainComponent, DefaultStateType);
+    static const FName NAME_SourceType = GET_MEMBER_NAME_CHECKED(FRpaiBindingConfiguration, SourceType);
+    static const FName NAME_SourceBindingPath = GET_MEMBER_NAME_CHECKED(FRpaiBindingConfiguration, SourceBindingPath);
+    static const FName NAME_TargetBindingPath = GET_MEMBER_NAME_CHECKED(FRpaiBindingConfiguration, TargetBindingPath);
+    
+    const FName ChangedPropertyName = PropertyChangedEvent.GetPropertyName();
+    const FString DebugChangedPropertyName = ChangedPropertyName.ToString();
+    
+    if(ChangedPropertyName == NAME_TargetStateStructType ||
+       ChangedPropertyName == NAME_StateBindingConfigurations ||
+       ChangedPropertyName == NAME_SourceType ||
+       ChangedPropertyName == NAME_SourceBindingPath ||
+       ChangedPropertyName == NAME_TargetBindingPath)
+    {
+        StateCopyBindings.SourceBindings.Empty();
+        StateCopyBindings.TargetBindings.Empty();
+        StateCopyBindings.BindingHandles.Empty();
+        for(const auto& PropertyPath : StateBindingConfigurations)
+        {
+            int32 Max = FMath::Min(PropertyPath.SourceBindingPath.Num(), PropertyPath.TargetBindingPath.Num());
+            for(int32 Idx = 0; Idx < Max; ++Idx)
+            {
+                StateCopyBindings.AddBinding(PropertyPath.SourceType,
+                                             PropertyPath.SourceBindingPath[Idx],
+                                             *DefaultStateType,
+                                             PropertyPath.TargetBindingPath[Idx]);
+            }
+        }
+    }
+}
+#endif

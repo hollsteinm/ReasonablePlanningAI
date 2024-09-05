@@ -2,6 +2,7 @@
 
 
 #include "Core/RpaiTypes.h"
+#include "PropertyPathHelpers.h"
 
 DEFINE_LOG_CATEGORY(LogRpai)
 
@@ -259,4 +260,281 @@ FRpaiMemoryStruct::~FRpaiMemoryStruct()
 		ensure(Type == nullptr);
 		ensure(Refs == nullptr);
 	}
+}
+
+FRpaiCachedPropertyPath::FRpaiCachedPropertyPath()
+: FCachedPropertyPath()
+{
+    
+}
+
+FRpaiCachedPropertyPath::FRpaiCachedPropertyPath(const FString& Path)
+: FCachedPropertyPath(Path)
+{
+    
+}
+
+FRpaiCachedPropertyPath::FRpaiCachedPropertyPath(const TArray<FString>& PropertyChain)
+: FCachedPropertyPath(PropertyChain)
+{
+    
+}
+
+
+int32 FRpaiStateTypePropertyMultiBind::AddBinding(const FString& PropertyName)
+{
+	if (IsValid(TargetBindingClass))
+	{
+        FRpaiCachedPropertyPath Property(PropertyName);
+        return BoundProperties.Add(Property);
+	}
+	else
+	{
+		return INDEX_NONE;
+	}
+}
+
+void FRpaiStateTypePropertyMultiBind::RemoveBinding(int32 BindingHandle)
+{
+	if (BoundProperties.IsValidIndex(BindingHandle))
+	{
+		BoundProperties.RemoveAt(BindingHandle, 1, false);
+	}
+}
+
+FStateBindingHandle FRpaiStateBinding::AddBinding(TObjectPtr<UStruct> SourceType, const FString& SourcePropertyName, TObjectPtr<UStruct> TargetType, const FString& TargetPropertyName)
+{
+	int32 SourceTypeIndex = INDEX_NONE;
+	int32 TargetTypeIndex = INDEX_NONE;
+
+	for (int32 Idx = 0; Idx < SourceBindings.Num(); ++Idx)
+	{
+		if (SourceType->IsChildOf(SourceBindings[Idx].TargetBindingClass))
+		{
+			SourceTypeIndex = Idx;
+			break;
+		}
+	}
+
+	for (int32 Idx = 0; Idx < TargetBindings.Num(); ++Idx)
+	{
+		if (TargetType->IsChildOf(TargetBindings[Idx].TargetBindingClass))
+		{
+			TargetTypeIndex = Idx;
+			break;
+		}
+	}
+
+	if (SourceTypeIndex == INDEX_NONE)
+	{
+		SourceTypeIndex = SourceBindings.AddDefaulted();
+		SourceBindings[SourceTypeIndex].TargetBindingClass = SourceType;
+	}
+
+	if (TargetTypeIndex == INDEX_NONE)
+	{
+		TargetTypeIndex = TargetBindings.AddDefaulted();
+		TargetBindings[TargetTypeIndex].TargetBindingClass = TargetType;
+	}
+
+	int32 SourcePropertyBindingIndex = SourceBindings[SourceTypeIndex].AddBinding(SourcePropertyName);
+	int32 TargetPropertyBindingIndex = TargetBindings[TargetTypeIndex].AddBinding(TargetPropertyName);
+
+	FStateBindingHandle& Binding = BindingHandles.AddDefaulted_GetRef();
+	Binding.Handle = BindingHandles.Num() - 1;
+	Binding.StateSourceTypeHandle.Handle = SourceTypeIndex;
+	Binding.StateSourcePropertyHandle.Handle = SourcePropertyBindingIndex;
+	Binding.StateTargetTypeHandle.Handle = TargetTypeIndex;
+	Binding.StateTargetPropertyHandle.Handle = TargetPropertyBindingIndex;
+	return Binding;
+}
+
+void FRpaiStateBinding::RemoveBinding(const FStateBindingHandle& Handle)
+{
+	if (BindingHandles.IsValidIndex(Handle.Handle))
+	{
+		if (SourceBindings.IsValidIndex(Handle.StateSourceTypeHandle.Handle) && TargetBindings.IsValidIndex(Handle.StateTargetTypeHandle.Handle))
+		{
+			SourceBindings[Handle.StateSourceTypeHandle.Handle].RemoveBinding(Handle.StateSourcePropertyHandle.Handle);
+			TargetBindings[Handle.StateTargetTypeHandle.Handle].RemoveBinding(Handle.StateTargetPropertyHandle.Handle);
+		}
+
+		if (SourceBindings[Handle.StateSourceTypeHandle.Handle].BoundProperties.IsEmpty())
+		{
+			SourceBindings.RemoveAt(Handle.StateSourceTypeHandle.Handle, 1, false);
+		}
+
+		if (TargetBindings[Handle.StateTargetTypeHandle.Handle].BoundProperties.IsEmpty())
+		{
+			TargetBindings.RemoveAt(Handle.StateTargetTypeHandle.Handle, 1, false);
+		}
+
+		BindingHandles.RemoveAt(Handle.Handle, 1, false);
+	}
+}
+
+bool FRpaiStateBinding::Transfer(const UObject* Source, FRpaiMemoryStruct& Target) const
+{
+    check(Source);
+    check(Target.GetRaw());
+    int32 SourceTypeIndex = INDEX_NONE;
+    int32 TargetTypeIndex = INDEX_NONE;
+
+	for (int32 Idx = 0; Idx < SourceBindings.Num(); ++Idx)
+	{
+		if (Source->GetClass()->IsChildOf(SourceBindings[Idx].TargetBindingClass))
+		{
+            SourceTypeIndex = Idx;
+			break;
+		}
+	}
+
+	for (int32 Idx = 0; Idx < TargetBindings.Num(); ++Idx)
+	{
+		if (Target.GetType()->IsChildOf(TargetBindings[Idx].TargetBindingClass))
+		{
+            TargetTypeIndex = Idx;
+			break;
+		}
+	}
+
+	if(SourceTypeIndex == INDEX_NONE || TargetTypeIndex == INDEX_NONE)
+    {
+        return false;
+    }
+
+    UStruct* SourceType = SourceBindings[SourceTypeIndex].TargetBindingClass;
+    UStruct* TargetType = TargetBindings[TargetTypeIndex].TargetBindingClass;
+    TArray<FRpaiCachedPropertyPath> SourceProperties = SourceBindings[SourceTypeIndex].BoundProperties;
+    TArray<FRpaiCachedPropertyPath> TargetProperties = TargetBindings[TargetTypeIndex].BoundProperties;
+	int32 CopyCount = FMath::Min(SourceProperties.Num(), TargetProperties.Num());
+	for (int32 Idx = 0; Idx < CopyCount; ++Idx)
+	{
+        FRpaiCachedPropertyPath SourceProperty = SourceProperties[Idx];
+        FRpaiCachedPropertyPath TargetProperty = TargetProperties[Idx];
+        UObject* SourcePtr = const_cast<UObject*>(Source);
+        uint8* TargetPtr = const_cast<uint8*>(Target.GetRaw());
+        FString SourceStringValue;
+        if(PropertyPathHelpers::GetPropertyValueAsString(SourcePtr, SourceType, SourceProperty, SourceStringValue))
+        {
+            PropertyPathHelpers::SetPropertyValueFromString(TargetPtr, TargetType, TargetProperty, SourceStringValue);
+        }
+	}
+
+	return true;
+}
+
+bool FRpaiStateBinding::Transfer(const UObject* Source, uint8* TargetData, UScriptStruct* TargetStructType) const
+{
+    check(Source);
+    check(TargetStructType);
+    
+    int32 SourceTypeIndex = INDEX_NONE;
+    int32 TargetTypeIndex = INDEX_NONE;
+
+    for (int32 Idx = 0; Idx < SourceBindings.Num(); ++Idx)
+    {
+        if (Source->GetClass()->IsChildOf(SourceBindings[Idx].TargetBindingClass))
+        {
+            SourceTypeIndex = Idx;
+            break;
+        }
+    }
+
+    for (int32 Idx = 0; Idx < TargetBindings.Num(); ++Idx)
+    {
+        if (TargetStructType->IsChildOf(TargetBindings[Idx].TargetBindingClass))
+        {
+            TargetTypeIndex = Idx;
+            break;
+        }
+    }
+
+    if(SourceTypeIndex == INDEX_NONE || TargetTypeIndex == INDEX_NONE)
+    {
+        return false;
+    }
+
+    UStruct* SourceType = SourceBindings[SourceTypeIndex].TargetBindingClass;
+    UStruct* TargetType = TargetBindings[TargetTypeIndex].TargetBindingClass;
+    TArray<FRpaiCachedPropertyPath> SourceProperties = SourceBindings[SourceTypeIndex].BoundProperties;
+    TArray<FRpaiCachedPropertyPath> TargetProperties = TargetBindings[TargetTypeIndex].BoundProperties;
+    int32 CopyCount = FMath::Min(SourceProperties.Num(), TargetProperties.Num());
+    for (int32 Idx = 0; Idx < CopyCount; ++Idx)
+    {
+        FRpaiCachedPropertyPath SourceProperty = SourceProperties[Idx];
+        FRpaiCachedPropertyPath TargetProperty = TargetProperties[Idx];
+        UObject* SourcePtr = const_cast<UObject*>(Source);
+        uint8* TargetPtr = TargetData;
+        FString SourceStringValue;
+        if(PropertyPathHelpers::GetPropertyValueAsString(SourcePtr, SourceType, SourceProperty, SourceStringValue))
+        {
+            PropertyPathHelpers::SetPropertyValueFromString(TargetPtr, TargetType, TargetProperty, SourceStringValue);
+        }
+    }
+
+    return true;
+}
+
+bool FRpaiStateBinding::Transfer(const UObject* Source, UObject* Target) const
+{
+    check(Source);
+    check(Target);
+    int32 SourceTypeIndex = INDEX_NONE;
+    int32 TargetTypeIndex = INDEX_NONE;
+
+    for (int32 Idx = 0; Idx < SourceBindings.Num(); ++Idx)
+    {
+        if (Source->GetClass()->IsChildOf(SourceBindings[Idx].TargetBindingClass))
+        {
+            SourceTypeIndex = Idx;
+            break;
+        }
+    }
+
+    for (int32 Idx = 0; Idx < TargetBindings.Num(); ++Idx)
+    {
+        if (Target->GetClass()->IsChildOf(TargetBindings[Idx].TargetBindingClass))
+        {
+            TargetTypeIndex = Idx;
+            break;
+        }
+    }
+
+    if(SourceTypeIndex == INDEX_NONE || TargetTypeIndex == INDEX_NONE)
+    {
+        return false;
+    }
+
+    UStruct* SourceType = SourceBindings[SourceTypeIndex].TargetBindingClass;
+    UStruct* TargetType = TargetBindings[TargetTypeIndex].TargetBindingClass;
+    TArray<FRpaiCachedPropertyPath> SourceProperties = SourceBindings[SourceTypeIndex].BoundProperties;
+    TArray<FRpaiCachedPropertyPath> TargetProperties = TargetBindings[TargetTypeIndex].BoundProperties;
+    int32 CopyCount = FMath::Min(SourceProperties.Num(), TargetProperties.Num());
+    for (int32 Idx = 0; Idx < CopyCount; ++Idx)
+    {
+        FRpaiCachedPropertyPath SourceProperty = SourceProperties[Idx];
+        FRpaiCachedPropertyPath TargetProperty = TargetProperties[Idx];
+        UObject* SourcePtr = const_cast<UObject*>(Source);
+        FString SourceStringValue;
+        if(PropertyPathHelpers::GetPropertyValueAsString(SourcePtr, SourceType, SourceProperty, SourceStringValue))
+        {
+            if(!PropertyPathHelpers::SetPropertyValueFromString(Target, TargetType, TargetProperty, SourceStringValue))
+            {
+                UE_LOG(LogRpai, Warning, TEXT("Unable to set target Property Path %s "), *TargetProperty.ToString());
+            }
+        }
+        else
+        {
+            UE_LOG(LogRpai, Warning, TEXT("Unable to get source Property Path %s "), *SourceProperty.ToString());
+        }
+    }
+
+    return true;
+}
+
+bool FRpaiStateBinding::Transfer(const AActor* Source, UObject* Target) const
+{
+    const UObject* AsUObject = Cast<UObject>(Source);
+    return Transfer(AsUObject, Target);
 }
