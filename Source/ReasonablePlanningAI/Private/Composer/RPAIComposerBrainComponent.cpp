@@ -17,6 +17,8 @@ void URpaiComposerBrainComponent::SetReasonablePlanningBehavior(URpaiComposerBeh
 		if (World == nullptr || !World->IsGameWorld())
 		{
 			ReasonablePlanningBehavior = NewBehavior;
+			DefaultStateType = NewBehavior->GetConstructedStateType();
+			ClearCachedStateInstance();
 		}
 		else
 		{
@@ -25,10 +27,36 @@ void URpaiComposerBrainComponent::SetReasonablePlanningBehavior(URpaiComposerBeh
 				StopLogic("New Behavior");
 			}
 			ReasonablePlanningBehavior = NewBehavior;
+			DefaultStateType = NewBehavior->GetConstructedStateType();
+			ClearCachedStateInstance();
 			StartLogic();
 		}
 	}
 }
+
+void URpaiComposerBrainComponent::OnRegister()
+{
+	Super::OnRegister();
+	if (IsValid(ReasonablePlanningBehavior))
+	{
+		DefaultStateType = ReasonablePlanningBehavior->GetConstructedStateType();
+	}
+}
+
+#if WITH_EDITOR
+void URpaiComposerBrainComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	static const FName NAME_ReasonablePlanningBehavior = GET_MEMBER_NAME_CHECKED(URpaiComposerBrainComponent, ReasonablePlanningBehavior);
+
+	const FName ChangedPropertyName = PropertyChangedEvent.GetPropertyName();
+
+	if (ChangedPropertyName == NAME_ReasonablePlanningBehavior)
+	{
+		DefaultStateType = ReasonablePlanningBehavior->GetConstructedStateType();
+	}
+}
+#endif
 
 const URpaiReasonerBase* URpaiComposerBrainComponent::AcquireReasoner_Implementation()
 {
@@ -56,14 +84,4 @@ void URpaiComposerBrainComponent::AcquireActions_Implementation(TArray<URpaiActi
 	{
 		OutActions = ReasonablePlanningBehavior->GetActions();
 	}
-}
-
-TSubclassOf<URpaiState> URpaiComposerBrainComponent::GetStateType_Implementation()
-{
-    if(ReasonablePlanningBehavior)
-    {
-        return ReasonablePlanningBehavior->GetConstructedStateType();
-    }
-    
-	return URpaiState::StaticClass();
 }

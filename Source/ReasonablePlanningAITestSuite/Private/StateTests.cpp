@@ -2,6 +2,7 @@
 #include "ReasonablePlanningAITestTypes.h"
 #include "States/RpaiState_Map.h"
 #include "States/RpaiState_Reflection.h"
+#include "ReasonablePlanningAITestTypes.h"
 
 BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
 	URpaiState_Map* ClassUnderTest;
@@ -668,5 +669,64 @@ void ReasonablePlanningStateReflectionSpec::Define()
 							ClassUnderTest->UnlockResource("Rpai.Test.LockedResource2");
 						});
 				});
+		});
+}
+
+BEGIN_DEFINE_SPEC(ReasonablePlanningStateBindingSpec, "ReasonablePlanningAI.StateBinding", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+	URpaiState* SourceState;
+END_DEFINE_SPEC(ReasonablePlanningStateBindingSpec)
+void ReasonablePlanningStateBindingSpec::Define()
+{
+	BeforeEach([this]()
+		{
+			SourceState = NewObject<UTestPlanningState>();
+		});
+
+	Describe("Behavior", [this]()
+		{
+			It("should register handles", [this]()
+				{
+					FRpaiStateBinding Binding;
+					FStateBindingHandle Handle = Binding.AddBinding(SourceState->GetClass(), TEXT("TheFloatValue"), FComplexTestStruct::StaticStruct(), TEXT("Value"));
+					TestTrue("Handle::IsValid", Handle.IsValid());
+					TestTrue("Handle::SourceType::IsValid", Handle.StateSourceTypeHandle.IsValid());
+					TestTrue("Handle::SourceProperty::IsValid", Handle.StateSourcePropertyHandle.IsValid());
+					TestTrue("Handle::TargetType::IsValid", Handle.StateTargetTypeHandle.IsValid());
+					TestTrue("Handle::TargetProperty::IsValid", Handle.StateTargetPropertyHandle.IsValid());
+
+					Handle = Binding.AddBinding(SourceState->GetClass(), TEXT("TheIntValue"), FComplexTestStruct::StaticStruct(), TEXT("Inner.Value"));
+					TestTrue("Handle::IsValid", Handle.IsValid());
+					TestTrue("Handle::SourceType::IsValid", Handle.StateSourceTypeHandle.IsValid());
+					TestTrue("Handle::SourceProperty::IsValid", Handle.StateSourcePropertyHandle.IsValid());
+					TestTrue("Handle::TargetType::IsValid", Handle.StateTargetTypeHandle.IsValid());
+					TestTrue("Handle::TargetProperty::IsValid", Handle.StateTargetPropertyHandle.IsValid());
+				});
+        
+            It("should copy values", [this]()
+                {
+                    FRpaiStateBinding Binding;
+                    Binding.AddBinding(SourceState->GetClass(), TEXT("TheFloatValue"), FComplexTestStruct::StaticStruct(), TEXT("Value"));
+                    Binding.AddBinding(SourceState->GetClass(), TEXT("TheIntValue"), FComplexTestStruct::StaticStruct(), TEXT("Inner.Value"));
+            
+                
+                    SourceState->SetFloat("TheFloatValue", -56.098f);
+                    SourceState->SetInt("TheIntValue", 9999999);
+                
+                    FRpaiMemory TestMemory;
+                    FRpaiMemoryStruct TargetMemory(&TestMemory, FComplexTestStruct::StaticStruct());
+                    FComplexTestStruct* TargetState = TargetMemory.Get<FComplexTestStruct>();
+                    TargetState->Value = 101.f;
+                    TargetState->Inner.Value = 4000;
+                
+                    Binding.Transfer(SourceState, TargetMemory);
+                
+                    TestEqual(TEXT("float value copied"), -56.098f, TargetState->Value);
+                    TestEqual(TEXT("complexx inner value copied"), 9999999, TargetState->Inner.Value);
+                });
+		});
+
+	AfterEach([this]()
+		{
+			SourceState->ConditionalBeginDestroy();
 		});
 }

@@ -7,6 +7,23 @@
 #include "RpaiTypes.h"
 #include "RpaiBrainComponent.generated.h"
 
+#if WITH_EDITORONLY_DATA
+USTRUCT()
+struct REASONABLEPLANNINGAI_API FRpaiBindingConfiguration
+{
+    GENERATED_BODY()
+    
+    UPROPERTY(EditAnywhere, Category=Rpai)
+    TSubclassOf<AActor> SourceType;
+    
+    UPROPERTY(EditAnywhere, Category=Rpai)
+    TArray<FString> SourceBindingPath;
+    
+    UPROPERTY(EditAnywhere, Category=Rpai)
+    TArray<FString> TargetBindingPath;
+};
+#endif
+
 /**
  * Base class for running the Reasonable Planning AI logic on an given AI agent (Character/Controller).
  */
@@ -32,6 +49,11 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void BeginPlay() override;
 	virtual void EndPlay(EEndPlayReason::Type Reason) override;
+    
+    // UObject Callbacks
+#if WITH_EDITOR
+    virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	URpaiState* LoadOrCreateStateFromAi();
@@ -58,9 +80,8 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void PopNextAction();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void SetStateFromAi(URpaiState* StateToModify) const;
-	virtual void SetStateFromAi_Implementation(URpaiState* StateToModify) const;
 
 	// Methods for getting execution implementations. By using functions instead of fields we allow for different approaches of getting the primary drivers, be it
 	// from a data asset, a subsystem, a cache, or instanced data.
@@ -82,11 +103,18 @@ protected:
 	virtual void AcquireActions_Implementation(TArray<URpaiActionBase*>& OutActions);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "Rpai")
-	TSubclassOf<URpaiState> GetStateType();
-	virtual TSubclassOf<URpaiState> GetStateType_Implementation();
+	TSubclassOf<URpaiState> GetStateType() const;
+    virtual TSubclassOf<URpaiState> GetStateType_Implementation() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void StartDebounceTimer();
+
+	/** The stored state type to use for reasoning and planning. **/
+	UPROPERTY(EditAnywhere, Category = Rpai)
+	TSubclassOf<URpaiState> DefaultStateType;
+
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	void ClearCachedStateInstance();
 
 private:
 	UPROPERTY(Transient)
@@ -117,6 +145,14 @@ private:
     const URpaiPlannerBase* DoAcquirePlanner();
 
 	const URpaiPlannerBase* CurrentPlanner;
+    
+#if WITH_EDITORONLY_DATA
+    UPROPERTY(EditAnywhere, Category=Rpai)
+    TArray<FRpaiBindingConfiguration> StateBindingConfigurations;
+#endif
+    
+    UPROPERTY()
+    FRpaiStateBinding StateCopyBindings;
 	
 public:
 	FORCEINLINE const URpaiActionBase* GetCurrentAction() const { return CurrentAction; }
@@ -124,4 +160,6 @@ public:
 	FORCEINLINE const URpaiGoalBase* GetCurrentGoal() const { return CurrentGoal; }
 
 	FORCEINLINE bool IsPaused() const { return bIsPaused; }
+    
+    FORCEINLINE void SetCurrentStateBindings(const FRpaiStateBinding& NewBindings) { StateCopyBindings = NewBindings; }
 };
