@@ -2,6 +2,7 @@
 #include "ISinglePropertyView.h"
 #include "Editor.h"
 #include "Widgets/SBoxPanel.h"
+#include "SlateCore.h"
 #include "UObject/Class.h"
 #include "Core/RpaiPlannerBase.h"
 #include "Core/RpaiReasonerBase.h"
@@ -9,6 +10,12 @@
 #include "Core/RpaiActionBase.h"
 
 #define LOCTEXT_NAMESPACE "ReasonablePlanningAIEditor"
+
+// structure for debug views of data tables
+struct FRpaiDiagnosticsViewData
+{
+	TArray<FText> ArbitraryRowData;
+};
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
@@ -59,7 +66,7 @@ void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
 						.AutoWidth()
 						[
 							SNew(SButton)
-								.ToolTipText(LOCTEXT("ComposerWidgetBehavior_FullEvaluateTip", "Using the given input state below, preview how actions will be evaluated."))
+								.ToolTipText(LOCTEXT("ComposerWidgetBehavior_FullEvaluateTip", "Using the given input state below, preview how actions will be evaluated. Additionally shows the goal weights and distances after the action is performed."))
 								.Text(LOCTEXT("ComposerWidgetBehavior_ActionOnlyEvaluate", "Evaluate Actions"))
 								.OnClicked(this, &SComposerBehaviorWidget::OnEvaluateActions)
 								.IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateButtonEnabled)
@@ -83,18 +90,24 @@ void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
 								.IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateButtonEnabled)
 						]
 						+ SHorizontalBox::Slot()
-						.AutoWidth()
+						.FillWidth(1.f)
+						.HAlign(EHorizontalAlignment::HAlign_Right)
 						[
-							GoalSelectionContent()
-						]
-						+ SHorizontalBox::Slot()
-						.AutoWidth()
-						[
-							SNew(SButton)
-								.ToolTipText(LOCTEXT("ComposerWidgetBehavior_ActionsEvaluateTip", "Using the given input state below and a selected goal from the state, determine actions from the Planner."))
-								.Text(LOCTEXT("ComposerWidgetBehavior_SetGoalActionsEvaluate", "Evaluate Plan with Goal"))
-								.OnClicked(this, &SComposerBehaviorWidget::OnEvaluatePlanWithGoal)
-								.IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateGoalButtonEnabled)
+							SNew(SHorizontalBox)
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								[
+									GoalSelectionContent()
+								]
+								+ SHorizontalBox::Slot()
+								.AutoWidth()
+								[
+									SNew(SButton)
+										.ToolTipText(LOCTEXT("ComposerWidgetBehavior_ActionsEvaluateTip", "Using the given input state below and a selected goal from the state, determine actions from the Planner."))
+										.Text(LOCTEXT("ComposerWidgetBehavior_SetGoalActionsEvaluate", "Evaluate Plan with Goal"))
+										.OnClicked(this, &SComposerBehaviorWidget::OnEvaluatePlanWithGoal)
+										.IsEnabled(this, &SComposerBehaviorWidget::IsEvaluateGoalButtonEnabled)
+								]
 						]
 				]
 				+ SVerticalBox::Slot()
@@ -104,18 +117,19 @@ void SComposerBehaviorWidget::Construct(const FArguments& InArgs)
 				+ SVerticalBox::Slot()
 				[
 					SNew(SBorder)
-					.Content()
-					[
-					SNew(SScrollBox)
-					+ SScrollBox::Slot()
+						.Content()
 						[
-							SAssignNew(ExperimentOutputList, SListView<TSharedPtr<FText>>)
-								.ItemHeight(24)
-								.SelectionMode(ESelectionMode::None)
-								.ListItemsSource(&ExperimentOutput)
-								.OnGenerateRow(this, &SComposerBehaviorWidget::OnGenerateExperimentOutputRow)
+							SNew(SScrollBox)
+								+ SScrollBox::Slot()
+								[
+									SAssignNew(ExperimentOutputList, SListView<TSharedPtr<FRpaiDiagnosticsViewData>>)
+										.ItemHeight(24)
+										.SelectionMode(ESelectionMode::None)
+										.ListItemsSource(&ExperimentOutput)
+										.OnGenerateRow(this, &SComposerBehaviorWidget::OnGenerateExperimentOutputRow)
+
+								]
 						]
-					]
 				]
 		];
 }
@@ -196,6 +210,12 @@ void SComposerBehaviorWidget::Tick(const FGeometry& AllottedGeometry, const doub
 			break;
 		case ERpaiPlannerResult::RequiresTick:
 			LastPlanResult = Planner->TickGoalPlanning(CurrentGoal, TestStartingState, Behavior->GetActions(), PlannedActions, CurrentPlannerMemory);
+			if (LastPlanResult == ERpaiPlannerResult::CompletedSuccess)
+			{
+				bIsExperimenting = false;
+				LastPlanResult = ERpaiPlannerResult::Invalid;
+				EmitPlanOutput(CurrentGoal, PlannedActions);
+			}
 			break;
 		case ERpaiPlannerResult::Invalid:
 			CurrentGoal = Reasoner->ReasonNextGoal(Behavior->GetGoals(), TestStartingState);
@@ -204,6 +224,8 @@ void SComposerBehaviorWidget::Tick(const FGeometry& AllottedGeometry, const doub
 			LastPlanResult = Planner->StartGoalPlanning(CurrentGoal, TestStartingState, Behavior->GetActions(), PlannedActions, CurrentPlannerMemory);
 			if (LastPlanResult == ERpaiPlannerResult::CompletedSuccess)
 			{
+				bIsExperimenting = false;
+				LastPlanResult = ERpaiPlannerResult::Invalid;
 				EmitPlanOutput(CurrentGoal, PlannedActions);
 			}
 			break;
@@ -293,11 +315,29 @@ void SComposerBehaviorWidget::HandleGoalSelectionChanged(URpaiGoalBase* Selectio
 
 void SComposerBehaviorWidget::EmitPlanOutput(const URpaiGoalBase* Goal, const TArray<URpaiActionBase*>& Actions)
 {
-	ExperimentOutput.Empty(Actions.Num() + 1);
-	ExperimentOutput.Add(MakeShareable(new FText(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalOutput", "Goal Selected: {0} with score Category {1} / Weight {2}"), FText::FromString(Goal->GetGoalName()), Goal->GetCategory(), Goal->GetWeight(TestStartingState)))));
+	ExperimentOutput.Empty();
+
+	TSharedPtr<FRpaiDiagnosticsViewData> GoalNameRow = MakeShareable(new FRpaiDiagnosticsViewData());
+	GoalNameRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalNameRow_Title", "Goal Name"));
+	GoalNameRow->ArbitraryRowData.Add(FText::FromString(Goal->GetGoalName()));
+	ExperimentOutput.Add(GoalNameRow);
+
+	TSharedPtr<FRpaiDiagnosticsViewData> GoalCategoryRow = MakeShareable(new FRpaiDiagnosticsViewData());
+	GoalCategoryRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalCategoryRow_Title", "Goal Category"));
+	GoalCategoryRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalOutput_Category", "{0}"), Goal->GetCategory()));
+	ExperimentOutput.Add(GoalCategoryRow);
+
+	TSharedPtr<FRpaiDiagnosticsViewData> GoalWeightRow = MakeShareable(new FRpaiDiagnosticsViewData());
+	GoalWeightRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalWeightRow_Title", "Goal Weight"));
+	GoalWeightRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalOutput_Weight", "{0}"), Goal->GetWeight(TestStartingState)));
+	ExperimentOutput.Add(GoalWeightRow);
+
 	for (const auto& Action : Actions)
 	{
-		ExperimentOutput.Add(MakeShareable(new FText(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionOutput", "-> {0}"), FText::FromString(Action->GetActionName())))));
+		TSharedPtr<FRpaiDiagnosticsViewData> ActionRow = MakeShareable(new FRpaiDiagnosticsViewData());
+		ActionRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalWeightRow_Title", "Action Name"));
+		ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionOutput", "{0}"), FText::FromString(Action->GetActionName())));
+		ExperimentOutput.Add(ActionRow);
 	}
 	ExperimentOutputList->RequestListRefresh();
 }
@@ -311,27 +351,42 @@ void SComposerBehaviorWidget::EmitCurrentStateActionWeightsAndDistances()
 		{
 			return;
 		}
+
+		ExperimentOutput.Empty();
 		TArray<URpaiActionBase*> BehaviorActions = Behavior->GetActions();
 		TArray<URpaiGoalBase*> BehaviorGoals = Behavior->GetGoals();
-		ExperimentOutput.Empty(BehaviorActions.Num() * BehaviorGoals.Num());
+
+		TSharedPtr<FRpaiDiagnosticsViewData> DynamicHeaderRow = MakeShareable(new FRpaiDiagnosticsViewData());
+		DynamicHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_ActionNameHeader", "Action Name"));
+		DynamicHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_ActionWeightHeader", "Action Weight"));
+		DynamicHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_ActionApplicableHeader", "Action Is Applicable?"));
+		for (const auto& Goal : BehaviorGoals)
+		{
+			FText GoalNameText = FText::FromString(Goal->GetGoalName());
+			DynamicHeaderRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalCategoryHeader_Fmt", "{0}.Category"), GoalNameText));
+			DynamicHeaderRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalWeightHeader_Fmt", "{0}.Weight"), GoalNameText));
+			DynamicHeaderRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalDistanceHeader_Fmt", "{0}.Distance"), GoalNameText));
+		}
+		ExperimentOutput.Add(DynamicHeaderRow);
+
 		for (const auto& Action : BehaviorActions)
 		{
 			URpaiState* FutureState = NewObject<URpaiState>(GetTransientPackage(), TestStartingState->GetClass());
 			Action->ApplyToState(FutureState);
-			ExperimentOutput.Add(MakeShareable(new FText(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput", "\n===============\n{0}\n\tWeight: {1}\n\tIs Applicable? {2}"),
-				FText::FromString(Action->GetActionName()),
-				Action->ExecutionWeight(TestStartingState),
-				Action->IsApplicable(TestStartingState)
-			))));
+
+			TSharedPtr<FRpaiDiagnosticsViewData> ActionRow = MakeShareable(new FRpaiDiagnosticsViewData());
+
+			ActionRow->ArbitraryRowData.Add(FText::FromString(Action->GetActionName()));
+			ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_ActionWeightValue_Fmt", "{0}"), Action->ExecutionWeight(TestStartingState)));
+			ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_ActionApplicableValue_Fmt", "{0}"), Action->IsApplicable(TestStartingState)));
+
 			for (const auto& Goal : BehaviorGoals)
 			{
-				ExperimentOutput.Add(MakeShareable(new FText(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalPreviewOutputEmbedded", "\n\t\t{0}\n\t\t\tCategory: {1}\n\t\t\tWeight: {2}\n\t\t\tDistance: {3}"),
-					FText::FromString(Goal->GetGoalName()),
-					Goal->GetCategory(),
-					Goal->GetWeight(FutureState),
-					Goal->GetDistanceToDesiredState(FutureState)
-				))));
+				ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalCategoryValue_Fmt", "{0}"), Goal->GetCategory()));
+				ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalWeightValue_Fmt", "{0}"), Goal->GetWeight(FutureState)));
+				ActionRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_ActionPreviewOutput_GoalDistanceValue_Fmt", "{0}"), Goal->GetDistanceToDesiredState(FutureState)));
 			}
+			ExperimentOutput.Add(ActionRow);
 		}
 		ExperimentOutputList->RequestListRefresh();
 	}
@@ -347,25 +402,45 @@ void SComposerBehaviorWidget::EmitCurrentStateGoalCategoryWeightDistance()
 			return;
 		}
 		TArray<URpaiGoalBase*> BehaviorGoals = Behavior->GetGoals();
-		ExperimentOutput.Empty(BehaviorGoals.Num());
+
+		ExperimentOutput.Empty();
+
+		TSharedPtr<FRpaiDiagnosticsViewData> GoalHeaderRow = MakeShareable(new FRpaiDiagnosticsViewData());
+		GoalHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalNameRow_Title", "Goal Name"));
+		GoalHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalCategoryRow_Title", "Goal Category"));
+		GoalHeaderRow->ArbitraryRowData.Add(LOCTEXT("ComposerWidgetBehavior_GoalOutput_GoalWeightRow_Title", "Goal Weight"));
+		ExperimentOutput.Add(GoalHeaderRow);
+
 		for (const auto& Goal : BehaviorGoals)
 		{
-			ExperimentOutput.Add(MakeShareable(new FText(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalPreviewOutput", "{0}\n\tCategory: {1}\n\tWeight: {2}\n\tDistance: {3}"),
-				FText::FromString(Goal->GetGoalName()),
-				Goal->GetCategory(),
-				Goal->GetWeight(TestStartingState),
-				Goal->GetDistanceToDesiredState(TestStartingState)
-			))));
+			TSharedPtr<FRpaiDiagnosticsViewData> GoalRow = MakeShareable(new FRpaiDiagnosticsViewData());
+			GoalRow->ArbitraryRowData.Add(FText::FromString(Goal->GetGoalName()));
+			GoalRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalOutput_Category", "{0}"), Goal->GetCategory()));
+			GoalRow->ArbitraryRowData.Add(FText::Format(LOCTEXT("ComposerWidgetBehavior_GoalOutput_Weight", "{0}"), Goal->GetWeight(TestStartingState)));
+			ExperimentOutput.Add(GoalRow);
 		}
 		ExperimentOutputList->RequestListRefresh();
 	}
 }
 
-TSharedRef<ITableRow> SComposerBehaviorWidget::OnGenerateExperimentOutputRow(TSharedPtr<FText> InText, const TSharedRef<STableViewBase>& OwnerTable)
+TSharedRef<ITableRow> SComposerBehaviorWidget::OnGenerateExperimentOutputRow(TSharedPtr<FRpaiDiagnosticsViewData> RowData, const TSharedRef<STableViewBase>& OwnerTable)
 {
-	return SNew(STableRow<TSharedPtr<FText>>, OwnerTable)
+	TSharedRef<SHorizontalBox> Cells = SNew(SHorizontalBox);
+	for (const auto& Text : RowData->ArbitraryRowData)
+	{
+		Cells->AddSlot()
+			[
+				SNew(SBorder)
+					.Padding(0.5f, 0.5f)
+					[
+						SNew(STextBlock)
+							.Margin(FMargin(3.f, 3.f))
+							.Text(Text)
+					]
+			];
+	}
+	return SNew(STableRow<TSharedPtr<FRpaiDiagnosticsViewData>>, OwnerTable)
 		[
-			SNew(STextBlock)
-				.Text(*InText.Get())
+			Cells
 		];
 }

@@ -5,6 +5,8 @@
 #include "Composer/RpaiComposerBehavior.h"
 #include "Core/RpaiGoalBase.h"
 
+struct FRpaiDiagnosticsViewData;
+
 class SComposerBehaviorWidget : public SCompoundWidget
 {
 public:
@@ -47,7 +49,7 @@ private:
 	FReply OnEvaluateGoals();
 	TSharedRef<SWidget> GoalSelectionContent();
 	TSharedRef<SWidget> OnGenerateGoalRow(URpaiGoalBase* Item);
-	TSharedRef<ITableRow> OnGenerateExperimentOutputRow(TSharedPtr<FText> InText, const TSharedRef<STableViewBase>& OwnerTable);
+	TSharedRef<ITableRow> OnGenerateExperimentOutputRow(TSharedPtr<FRpaiDiagnosticsViewData> InText, const TSharedRef<STableViewBase>& OwnerTable);
 	FText GetCurrentGoalSelectionText() const;
 	void HandleGoalSelectionChanged(URpaiGoalBase* Selection, ESelectInfo::Type SelectInfo);
 	void EmitPlanOutput(const URpaiGoalBase* Goal, const TArray<URpaiActionBase*>& Actions);
@@ -56,9 +58,9 @@ private:
 
 	// Assigned Slate objects
 	TSharedPtr<SComboBox<URpaiGoalBase*>> GoalComboBox;
-	TSharedPtr<SListView<TSharedPtr<FText>>> ExperimentOutputList;
+	TSharedPtr<SListView<TSharedPtr<FRpaiDiagnosticsViewData>>> ExperimentOutputList;
 
 	// Internal Copies for Slate components
 	TArray<URpaiGoalBase*> Goals;
-	TArray<TSharedPtr<FText>> ExperimentOutput;
+	TArray<TSharedPtr<FRpaiDiagnosticsViewData>> ExperimentOutput;
 };
