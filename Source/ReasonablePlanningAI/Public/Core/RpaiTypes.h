@@ -298,6 +298,15 @@ struct REASONABLEPLANNINGAI_API FRpaiStateTypePropertyMultiBind
 };
 
 USTRUCT(BlueprintType)
+/**
+* Configuration struct that will map a source type and it's properties
+* to a target type and it's properties. The mapping will perform a 
+* copy operation only. The evaluation rules are per index matching
+* each index of the configuration from SourceBindings to each index
+* to TargetBindings. Binding Handles are references to configuration
+* used to selectively clean up certian bindings. Transfer functions
+* will copy by value only.
+**/
 struct REASONABLEPLANNINGAI_API FRpaiStateBinding
 {
 	GENERATED_BODY()
