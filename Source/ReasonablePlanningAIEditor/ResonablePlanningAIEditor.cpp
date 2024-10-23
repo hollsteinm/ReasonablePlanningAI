@@ -3,6 +3,7 @@
 #include "ReasonablePlanningAIEditor.h"
 #include "StateKeyValueReferenceCustom.h"
 #include "StateQueryComparisonCustom.h"
+#include "StateTypePropertyMultiBindCustom.h"
 #include "ComposerBehaviorCustom.h"
 #include "Core/RpaiTypes.h"
 #include "Composer/RpaiComposerBehavior.h"
@@ -40,6 +41,7 @@ struct FReasonablePlanningAIEditorModule : public IReasonablePlanningAIEditorMod
 
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		PropertyModule.RegisterCustomPropertyTypeLayout(FStateKeyValueReference::StaticStruct()->GetFName(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&StateKeyValueReferenceCustom::MakeInstance));
+		PropertyModule.RegisterCustomPropertyTypeLayout(FRpaiStateTypePropertyMultiBind::StaticStruct()->GetFName(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&StateTypePropertyMultiBindCustom::MakeInstance));
 		PropertyModule.RegisterCustomPropertyTypeLayout(URpaiStateQuery_CompareToBool::StaticClass()->GetFName(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&StateQueryComparisonCustom::MakePropertyInstance, FName(TEXT("bValueToCompare"))));
 		PropertyModule.RegisterCustomPropertyTypeLayout(URpaiStateQuery_CompareToDistance::StaticClass()->GetFName(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&StateQueryComparisonCustom::MakePropertyInstance, FName(TEXT("Distance"))));
 		PropertyModule.RegisterCustomPropertyTypeLayout(URpaiStateQuery_CompareToFloat::StaticClass()->GetFName(), FOnGetPropertyTypeCustomizationInstance::CreateStatic(&StateQueryComparisonCustom::MakePropertyInstance, FName(TEXT("ValueToCompare"))));
@@ -82,6 +84,7 @@ struct FReasonablePlanningAIEditorModule : public IReasonablePlanningAIEditorMod
 			PropertyModule.UnregisterCustomPropertyTypeLayout(URpaiStateQuery_CompareToInteger::StaticClass()->GetFName());
 			PropertyModule.UnregisterCustomPropertyTypeLayout(URpaiStateQuery_CompareToStateValue::StaticClass()->GetFName());
 			PropertyModule.UnregisterCustomPropertyTypeLayout(FStateKeyValueReference::StaticStruct()->GetFName());
+			PropertyModule.UnregisterCustomPropertyTypeLayout(FRpaiStateTypePropertyMultiBind::StaticStruct()->GetFName());
 			PropertyModule.NotifyCustomizationModuleChanged();
 		}
 
