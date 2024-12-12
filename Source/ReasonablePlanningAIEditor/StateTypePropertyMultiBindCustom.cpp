@@ -8,6 +8,7 @@
 #include "StructViewerFilter.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Core/RpaiTypes.h"
+#include "Slate/SCachedPropertyPathStructPropertyPicker.h"
 
 #define LOCTEXT_NAMESPACE "ReasonablePlanningAIEditor"
 
@@ -146,20 +147,30 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	TSharedPtr<IPropertyHandle> BoundProps = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FRpaiStateTypePropertyMultiBind, BoundProperties));
-	if (BoundProps->IsValidHandle())
+	TSharedPtr<IPropertyHandle> PickedClassOrStruct = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FRpaiStateTypePropertyMultiBind, TargetBindingClass));
+	void* ContainerAddress = nullptr;
+	if (BoundProps->IsValidHandle() && PickedClassOrStruct->IsValidHandle() && PickedClassOrStruct->GetValueData(ContainerAddress) == FPropertyAccess::Success)
 	{
-		TSharedPtr<IPropertyHandleArray> BoundPropsArray = BoundProps->AsArray();
-		check(BoundPropsArray.IsValid());
-
-		uint32 TotalElements = 0U;
-		if (BoundPropsArray->GetNumElements(TotalElements) == FPropertyAccess::Success)
+		if (ContainerAddress != nullptr)
 		{
-			for (uint32 Idx = 0U; Idx < TotalElements; ++Idx)
+			TSharedPtr<IPropertyHandleArray> BoundPropsArray = BoundProps->AsArray();
+			check(BoundPropsArray.IsValid());
+
+			uint32 TotalElements = 0U;
+			if (BoundPropsArray->GetNumElements(TotalElements) == FPropertyAccess::Success)
 			{
-				// Create a FRpaiCachedPropertyPath Picker Widget
-				TSharedPtr<IPropertyHandle> Element = BoundPropsArray->GetElement(Idx);
-				StructBuilder.AddProperty(Element.ToSharedRef())
-					.DisplayName(LOCTEXT("Rpai_SOME", "SOME"));
+				for (uint32 Idx = 0U; Idx < TotalElements; ++Idx)
+				{
+					// Create a FRpaiCachedPropertyPath Picker Widget
+					TSharedPtr<IPropertyHandle> Element = BoundPropsArray->GetElement(Idx);
+					StructBuilder.AddProperty(Element.ToSharedRef())
+						.DisplayName(LOCTEXT("Rpai_SOME", "SOME"))
+						.CustomWidget(true)
+						[
+							SNew(SCachedPropertyPathStructPropertyPicker)
+								.PickerClass((*static_cast<TObjectPtr<UStruct>*>(ContainerAddress)).Get())
+						];
+				}
 			}
 		}
 	}
