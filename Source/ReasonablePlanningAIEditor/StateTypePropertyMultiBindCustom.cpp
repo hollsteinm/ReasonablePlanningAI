@@ -75,8 +75,8 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 
 	TSharedRef<SWidget> AddButton = PropertyCustomizationHelpers::MakeAddButton(
 		FSimpleDelegate::CreateSP(this, &StateTypePropertyMultiBindCustom::AddBindingButton_OnClick, StructPropertyHandle, BoundPropsArray),
-	TAttribute<FText>(this, &StateTypePropertyMultiBindCustom::GetAddNewBindingTooltip),
-	TAttribute<bool>(this, &StateTypePropertyMultiBindCustom::CanAddNewBinding)
+		TAttribute<FText>(this, &StateTypePropertyMultiBindCustom::GetAddNewBindingTooltip),
+		TAttribute<bool>(this, &StateTypePropertyMultiBindCustom::CanAddNewBinding)
 	);
 	TSharedRef<SWidget> ClearButton = PropertyCustomizationHelpers::MakeClearButton(
 		FSimpleDelegate::CreateSP(this, &StateTypePropertyMultiBindCustom::ClearBindingButton_OnClick, StructPropertyHandle, BoundPropsArray),
@@ -164,16 +164,44 @@ void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHan
 					// Create a FRpaiCachedPropertyPath Picker Widget
 					TSharedPtr<IPropertyHandle> Element = BoundPropsArray->GetElement(Idx);
 					StructBuilder.AddProperty(Element.ToSharedRef())
-						.DisplayName(LOCTEXT("Rpai_SOME", "SOME"))
-						.CustomWidget(true)
+						.CustomWidget()
+						.NameContent()
+						[
+							SNew(STextBlock).Text(TAttribute<FText>::Create(TAttribute<FText>::FGetter::CreateRaw(this, &StateTypePropertyMultiBindCustom::GetBoundPropertyName, Element)))
+						]
+						.ValueContent()
 						[
 							SNew(SCachedPropertyPathStructPropertyPicker)
 								.PickerClass((*static_cast<TObjectPtr<UStruct>*>(ContainerAddress)).Get())
+								.OnPropertyPathPicked_Lambda([Element](const FString& PropertyPath) -> void {
+										UE_LOG(LogTemp, Log, TEXT("%s"), *PropertyPath);
+										if (Element.IsValid())
+										{
+											void* OutValue = nullptr;
+											if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
+											{
+												FCachedPropertyPath* PathObj = static_cast<FCachedPropertyPath*>(OutValue);
+												PathObj->RemoveFromStart(PathObj->GetNumSegments());
+												PathObj->MakeFromString(PropertyPath);
+											}
+										}
+									})
 						];
 				}
 			}
 		}
 	}
+}
+
+FText StateTypePropertyMultiBindCustom::GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element)
+{
+	void* OutValue = nullptr;
+	if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
+	{
+		FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
+		return FText::FromString(PropertyPath->ToString());
+	}
+	return LOCTEXT("Rpai_PickPath", "Pick Property Path");
 }
 
 void StateTypePropertyMultiBindCustom::OnClassPicked(UClass* InClassPicked, TSharedRef<IPropertyHandle> Parent, TSharedPtr<IPropertyHandle> Property)

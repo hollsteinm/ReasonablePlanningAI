@@ -37,4 +37,6 @@ private:
 	FText GetAddNewBindingTooltip() const;
 	bool CanAddNewBinding() const;
 	FText GetClearBindingTooltip() const;
+
+	FText GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element);
 };

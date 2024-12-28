@@ -25,8 +25,6 @@ private:
 	FOnPropertyPathPicked OnPropertyPathPicked;
 
 	TSharedPtr<SListView<TSharedPtr<FString>>> PropertyListView;
-
-	FReply OnComboBoxButtonContentSelected(const FString& PropertyPathSelection);
 	TSharedRef<SWidget> GetPropertyPathDropdown();
 
 	UStruct* CachedPickerClass;

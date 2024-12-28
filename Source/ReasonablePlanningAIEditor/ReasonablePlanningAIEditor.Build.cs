@@ -25,6 +25,7 @@ namespace UnrealBuildTool.Rules
 					"UnrealEd",
 					"PropertyEditor",
 					"EditorStyle",
+					"PropertyPath"
 				}
 			);
 		}

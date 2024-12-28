@@ -35,18 +35,6 @@ void SCachedPropertyPathStructPropertyPicker::Construct(const FArguments& InArgs
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
-FReply SCachedPropertyPathStructPropertyPicker::OnComboBoxButtonContentSelected(const FString& PropertyPathSelection)
-{
-	if (OnPropertyPathPicked.ExecuteIfBound(PropertyPathSelection))
-	{
-		return FReply::Handled();
-	}
-	else
-	{
-		return FReply::Unhandled();
-	}
-}
-
 static bool GetPropertyPaths(TFieldIterator<FProperty> Piter, TArray<FString>& OutPaths)
 {
 	if (Piter->IsA<FBoolProperty>())
@@ -107,12 +95,23 @@ TSharedRef<SWidget> SCachedPropertyPathStructPropertyPicker::GetPropertyPathDrop
 		{
 			SAssignNew(PropertyListView, SListView<TSharedPtr<FString>>)
 				.ListItemsSource(&CachedPropertyPaths)
-				.OnGenerateRow(SListView<TSharedPtr<FString>>::FOnGenerateRow::CreateLambda([](TSharedPtr<FString> Value, const TSharedRef<STableViewBase> OwnerTable) -> TSharedRef<ITableRow> {
-				return SNew(STableRow<TSharedPtr<FString>>, OwnerTable)
-					[
-						SNew(STextBlock).Text(FText::FromString(*Value.Get()))
-					];
-				}));
+				.SelectionMode(ESelectionMode::Single)
+				.ReturnFocusToSelection(true)
+				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type SelectionType) -> void
+					{
+						if (Selection.IsValid() && SelectionType != ESelectInfo::OnNavigation)
+						{
+							OnPropertyPathPicked.ExecuteIfBound(*Selection.Get());
+						}
+					})
+				.OnGenerateRow(SListView<TSharedPtr<FString>>::FOnGenerateRow::CreateLambda([this](TSharedPtr<FString> Value, const TSharedRef<STableViewBase> OwnerTable) -> TSharedRef<ITableRow>
+					{
+						return SNew(STableRow<TSharedPtr<FString>>, OwnerTable)
+						[
+							SNew(STextBlock)
+								.Text(FText::FromString(*Value.Get()))
+						];
+					}));
 		}
 
 		UStruct* CurrentPickerClass = PickerClass.Get();
@@ -126,7 +125,6 @@ TSharedRef<SWidget> SCachedPropertyPathStructPropertyPicker::GetPropertyPathDrop
 			TArray<FString> Properties;
 			for (TFieldIterator<FProperty> Piter(CurrentPickerClass, EFieldIterationFlags::IncludeDeprecated | EFieldIterationFlags::IncludeSuper); Piter; ++Piter)
 			{
-				UE_LOG(LogTemp, Log, TEXT("%s"), *Piter->GetName());
 				if (GetPropertyPaths(Piter, Properties))
 				{
 					for (const auto& Property : Properties)
