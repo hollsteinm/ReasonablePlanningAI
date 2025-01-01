@@ -8,26 +8,61 @@
 #include "StructViewerFilter.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Core/RpaiTypes.h"
+#include "Core/RpaiState.h"
 #include "Slate/SCachedPropertyPathStructPropertyPicker.h"
-
+#include "AIController.h"
 #define LOCTEXT_NAMESPACE "ReasonablePlanningAIEditor"
 
 class FClassStructViewerFilter : public IClassViewerFilter, public IStructViewerFilter
 {
+private:
+	TArray<UClass*> AllowedClasses;
+
 public:
 	static constexpr EClassFlags DisallowedClassFlags = CLASS_Deprecated | CLASS_Abstract;
+
+	FClassStructViewerFilter()
+		: AllowedClasses()
+	{
+
+	}
+
+	FClassStructViewerFilter(const TArray<UClass*>& InAllowedClasses)
+		: AllowedClasses(InAllowedClasses)
+	{
+
+	}
 
 	//~ Begin IClassViewerFilter
 	virtual bool IsClassAllowed(const FClassViewerInitializationOptions&, const UClass* InClass, TSharedRef<FClassViewerFilterFuncs>) override
 	{
-		return InClass
-			&& InClass->IsChildOf<AActor>()
-			&& !InClass->HasAnyClassFlags(DisallowedClassFlags);
+		if (InClass && !InClass->HasAnyClassFlags(DisallowedClassFlags))
+		{
+			for (const UClass* C : AllowedClasses)
+			{
+				if (InClass->IsChildOf(C))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
 	}
 	virtual bool IsUnloadedClassAllowed(const FClassViewerInitializationOptions&, const TSharedRef<const IUnloadedBlueprintData> InUnloadedClassData, TSharedRef<FClassViewerFilterFuncs>) override
 	{
-		return InUnloadedClassData->IsChildOf(AActor::StaticClass())
-			&& !InUnloadedClassData->HasAnyClassFlags(DisallowedClassFlags);
+		if (!InUnloadedClassData->HasAnyClassFlags(DisallowedClassFlags))
+		{
+			for (const UClass* C : AllowedClasses)
+			{
+				if (InUnloadedClassData->IsChildOf(C))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		return false;
 	}
 	//~ End IClassViewerFilter
 
@@ -107,24 +142,24 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 								.Text(LOCTEXT("RpaiPickClass", "Actor"))
 						]
 				]
-				+ SHorizontalBox::Slot()
-				.HAlign(HAlign_Center)
-				[
-					SNew(STextBlock)
-						.Margin(FMargin(8.f, 1.f))
-						.Text(LOCTEXT("RpaiOrLower", "or"))
-				]
-				+ SHorizontalBox::Slot()
-				[
-					SAssignNew(StructPickerComboButton, SComboButton)
-						.ContentPadding(1)
-						.OnGetMenuContent(this, &StateTypePropertyMultiBindCustom::GenerateStructPicker, StructPropertyHandle, TargetBindingClassHandle)
-						.ButtonContent()
-						[
-							SNew(STextBlock)
-								.Text(LOCTEXT("RpaiPickStruct", "Struct"))
-						]
-				]
+				//+ SHorizontalBox::Slot()
+				//.HAlign(HAlign_Center)
+				//[
+				//	SNew(STextBlock)
+				//		.Margin(FMargin(8.f, 1.f))
+				//		.Text(LOCTEXT("RpaiOrLower", "or"))
+				//]
+				//+ SHorizontalBox::Slot()
+				//[
+				//	SAssignNew(StructPickerComboButton, SComboButton)
+				//		.ContentPadding(1)
+				//		.OnGetMenuContent(this, &StateTypePropertyMultiBindCustom::GenerateStructPicker, StructPropertyHandle, TargetBindingClassHandle)
+				//		.ButtonContent()
+				//		[
+				//			SNew(STextBlock)
+				//				.Text(LOCTEXT("RpaiPickStruct", "Struct"))
+				//		]
+				//]
 				+ SHorizontalBox::Slot()
 				.Padding(2.0f)
 				.HAlign(HAlign_Center)
@@ -144,6 +179,17 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 		];
 }
 
+static FString GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element)
+{
+	void* OutValue = nullptr;
+	if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
+	{
+		FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
+		return PropertyPath->ToString();
+	}
+	return FString();
+}
+
 void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
 	TSharedPtr<IPropertyHandle> BoundProps = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FRpaiStateTypePropertyMultiBind, BoundProperties));
@@ -161,47 +207,30 @@ void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHan
 			{
 				for (uint32 Idx = 0U; Idx < TotalElements; ++Idx)
 				{
-					// Create a FRpaiCachedPropertyPath Picker Widget
 					TSharedPtr<IPropertyHandle> Element = BoundPropsArray->GetElement(Idx);
 					StructBuilder.AddProperty(Element.ToSharedRef())
 						.CustomWidget()
-						.NameContent()
-						[
-							SNew(STextBlock).Text(TAttribute<FText>::Create(TAttribute<FText>::FGetter::CreateRaw(this, &StateTypePropertyMultiBindCustom::GetBoundPropertyName, Element)))
-						]
-						.ValueContent()
 						[
 							SNew(SCachedPropertyPathStructPropertyPicker)
 								.PickerClass((*static_cast<TObjectPtr<UStruct>*>(ContainerAddress)).Get())
+								.InitialValue(GetBoundPropertyName(Element))
 								.OnPropertyPathPicked_Lambda([Element](const FString& PropertyPath) -> void {
-										UE_LOG(LogTemp, Log, TEXT("%s"), *PropertyPath);
-										if (Element.IsValid())
+									if (Element.IsValid())
+									{
+										void* OutValue = nullptr;
+										if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
 										{
-											void* OutValue = nullptr;
-											if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
-											{
-												FCachedPropertyPath* PathObj = static_cast<FCachedPropertyPath*>(OutValue);
-												PathObj->RemoveFromStart(PathObj->GetNumSegments());
-												PathObj->MakeFromString(PropertyPath);
-											}
+											FCachedPropertyPath* PathObj = static_cast<FCachedPropertyPath*>(OutValue);
+											PathObj->RemoveFromStart(PathObj->GetNumSegments());
+											PathObj->MakeFromString(PropertyPath);
 										}
-									})
+									}
+								})
 						];
 				}
 			}
 		}
 	}
-}
-
-FText StateTypePropertyMultiBindCustom::GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element)
-{
-	void* OutValue = nullptr;
-	if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
-	{
-		FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
-		return FText::FromString(PropertyPath->ToString());
-	}
-	return LOCTEXT("Rpai_PickPath", "Pick Property Path");
 }
 
 void StateTypePropertyMultiBindCustom::OnClassPicked(UClass* InClassPicked, TSharedRef<IPropertyHandle> Parent, TSharedPtr<IPropertyHandle> Property)
@@ -233,7 +262,8 @@ void StateTypePropertyMultiBindCustom::OnStructPicked(const UScriptStruct* InStr
 
 TSharedRef<SWidget> StateTypePropertyMultiBindCustom::GenerateClassPicker(TSharedRef<IPropertyHandle> Parent, TSharedPtr<IPropertyHandle> Property)
 {
-	TSharedRef<FClassStructViewerFilter> ViewerFilter = MakeShared<FClassStructViewerFilter>();
+	static TArray<UClass*> AllowedClasses({ AAIController::StaticClass(), APawn::StaticClass(), URpaiState::StaticClass() });
+	TSharedRef<FClassStructViewerFilter> ViewerFilter = MakeShared<FClassStructViewerFilter>(AllowedClasses);
 
 	FClassViewerInitializationOptions ClassPickerOptions;
 	ClassPickerOptions.ClassFilter = ViewerFilter;

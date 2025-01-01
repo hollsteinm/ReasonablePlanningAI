@@ -12,26 +12,59 @@ void SCachedPropertyPathStructPropertyPicker::Construct(const FArguments& InArgs
 {
 	PickerClass = InArgs._PickerClass;
 	OnPropertyPathPicked = InArgs._OnPropertyPathPicked;
+
+	if (PickerClass.IsSet() || PickerClass.IsBound())
+	{
+		LazyBuildPropertyValueWidget();
+		LazyInitializePropertyListValues();
+		
+		const FString& InitialValue = InArgs._InitialValue;
+		if (!InitialValue.IsEmpty())
+		{
+			int32 FoundIndex = INDEX_NONE;
+			int32 Count = CachedPropertyPaths.Num();
+			for (int32 Idx = 0; Idx < Count; ++Idx)
+			{
+				const auto& Value = CachedPropertyPaths[Idx];
+				if (Value.IsValid() && Value->Equals(InitialValue))
+				{
+					FoundIndex = Idx;
+					break;
+				}
+			}
+
+			if (FoundIndex != INDEX_NONE)
+			{
+				PropertyListView->SetSelection(CachedPropertyPaths[FoundIndex]);
+			}
+		}
+	}
 	
 	CachedPickerClass = nullptr;
-	
 	ChildSlot
 		[
-			SNew(SComboButton)
+			SAssignNew(ComboButton, SComboButton)
 				.OnGetMenuContent(FOnGetContent::CreateSP(this, &SCachedPropertyPathStructPropertyPicker::GetPropertyPathDropdown))
 				.ButtonContent()
 				[
 					SNew(STextBlock)
-						.Text(LOCTEXT("RpaiPropertyPicker", "Pick Property"))
+						.Text(TAttribute<FText>::Create(TAttribute<FText>::FGetter::CreateLambda([this]() -> FText {
+							if (PropertyListView.IsValid() && PropertyListView->GetNumItemsSelected() > 0)
+							{
+								TArray<TSharedPtr<FString>> Selections = PropertyListView->GetSelectedItems();
+								return FText::FromString(*(Selections[0].Get()));
+							}
+							else
+							{
+								return LOCTEXT("RpaiPickProperty", "Pick Property");
+							}
+					})))
 				]
 		];
 
 
 
-	// Get all the properties, included nested (recursive) of the input struct type.
-	// Make sure to use Get methods over properties if available
-
-	// Add a slot to the scroll box with an "on-click" event to make a callback
+	
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -86,63 +119,68 @@ static bool GetPropertyPaths(TFieldIterator<FProperty> Piter, TArray<FString>& O
 	return !OutPaths.IsEmpty();
 }
 
-TSharedRef<SWidget> SCachedPropertyPathStructPropertyPicker::GetPropertyPathDropdown()
+void SCachedPropertyPathStructPropertyPicker::LazyBuildPropertyValueWidget()
 {
-	if (PickerClass.IsSet() || PickerClass.IsBound())
+	// Construct the List view if neccesary
+	if (!PropertyListView.IsValid())
 	{
-		// Construct the List view if neccesary
-		if (!PropertyListView.IsValid())
-		{
-			SAssignNew(PropertyListView, SListView<TSharedPtr<FString>>)
-				.ListItemsSource(&CachedPropertyPaths)
-				.SelectionMode(ESelectionMode::Single)
-				.ReturnFocusToSelection(true)
-				.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type SelectionType) -> void
+		SAssignNew(PropertyListView, SListView<TSharedPtr<FString>>)
+			.ListItemsSource(&CachedPropertyPaths)
+			.SelectionMode(ESelectionMode::Single)
+			.ReturnFocusToSelection(true)
+			.OnSelectionChanged_Lambda([this](TSharedPtr<FString> Selection, ESelectInfo::Type SelectionType) -> void
+				{
+					if (Selection.IsValid() && SelectionType != ESelectInfo::OnNavigation && SelectionType != ESelectInfo::Direct)
 					{
-						if (Selection.IsValid() && SelectionType != ESelectInfo::OnNavigation)
-						{
-							OnPropertyPathPicked.ExecuteIfBound(*Selection.Get());
-						}
-					})
-				.OnGenerateRow(SListView<TSharedPtr<FString>>::FOnGenerateRow::CreateLambda([this](TSharedPtr<FString> Value, const TSharedRef<STableViewBase> OwnerTable) -> TSharedRef<ITableRow>
-					{
-						return SNew(STableRow<TSharedPtr<FString>>, OwnerTable)
+						OnPropertyPathPicked.ExecuteIfBound(*Selection.Get());
+					}
+				})
+			.OnGenerateRow(SListView<TSharedPtr<FString>>::FOnGenerateRow::CreateLambda([this](TSharedPtr<FString> Value, const TSharedRef<STableViewBase> OwnerTable) -> TSharedRef<ITableRow>
+				{
+					return SNew(STableRow<TSharedPtr<FString>>, OwnerTable)
 						[
 							SNew(STextBlock)
 								.Text(FText::FromString(*Value.Get()))
 						];
-					}));
-		}
+				}));
+	}
+}
 
-		UStruct* CurrentPickerClass = PickerClass.Get();
-		if (CachedPickerClass == nullptr || CachedPickerClass != CurrentPickerClass || CachedPropertyPaths.IsEmpty())
+void SCachedPropertyPathStructPropertyPicker::LazyInitializePropertyListValues()
+{
+	UStruct* CurrentPickerClass = PickerClass.Get();
+	if (CachedPickerClass == nullptr || CachedPickerClass != CurrentPickerClass || CachedPropertyPaths.IsEmpty())
+	{
+
+		// Rebuild cached content
+		CachedPropertyPaths.Empty();
+
+		// Regenerate the list content
+		TArray<FString> Properties;
+		for (TFieldIterator<FProperty> Piter(CurrentPickerClass, EFieldIterationFlags::IncludeDeprecated | EFieldIterationFlags::IncludeSuper); Piter; ++Piter)
 		{
-
-			// Rebuild cached content
-			CachedPropertyPaths.Empty();
-
-			// Regenerate the list content
-			TArray<FString> Properties;
-			for (TFieldIterator<FProperty> Piter(CurrentPickerClass, EFieldIterationFlags::IncludeDeprecated | EFieldIterationFlags::IncludeSuper); Piter; ++Piter)
+			if (GetPropertyPaths(Piter, Properties))
 			{
-				if (GetPropertyPaths(Piter, Properties))
+				for (const auto& Property : Properties)
 				{
-					for (const auto& Property : Properties)
-					{
-						TSharedPtr<FString> Str = MakeShared<FString>(Property);
-						CachedPropertyPaths.Add(Str);
-					}
-					Properties.Empty();
+					TSharedPtr<FString> Str = MakeShared<FString>(Property);
+					CachedPropertyPaths.Add(Str);
 				}
+				Properties.Empty();
 			}
+		}
 
-			PropertyListView->RebuildList();
-			return PropertyListView.ToSharedRef();
-		}
-		else
-		{
-			return PropertyListView.ToSharedRef();
-		}
+		PropertyListView->RebuildList();
+	}
+}
+
+TSharedRef<SWidget> SCachedPropertyPathStructPropertyPicker::GetPropertyPathDropdown()
+{
+	if (PickerClass.IsSet() || PickerClass.IsBound())
+	{
+		LazyBuildPropertyValueWidget();
+		LazyInitializePropertyListValues();
+		return PropertyListView.ToSharedRef();
 	}
 	else
 	{
