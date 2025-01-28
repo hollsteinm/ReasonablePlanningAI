@@ -12,11 +12,13 @@ public:
 	SLATE_BEGIN_ARGS(SCachedPropertyPathStructPropertyPicker)
 		: _PickerClass(nullptr)
 		, _OnPropertyPathPicked()
-		, _InitialValue()
+		, _InitialPath()
+		, _bShowComboButton(true)
 		{}
 		SLATE_ATTRIBUTE(UStruct*, PickerClass)
 		SLATE_EVENT(FOnPropertyPathPicked, OnPropertyPathPicked)
-		SLATE_ARGUMENT(FString, InitialValue)
+		SLATE_ARGUMENT(FString, InitialPath)
+		SLATE_ARGUMENT(bool, bShowComboButton)
 	SLATE_END_ARGS()
 
 	virtual void Construct(const FArguments& InArgs);
@@ -26,13 +28,14 @@ private:
 	TAttribute<UStruct*> PickerClass;
 	FOnPropertyPathPicked OnPropertyPathPicked;
 
-	TSharedPtr<SListView<TSharedPtr<FString>>> PropertyListView;
 	TSharedPtr<SComboButton> ComboButton;
 	TSharedRef<SWidget> GetPropertyPathDropdown();
+	TSharedPtr<SWidget> CachedPropertyPathDropdown;
 
+	// State Management
 	UStruct* CachedPickerClass;
-	TArray<TSharedPtr<FString>> CachedPropertyPaths;
+	FString SelectionString;
 
-	void LazyBuildPropertyValueWidget();
-	void LazyInitializePropertyListValues();
+	void OnSelection(FProperty* Leaf, TArray<FProperty*> Parents);
+	void RecursiveMenuBuilder(FMenuBuilder& MenuBuilder, UStruct* GivenPickerClass, TArray<FProperty*> Parents);
 };

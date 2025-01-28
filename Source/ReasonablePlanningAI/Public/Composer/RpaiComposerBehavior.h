@@ -37,10 +37,9 @@ class REASONABLEPLANNINGAI_API URpaiComposerBehavior : public UDataAsset
 	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "ActionName"))
 	TArray<URpaiActionBase*> Actions;
 
+public:
 	UPROPERTY(EditAnywhere, Category = "Rpai")
 	FRpaiStateBinding Bindings;
-
-public:
 
 	FORCEINLINE const URpaiReasonerBase* GetReasoner() const { return Reasoner; }
 

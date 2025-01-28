@@ -16,4 +16,17 @@ public:
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 
 	static TSharedRef<IDetailCustomization> MakeInstance();
+
+private:
+	TArray<TSharedPtr<FText>> Warnings;
+
+	// Simple state management
+	FDelegateHandle OnSourcePropertyElementsChanged;
+	FDelegateHandle OnTargetPropertyElementsChanged;
+
+	/**
+	* Just a validation workflow, do not prevent developers from doing what they want but let
+	* them know that it may not work as intended.
+	**/
+	void OnBindingPropertyElementsChanged(TSharedPtr<IPropertyHandleArray> ChangedArray, TSharedPtr<IPropertyHandleArray> CoupledArray);
 };

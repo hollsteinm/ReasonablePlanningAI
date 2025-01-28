@@ -83,6 +83,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Rpai")
 	void SetStateFromAi(URpaiState* StateToModify) const;
 
+	UFUNCTION(BlueprintCallable, Category = "Rpai")
+	virtual void OnComponentSetStateFromAi(URpaiState* StateToModify) const;
+
 	// Methods for getting execution implementations. By using functions instead of fields we allow for different approaches of getting the primary drivers, be it
 	// from a data asset, a subsystem, a cache, or instanced data.
 

@@ -403,7 +403,13 @@ void URpaiBrainComponent::SetStateFromAi(URpaiState* StateToModify) const
         StateCopyBindings.Transfer(AI, StateToModify);
         StateCopyBindings.Transfer(AI->GetPawn(), StateToModify);
         StateToModify->SetStateFromController(AI);
+		OnComponentSetStateFromAi(StateToModify);
     }
+}
+
+void URpaiBrainComponent::OnComponentSetStateFromAi(URpaiState* StateToModify) const
+{
+	// nil
 }
 
 const URpaiPlannerBase* URpaiBrainComponent::DoAcquirePlanner()

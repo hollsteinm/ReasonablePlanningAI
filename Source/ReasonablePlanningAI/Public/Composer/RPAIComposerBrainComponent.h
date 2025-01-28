@@ -37,6 +37,7 @@ protected:
 	virtual const URpaiPlannerBase* AcquirePlanner_Implementation() override;
 	virtual void AcquireGoals_Implementation(TArray<URpaiGoalBase*>& OutGoals) override;
 	virtual void AcquireActions_Implementation(TArray<URpaiActionBase*>& OutActions) override;
+	virtual void OnComponentSetStateFromAi(URpaiState* StateToModify) const override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Rpai")
