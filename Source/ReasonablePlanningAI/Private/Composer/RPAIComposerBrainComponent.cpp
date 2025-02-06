@@ -3,6 +3,7 @@
 
 #include "Composer/RpaiComposerBrainComponent.h"
 #include "Composer/RpaiComposerBehavior.h"
+#include "AIController.h"
 
 URpaiComposerBrainComponent::URpaiComposerBrainComponent()
 	: ReasonablePlanningBehavior(nullptr)
@@ -30,6 +31,19 @@ void URpaiComposerBrainComponent::SetReasonablePlanningBehavior(URpaiComposerBeh
 			DefaultStateType = NewBehavior->GetConstructedStateType();
 			ClearCachedStateInstance();
 			StartLogic();
+		}
+	}
+}
+
+void URpaiComposerBrainComponent::OnComponentSetStateFromAi(URpaiState* StateToModify) const
+{
+	if (IsValid(ReasonablePlanningBehavior))
+	{
+		const AAIController* AI = GetAIOwner();
+		if (FAISystem::IsValidControllerAndHasValidPawn(AI))
+		{
+			ReasonablePlanningBehavior->Bindings.Transfer(AI, StateToModify);
+			ReasonablePlanningBehavior->Bindings.Transfer(AI->GetPawn(), StateToModify);
 		}
 	}
 }

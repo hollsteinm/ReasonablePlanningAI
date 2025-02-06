@@ -38,6 +38,8 @@ class REASONABLEPLANNINGAI_API URpaiComposerBehavior : public UDataAsset
 	TArray<URpaiActionBase*> Actions;
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Rpai")
+	FRpaiStateBinding Bindings;
 
 	FORCEINLINE const URpaiReasonerBase* GetReasoner() const { return Reasoner; }
 
