@@ -4,7 +4,7 @@
 #include "Reasoners/RpaiReasoner_AbsoluteUtility.h"
 #include "States/RpaiState_Map.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningReasonersSpec, "ReasonablePlanningAI.Reasoners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningReasonersSpec, "ReasonablePlanningAI.Reasoners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiReasonerBase* ClassUnderTest;
 	URpaiState* GivenState;
 	TArray<URpaiGoalBase*> GivenGoals;

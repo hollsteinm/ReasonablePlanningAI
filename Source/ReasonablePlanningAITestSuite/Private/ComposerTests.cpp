@@ -42,7 +42,7 @@
 #include "Composer/Weights/RpaiWeight_Distance.h"
 #include "Composer/Weights/RpaiWeight_Select.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningComposerSpec, "ReasonablePlanningAI.Composer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningComposerSpec, "ReasonablePlanningAI.Composer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiPlannerBase* GivenPlanner;
 	URpaiReasonerBase* GivenReasoner;
 	URpaiState* GivenState;

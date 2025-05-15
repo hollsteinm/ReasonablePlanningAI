@@ -35,7 +35,7 @@ void UTestComposerActionTask::ReceiveCompleteActionTask_Implementation(AAIContro
 	++CompleteActionTaskCallsTotal;
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningComposerActionTaskSequenceSpec, "ReasonablePlanningAI.Composer.ActionTask", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningComposerActionTaskSequenceSpec, "ReasonablePlanningAI.Composer.ActionTask", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	AAIController* GivenController;
 	URpaiActionTask_Sequence* ActionTaskUnderTest;
 	FRpaiMemory GivenPool;
@@ -176,7 +176,7 @@ void ReasonablePlanningComposerActionTaskSequenceSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningComposerActionTaskComposerSpec, "ReasonablePlanningAI.Composer.ActionTask", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningComposerActionTaskComposerSpec, "ReasonablePlanningAI.Composer.ActionTask", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	AAIController* GivenController;
 	URpaiActionTask_Composite* ActionTaskUnderTest;
 	FRpaiMemory GivenPool;

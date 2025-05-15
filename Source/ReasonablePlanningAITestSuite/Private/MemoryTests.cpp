@@ -3,7 +3,7 @@
 #include "ReasonablePlanningAITestTypes.h"
 
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMemoryTests, "ReasonablePlanningAI.Core.Memory", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMemoryTests, "ReasonablePlanningAI.Core.Memory", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 END_DEFINE_SPEC(ReasonablePlanningMemoryTests)
 void ReasonablePlanningMemoryTests::Define()
 {
