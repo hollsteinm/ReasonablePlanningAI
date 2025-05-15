@@ -10,7 +10,7 @@
 #include "Composer/Distances/RpaiDistance_CurveFloat.h"
 #include "States/RpaiState_Map.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec, "ReasonablePlanningAI.Distance.Bool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec, "ReasonablePlanningAI.Distance.Bool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
     URpaiDistance_Bool* ClassUnderTest;
     URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceBoolSpec)
@@ -119,7 +119,7 @@ void ReasonablePlanningDistanceBoolSpec::Define()
         });
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceFloatSpec, "ReasonablePlanningAI.Distance.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceFloatSpec, "ReasonablePlanningAI.Distance.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiDistance_Float* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceFloatSpec)
@@ -208,7 +208,7 @@ void ReasonablePlanningDistanceFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceIntegerSpec, "ReasonablePlanningAI.Distance.Integer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceIntegerSpec, "ReasonablePlanningAI.Distance.Integer", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiDistance_Integer* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceIntegerSpec)
@@ -302,7 +302,7 @@ void ReasonablePlanningDistanceIntegerSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceRotatorSpec, "ReasonablePlanningAI.Distance.Rotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceRotatorSpec, "ReasonablePlanningAI.Distance.Rotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiDistance_Rotator* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceRotatorSpec)
@@ -394,7 +394,7 @@ void ReasonablePlanningDistanceRotatorSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceVectorSpec, "ReasonablePlanningAI.Distance.Vector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceVectorSpec, "ReasonablePlanningAI.Distance.Vector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiDistance_Vector* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceVectorSpec)
@@ -486,7 +486,7 @@ void ReasonablePlanningDistanceVectorSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec, "ReasonablePlanningAI.Distance.State", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec, "ReasonablePlanningAI.Distance.State", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
     URpaiDistance_State* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningDistanceStateSpec)
@@ -656,7 +656,7 @@ void ReasonablePlanningDistanceStateSpec::Define()
 
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceCurveFloatSpec, "ReasonablePlanningAI.Distance.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningDistanceCurveFloatSpec, "ReasonablePlanningAI.Distance.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 URpaiDistance_CurveFloat* ClassUnderTest;
 URpaiDistance_Float* GivenDistance;
 URpaiState* GivenState;

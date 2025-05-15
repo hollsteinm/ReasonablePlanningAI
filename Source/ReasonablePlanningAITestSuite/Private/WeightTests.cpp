@@ -5,7 +5,7 @@
 #include "Composer/Weights/RpaiWeight_CurveFloat.h"
 #include "Composer/Weights/RpaiWeight_ConstantFloat.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec, "ReasonablePlanningAI.Weights.ConstantFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec, "ReasonablePlanningAI.Weights.ConstantFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiWeight_ConstantFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningWeightConstantFloatSpec)
@@ -40,7 +40,7 @@ void ReasonablePlanningWeightConstantFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningWeightFloatSpec, "ReasonablePlanningAI.Weights.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningWeightFloatSpec, "ReasonablePlanningAI.Weights.Float", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiWeight_Float* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningWeightFloatSpec)
@@ -82,7 +82,7 @@ void ReasonablePlanningWeightFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningWeightCurveFloatSpec, "ReasonablePlanningAI.Weights.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningWeightCurveFloatSpec, "ReasonablePlanningAI.Weights.CurveFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiWeight_CurveFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 	UCurveFloat* GivenCurve;

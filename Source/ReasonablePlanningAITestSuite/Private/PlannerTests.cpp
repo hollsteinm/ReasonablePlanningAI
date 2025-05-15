@@ -4,7 +4,7 @@
 #include "Planners/RpaiPlanner_HUG.h"
 #include "States/RpaiState_Map.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningPlannerImplSpec, "ReasonablePlanningAI.Planners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningPlannerImplSpec, "ReasonablePlanningAI.Planners", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiPlannerBase* ClassUnderTest;
 	URpaiState* GivenState;
 	URpaiGoalBase* GivenGoal;

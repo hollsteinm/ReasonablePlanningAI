@@ -2,7 +2,7 @@
 #include "ReasonablePlanningAITestTypes.h"
 #include "Core/RpaiResourceCollection.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningResourceCollectionSpec, "ReasonablePlanningAI.ResourceCollection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningResourceCollectionSpec, "ReasonablePlanningAI.ResourceCollection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiResourceCollection* ClassUnderTest;
 	URpaiResourceCollection* LockingObject;
 END_DEFINE_SPEC(ReasonablePlanningResourceCollectionSpec)

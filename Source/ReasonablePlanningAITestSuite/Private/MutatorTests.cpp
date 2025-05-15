@@ -15,7 +15,7 @@
 #include "Composer/Mutators/RpaiStateMutator_SetValueVector.h"
 #include "Composer/Mutators/RpaiStateMutator_CopyState.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec, "ReasonablePlanningAI.Mutators.AddFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec, "ReasonablePlanningAI.Mutators.AddFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_AddFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorAddFloatSpec)
@@ -63,7 +63,7 @@ void ReasonablePlanningMutatorAddFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddIntegerSpec, "ReasonablePlanningAI.Mutators.AddInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorAddIntegerSpec, "ReasonablePlanningAI.Mutators.AddInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_AddInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorAddIntegerSpec)
@@ -111,7 +111,7 @@ void ReasonablePlanningMutatorAddIntegerSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyFloatSpec, "ReasonablePlanningAI.Mutators.MultiplyFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyFloatSpec, "ReasonablePlanningAI.Mutators.MultiplyFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_MultiplyFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyFloatSpec)
@@ -172,7 +172,7 @@ void ReasonablePlanningMutatorMultiplyFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyIntegerSpec, "ReasonablePlanningAI.Mutators.MulitplyInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyIntegerSpec, "ReasonablePlanningAI.Mutators.MulitplyInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_MultiplyInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorMultiplyIntegerSpec)
@@ -209,7 +209,7 @@ void ReasonablePlanningMutatorMultiplyIntegerSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec, "ReasonablePlanningAI.Mutators.SetBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec, "ReasonablePlanningAI.Mutators.SetBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueBool* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetBoolSpec)
@@ -246,7 +246,7 @@ void ReasonablePlanningMutatorSetBoolSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetClassSpec, "ReasonablePlanningAI.Mutators.SetClass", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetClassSpec, "ReasonablePlanningAI.Mutators.SetClass", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueClass* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetClassSpec)
@@ -283,7 +283,7 @@ void ReasonablePlanningMutatorSetClassSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetFloatSpec, "ReasonablePlanningAI.Mutators.SetFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetFloatSpec, "ReasonablePlanningAI.Mutators.SetFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetFloatSpec)
@@ -320,7 +320,7 @@ void ReasonablePlanningMutatorSetFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetIntegerSpec, "ReasonablePlanningAI.Mutators.SetInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetIntegerSpec, "ReasonablePlanningAI.Mutators.SetInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetIntegerSpec)
@@ -357,7 +357,7 @@ void ReasonablePlanningMutatorSetIntegerSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetNameSpec, "ReasonablePlanningAI.Mutators.SetName", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetNameSpec, "ReasonablePlanningAI.Mutators.SetName", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueName* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetNameSpec)
@@ -394,7 +394,7 @@ void ReasonablePlanningMutatorSetNameSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetRotatorSpec, "ReasonablePlanningAI.Mutators.SetRotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetRotatorSpec, "ReasonablePlanningAI.Mutators.SetRotator", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueRotator* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetRotatorSpec)
@@ -432,7 +432,7 @@ void ReasonablePlanningMutatorSetRotatorSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetStringSpec, "ReasonablePlanningAI.Mutators.SetString", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetStringSpec, "ReasonablePlanningAI.Mutators.SetString", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueString* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetStringSpec)
@@ -470,7 +470,7 @@ void ReasonablePlanningMutatorSetStringSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetVectorSpec, "ReasonablePlanningAI.Mutators.SetVector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorSetVectorSpec, "ReasonablePlanningAI.Mutators.SetVector", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_SetValueVector* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorSetVectorSpec)
@@ -508,7 +508,7 @@ void ReasonablePlanningMutatorSetVectorSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec, "ReasonablePlanningAI.Mutators.CopyState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateMutator_CopyState* ClassUnderTest;
 	URpaiState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningMutatorCopyStateSpec)

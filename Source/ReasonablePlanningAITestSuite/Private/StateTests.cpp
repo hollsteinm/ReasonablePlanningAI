@@ -4,7 +4,7 @@
 #include "States/RpaiState_Reflection.h"
 #include "ReasonablePlanningAITestTypes.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningStateMapSpec, "ReasonablePlanningAI.StateMap", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiState_Map* ClassUnderTest;
 END_DEFINE_SPEC(ReasonablePlanningStateMapSpec)
 void ReasonablePlanningStateMapSpec::Define()
@@ -444,7 +444,7 @@ void ReasonablePlanningStateMapSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningStateReflectionSpec, "ReasonablePlanningAI.StateReflection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningStateReflectionSpec, "ReasonablePlanningAI.StateReflection", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiState_Reflection* ClassUnderTest;
 END_DEFINE_SPEC(ReasonablePlanningStateReflectionSpec)
 void ReasonablePlanningStateReflectionSpec::Define()
@@ -672,7 +672,7 @@ void ReasonablePlanningStateReflectionSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningStateBindingSpec, "ReasonablePlanningAI.StateBinding", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningStateBindingSpec, "ReasonablePlanningAI.StateBinding", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiState* SourceState;
 END_DEFINE_SPEC(ReasonablePlanningStateBindingSpec)
 void ReasonablePlanningStateBindingSpec::Define()

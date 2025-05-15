@@ -6,7 +6,7 @@
 #include "Composer/Queries/RpaiStateQuery_CompareToStateValue.h"
 #include "States/RpaiState_Map.h"
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToBoolSpec, "ReasonablePlanningAI.Queries.CompareBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToBoolSpec, "ReasonablePlanningAI.Queries.CompareBool", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateQuery_CompareToBool* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToBoolSpec)
@@ -94,7 +94,7 @@ void ReasonablePlanningQueryCompareToBoolSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToFloatSpec, "ReasonablePlanningAI.Queries.CompareFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToFloatSpec, "ReasonablePlanningAI.Queries.CompareFloat", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateQuery_CompareToFloat* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToFloatSpec)
@@ -182,7 +182,7 @@ void ReasonablePlanningQueryCompareToFloatSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToIntegerSpec, "ReasonablePlanningAI.Queries.CompareInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToIntegerSpec, "ReasonablePlanningAI.Queries.CompareInteger", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateQuery_CompareToInteger* ClassUnderTest;
 	UTestPlanningState* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToIntegerSpec)
@@ -270,7 +270,7 @@ void ReasonablePlanningQueryCompareToIntegerSpec::Define()
 		});
 }
 
-BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToStateSpec, "ReasonablePlanningAI.Queries.CompareState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags::ApplicationContextMask)
+BEGIN_DEFINE_SPEC(ReasonablePlanningQueryCompareToStateSpec, "ReasonablePlanningAI.Queries.CompareState", EAutomationTestFlags::ProductFilter | EAutomationTestFlags_ApplicationContextMask)
 	URpaiStateQuery_CompareToStateValue* ClassUnderTest;
 	URpaiState_Map* GivenState;
 END_DEFINE_SPEC(ReasonablePlanningQueryCompareToStateSpec)

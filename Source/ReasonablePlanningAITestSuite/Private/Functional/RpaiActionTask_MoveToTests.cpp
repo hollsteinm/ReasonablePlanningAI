@@ -92,7 +92,7 @@ bool FExecuteSimpleMoveToActionTaskLatentCommand::Update()
     return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRpaiActionTask_MoveTo_PawnShouldMove, "ReasonablePlanningAI.Composer.Functional.ActionTask_MoveTo", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FRpaiActionTask_MoveTo_PawnShouldMove, "ReasonablePlanningAI.Composer.Functional.ActionTask_MoveTo", EAutomationTestFlags_ApplicationContextMask | EAutomationTestFlags::ProductFilter)
 bool FRpaiActionTask_MoveTo_PawnShouldMove::RunTest(const FString& Parameters)
 {
     ADD_LATENT_AUTOMATION_COMMAND(FEditorLoadMap("/ReasonablePlanningAI/RpaiAutomationTestWorld"));

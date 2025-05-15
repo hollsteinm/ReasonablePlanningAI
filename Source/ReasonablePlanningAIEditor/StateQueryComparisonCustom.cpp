@@ -7,12 +7,12 @@
 
 TSharedRef<IDetailCustomization> StateQueryComparisonCustom::MakeInstance(FName RHSFieldName)
 {
-    return MakeShareable(new StateQueryComparisonCustom(RHSFieldName));
+    return MakeShareable<IDetailCustomization>(new StateQueryComparisonCustom(RHSFieldName));
 }
 
 TSharedRef<IPropertyTypeCustomization> StateQueryComparisonCustom::MakePropertyInstance(FName RHSFieldName)
 {
-	return MakeShareable(new StateQueryComparisonCustom(RHSFieldName));
+	return MakeShareable<IPropertyTypeCustomization> (new StateQueryComparisonCustom(RHSFieldName));
 }
 
 StateQueryComparisonCustom::StateQueryComparisonCustom(FName RHSFieldName)
