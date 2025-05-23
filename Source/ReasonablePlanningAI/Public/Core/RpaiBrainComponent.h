@@ -8,11 +8,9 @@
 #include "RpaiBrainComponent.generated.h"
 
 #if WITH_EDITORONLY_DATA
-USTRUCT()
+USTRUCT(NoExport)
 struct REASONABLEPLANNINGAI_API FRpaiBindingConfiguration
 {
-    GENERATED_BODY()
-    
     UPROPERTY(EditAnywhere, Category=Rpai)
     TSubclassOf<AActor> SourceType;
     

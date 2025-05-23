@@ -174,7 +174,7 @@ TSharedRef<SWidget> SStateTypePropertyMultibind::GenerateClassPicker( TSharedPtr
 	TSharedRef<FClassStructViewerFilter> ViewerFilter = MakeShared<FClassStructViewerFilter>(AllowedClasses);
 
 	FClassViewerInitializationOptions ClassPickerOptions;
-	ClassPickerOptions.ClassFilter = ViewerFilter;
+	ClassPickerOptions.ClassFilters.Add(ViewerFilter);
 	ClassPickerOptions.PropertyHandle = Property;
 	ClassPickerOptions.bShowBackgroundBorder = false;
 	ClassPickerOptions.bShowUnloadedBlueprints = true;

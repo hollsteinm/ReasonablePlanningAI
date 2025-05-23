@@ -1,4 +1,5 @@
 // Troll Purse. All rights reserved.
+#pragma once
 
 #include "StateTypePropertyMultiBindCustom.h"
 #include "PropertyEditing.h"
@@ -13,72 +14,6 @@
 #include "Slate/SStateTypePropertyMultibind.h"
 #include "AIController.h"
 #define LOCTEXT_NAMESPACE "ReasonablePlanningAIEditor"
-
-class FClassStructViewerFilter : public IClassViewerFilter, public IStructViewerFilter
-{
-private:
-	TArray<UClass*> AllowedClasses;
-
-public:
-	static constexpr EClassFlags DisallowedClassFlags = CLASS_Deprecated | CLASS_Abstract;
-
-	FClassStructViewerFilter()
-		: AllowedClasses()
-	{
-
-	}
-
-	FClassStructViewerFilter(const TArray<UClass*>& InAllowedClasses)
-		: AllowedClasses(InAllowedClasses)
-	{
-
-	}
-
-	//~ Begin IClassViewerFilter
-	virtual bool IsClassAllowed(const FClassViewerInitializationOptions&, const UClass* InClass, TSharedRef<FClassViewerFilterFuncs>) override
-	{
-		if (InClass && !InClass->HasAnyClassFlags(DisallowedClassFlags))
-		{
-			for (const UClass* C : AllowedClasses)
-			{
-				if (InClass->IsChildOf(C))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-	virtual bool IsUnloadedClassAllowed(const FClassViewerInitializationOptions&, const TSharedRef<const IUnloadedBlueprintData> InUnloadedClassData, TSharedRef<FClassViewerFilterFuncs>) override
-	{
-		if (!InUnloadedClassData->HasAnyClassFlags(DisallowedClassFlags))
-		{
-			for (const UClass* C : AllowedClasses)
-			{
-				if (InUnloadedClassData->IsChildOf(C))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		return false;
-	}
-	//~ End IClassViewerFilter
-
-	//~ Begin IStructViewerFilter
-	virtual bool IsStructAllowed(const FStructViewerInitializationOptions& InInitOptions, const UScriptStruct* InStruct, TSharedRef<class FStructViewerFilterFuncs> InFilterFuncs) override
-	{
-		return true;
-	}
-
-	virtual bool IsUnloadedStructAllowed(const FStructViewerInitializationOptions& InInitOptions, const FSoftObjectPath& InStructPath, TSharedRef<class FStructViewerFilterFuncs> InFilterFuncs) override
-	{
-		return true;
-	}
-	//~ End IStructViewerFilter
-};
 
 TSharedRef<IPropertyTypeCustomization> StateTypePropertyMultiBindCustom::MakeInstance()
 {
@@ -116,17 +51,6 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 				.StructPropertyHandle(StructPropertyHandle)
 				.AllowedClasses({ URpaiState::StaticClass(), AAIController::StaticClass(), APawn::StaticClass() })
 		];
-}
-
-static FString GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element)
-{
-	void* OutValue = nullptr;
-	if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
-	{
-		FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
-		return PropertyPath->ToString();
-	}
-	return FString();
 }
 
 void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)

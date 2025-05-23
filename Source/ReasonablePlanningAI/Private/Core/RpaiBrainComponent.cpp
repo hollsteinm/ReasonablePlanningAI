@@ -464,6 +464,7 @@ void URpaiBrainComponent::ClearCachedStateInstance()
 void URpaiBrainComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
     Super::PostEditChangeProperty(PropertyChangedEvent);
+#if WITH_EDITORONLY_DATA
     static const FName NAME_StateBindingConfigurations = GET_MEMBER_NAME_CHECKED(URpaiBrainComponent,StateBindingConfigurations);
     static const FName NAME_TargetStateStructType = GET_MEMBER_NAME_CHECKED(URpaiBrainComponent, DefaultStateType);
     static const FName NAME_SourceType = GET_MEMBER_NAME_CHECKED(FRpaiBindingConfiguration, SourceType);
@@ -494,5 +495,6 @@ void URpaiBrainComponent::PostEditChangeProperty(FPropertyChangedEvent& Property
             }
         }
     }
+#endif
 }
 #endif

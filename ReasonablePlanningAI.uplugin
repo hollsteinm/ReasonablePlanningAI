@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineVersion", "5.5",
+	"EngineVersion": "5.5",
 	"FabURL": "com.epicgames.launcher://ue/Fab/product/dd0fadd5-172c-4938-ae9c-be527eab8b09",
 	"Version": 1,
 	"VersionName": "1.0.1-5.5-gold",
