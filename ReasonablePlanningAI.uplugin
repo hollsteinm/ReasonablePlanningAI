@@ -1,39 +1,41 @@
 {
 	"FileVersion": 3,
+	"EngineVersion", "5.5",
+	"FabURL": "com.epicgames.launcher://ue/Fab/product/dd0fadd5-172c-4938-ae9c-be527eab8b09",
 	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "Reasonable Planning AI Extension",
+	"VersionName": "1.0.1-5.5-gold",
+	"FriendlyName": "Reasonable Planning AI",
 	"Description": "Dual Utility Reasoning to select Goals that initiate a Goal Oriented Action Plan",
-	"Category": "AI",
-	"CreatedBy": "Martin Hollstein (Troll Purse)",
+	"Category": "Artificial Intelligence",
+	"CreatedBy": "Radaway Software LLC",
 	"CreatedByURL": "https://hollstein.dev",
-	"DocsURL": "https://github.com/hollsteinm/ReasonablePlanningAI",
-	"MarketplaceURL": "",
+	"DocsURL": "https://github.com/hollsteinm/ReasonablePlanningAI/wiki",
 	"SupportURL": "https://github.com/hollsteinm/ReasonablePlanningAI/issues",
 	"CanContainContent": true,
-	"IsBetaVersion": true,
-	"IsExperimentalVersion": false,
-	"Installed": false,
 	"Modules": [
 		{
 			"Name": "ReasonablePlanningAI",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"PlaformAllowList": ["Win64"]
 		},
 		{
 			"Name": "ReasonablePlanningAITestSuite",
 			"Type": "UncookedOnly",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"PlaformAllowList": ["Win64"]
 		},
 		{
 			"Name": "ReasonablePlanningAINodes",
 			"Type": "UncookedOnly",
-			"LoadingPhase": "PostEngineInit"
+			"LoadingPhase": "PostEngineInit",
+			"PlaformAllowList": ["Win64"]
 		},
 		{
 			"Name": "ReasonablePlanningAIEditor",
 			"Type": "Editor",
-			"LoadingPhase":  "PostEngineInit"
+			"LoadingPhase":  "PostEngineInit",
+			"PlaformAllowList": ["Win64"]
 		}
 	]
 }
