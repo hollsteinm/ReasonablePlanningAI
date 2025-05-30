@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Radaway Software LLC. 2025. All rights reserved.
 #pragma once
 
 #include "StateTypePropertyMultiBindCustom.h"
@@ -51,6 +51,17 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
 				.StructPropertyHandle(StructPropertyHandle)
 				.AllowedClasses({ URpaiState::StaticClass(), AAIController::StaticClass(), APawn::StaticClass() })
 		];
+}
+
+static FString GetBoundPropertyName (TSharedPtr<IPropertyHandle> Element)
+{
+	void* OutValue = nullptr;
+	if (Element->GetValueData (OutValue) == FPropertyAccess::Success)
+	{
+		FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
+		return PropertyPath->ToString ();
+	}
+	return FString ();
 }
 
 void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)

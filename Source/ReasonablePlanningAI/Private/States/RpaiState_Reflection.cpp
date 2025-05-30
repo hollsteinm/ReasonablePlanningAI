@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Radaway Software LLC. 2025. All rights reserved.
 
 #include "States/RpaiState_Reflection.h"
 #include "Core/RpaiResourceCollection.h"
