@@ -5,12 +5,12 @@
 
 EStateQueryResult URpaiStateQuery_Every::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
-	for (const auto Query : SubQueries)
-	{
-		if (Query->Query(StateToQuery) != EStateQueryResult::Succeeded)
-		{
-			return EStateQueryResult::Failed;
-		}
-	}
-	return EStateQueryResult::Succeeded;
+   for (const auto Query : SubQueries)
+   {
+      if (Query->Query(StateToQuery) != EStateQueryResult::Succeeded)
+      {
+         return EStateQueryResult::Failed;
+      }
+   }
+   return EStateQueryResult::Succeeded;
 }

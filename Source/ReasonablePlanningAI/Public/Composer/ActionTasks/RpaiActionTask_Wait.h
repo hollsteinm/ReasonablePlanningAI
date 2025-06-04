@@ -9,11 +9,11 @@
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FActionTaskWait
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	FActionTaskWait();
+   FActionTaskWait();
 
-	float RemainingSeconds;
+   float RemainingSeconds;
 };
 
 /**
@@ -22,17 +22,17 @@ struct REASONABLEPLANNINGAI_API FActionTaskWait
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_Wait : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 public:
-	URpaiActionTask_Wait();
+   URpaiActionTask_Wait();
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float WaitTimeSeconds;
+   UPROPERTY(Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
+   float WaitTimeSeconds;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float RandomDeviation;
+   UPROPERTY(Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
+   float RandomDeviation;
 };

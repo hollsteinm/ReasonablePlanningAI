@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiDistance_Bool : public URpaiComposerDistance
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const override;

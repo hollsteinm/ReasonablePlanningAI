@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiReasoner_AbsoluteUtility : public URpaiReasonerBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 protected:
     virtual URpaiGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const override;
 };

@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_MultiplyInteger : public URpaiStateMutator_MultiplyValue
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     /**

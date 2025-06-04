@@ -11,7 +11,7 @@ TMap<FName, TSharedRef<IPropertyTypeCustomization>> ComposerStateQueryCustom::Cu
 
 TSharedRef<IPropertyTypeCustomization> ComposerStateQueryCustom::MakeInstance()
 {
-	return MakeShareable(new ComposerStateQueryCustom());
+   return MakeShareable(new ComposerStateQueryCustom());
 }
 
 void ComposerStateQueryCustom::AddChildCustomization(const FName Name, TSharedRef<IPropertyTypeCustomization> Customization)

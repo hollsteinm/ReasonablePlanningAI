@@ -24,8 +24,8 @@ enum class EStateQueryCompareToOperation : uint8
 UCLASS(Abstract)
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareTo : public URpaiComposerStateQuery
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
     UPROPERTY(EditAnywhere, Category = "Rpai")
     FStateKeyValueReference QueriedState;

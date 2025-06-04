@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Engine/World.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "RpaiSubsystem.generated.h"
 

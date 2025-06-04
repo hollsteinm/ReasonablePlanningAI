@@ -14,21 +14,21 @@ class URpaiState;
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, DefaultToInstanced)
 class REASONABLEPLANNINGAI_API URpaiComposerDistanceBase : public UObject
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	/**
-	* Public interface to determine distance between two compared values in a give ReasonablePlanningState
-	*/
-	UFUNCTION(BlueprintPure, Category = "Rpai")
-		float CalculateDistance(const URpaiState* GivenState) const;
+   /**
+   * Public interface to determine distance between two compared values in a give ReasonablePlanningState
+   */
+   UFUNCTION(BlueprintPure, Category = "Rpai")
+      float CalculateDistance(const URpaiState* GivenState) const;
 
 protected:
-	/**
-	* Override to implement CalculateDistance
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Rpai")
-		float ReceiveCalculateDistance(const URpaiState* GivenState) const;
-	virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const;
-	
+   /**
+   * Override to implement CalculateDistance
+   */
+   UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Rpai")
+      float ReceiveCalculateDistance(const URpaiState* GivenState) const;
+   virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const;
+   
 };

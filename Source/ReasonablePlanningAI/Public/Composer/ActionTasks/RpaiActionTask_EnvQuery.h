@@ -11,11 +11,11 @@
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FActionTaskEnvQueryMemory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	FActionTaskEnvQueryMemory();
+   FActionTaskEnvQueryMemory();
 
-	int32 RequestId;
+   int32 RequestId;
 };
 
 /**
@@ -25,28 +25,28 @@ struct REASONABLEPLANNINGAI_API FActionTaskEnvQueryMemory
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_EnvQuery : public URpaiComposerActionTask
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_EnvQuery();
+   URpaiActionTask_EnvQuery();
 
-	UPROPERTY(Category=Rpai, EditAnywhere)
-	TObjectPtr<UEnvQuery> QueryTemplate;
+   UPROPERTY(Category=Rpai, EditAnywhere)
+   TObjectPtr<UEnvQuery> QueryTemplate;
 
-	UPROPERTY(Category = Rpai, EditAnywhere)
-	TArray<FAIDynamicParam> QueryConfig;
+   UPROPERTY(Category = Rpai, EditAnywhere)
+   TArray<FAIDynamicParam> QueryConfig;
 
-	UPROPERTY(Category = Rpai, EditAnywhere)
-	TEnumAsByte<EEnvQueryRunMode::Type> RunMode;
+   UPROPERTY(Category = Rpai, EditAnywhere)
+   TEnumAsByte<EEnvQueryRunMode::Type> RunMode;
 
 private:
-	/* Rare managed runtime state property. Used to maintain references to these handles less they go out of scope. */
-	TArray<FAIMessageObserverHandle> ObserverCache;
+   /* Rare managed runtime state property. Used to maintain references to these handles less they go out of scope. */
+   TArray<FAIMessageObserverHandle> ObserverCache;
 
-	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
-	void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+   void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+   void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
 };

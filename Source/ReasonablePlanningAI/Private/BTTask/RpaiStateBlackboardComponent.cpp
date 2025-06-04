@@ -6,7 +6,7 @@
 
 // Sets default values for this component's properties
 URpaiStateBlackboardComponent::URpaiStateBlackboardComponent()
-	: StateAdapter(nullptr)
+   : StateAdapter(nullptr)
 {
-	PrimaryComponentTick.bCanEverTick = false;
+   PrimaryComponentTick.bCanEverTick = false;
 }

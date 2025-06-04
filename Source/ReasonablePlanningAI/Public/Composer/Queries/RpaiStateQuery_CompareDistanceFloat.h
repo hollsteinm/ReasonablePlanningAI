@@ -15,7 +15,7 @@ class URpaiComposerDistance;
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareDistanceFloat : public URpaiComposerStateQuery
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;

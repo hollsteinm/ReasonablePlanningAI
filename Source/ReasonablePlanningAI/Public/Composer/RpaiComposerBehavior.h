@@ -20,44 +20,44 @@ class URpaiPlannerBase;
 UCLASS(BlueprintType)
 class REASONABLEPLANNINGAI_API URpaiComposerBehavior : public UDataAsset
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	TSubclassOf<URpaiState> ConstructedStateType;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   TSubclassOf<URpaiState> ConstructedStateType;
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	URpaiReasonerBase* Reasoner;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   URpaiReasonerBase* Reasoner;
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	URpaiPlannerBase* Planner;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   URpaiPlannerBase* Planner;
 
-	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "GoalName"))
-	TArray<URpaiGoalBase*> Goals;
+   UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "GoalName"))
+   TArray<URpaiGoalBase*> Goals;
 
-	UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "ActionName"))
-	TArray<URpaiActionBase*> Actions;
+   UPROPERTY(EditAnywhere,Instanced,Category = "Rpai", meta=(TitleProperty = "ActionName"))
+   TArray<URpaiActionBase*> Actions;
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	FRpaiStateBinding Bindings;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   FRpaiStateBinding Bindings;
 
-	FORCEINLINE const URpaiReasonerBase* GetReasoner() const { return Reasoner; }
+   FORCEINLINE const URpaiReasonerBase* GetReasoner() const { return Reasoner; }
 
-	FORCEINLINE const URpaiPlannerBase* GetPlanner() const { return Planner; }
+   FORCEINLINE const URpaiPlannerBase* GetPlanner() const { return Planner; }
 
-	FORCEINLINE TSubclassOf<URpaiState> GetConstructedStateType() const { return ConstructedStateType; }
+   FORCEINLINE TSubclassOf<URpaiState> GetConstructedStateType() const { return ConstructedStateType; }
 
-	FORCEINLINE TArray<URpaiGoalBase*> GetGoals() const { return Goals; }
+   FORCEINLINE TArray<URpaiGoalBase*> GetGoals() const { return Goals; }
 
-	FORCEINLINE TArray<URpaiActionBase*> GetActions() const { return Actions; }
+   FORCEINLINE TArray<URpaiActionBase*> GetActions() const { return Actions; }
 
-	FORCEINLINE void SetReasoner(URpaiReasonerBase* NewReasoner) { Reasoner = NewReasoner; }
+   FORCEINLINE void SetReasoner(URpaiReasonerBase* NewReasoner) { Reasoner = NewReasoner; }
 
-	FORCEINLINE void SetPlanner(URpaiPlannerBase* NewPlanner) { Planner = NewPlanner; }
+   FORCEINLINE void SetPlanner(URpaiPlannerBase* NewPlanner) { Planner = NewPlanner; }
 
-	FORCEINLINE void SetConstructedStateType(TSubclassOf<URpaiState> NewStateType) { ConstructedStateType = NewStateType; }
+   FORCEINLINE void SetConstructedStateType(TSubclassOf<URpaiState> NewStateType) { ConstructedStateType = NewStateType; }
 
-	FORCEINLINE void SetGoals(const TArray<URpaiGoalBase*>& NewGoals) { Goals = NewGoals; }
+   FORCEINLINE void SetGoals(const TArray<URpaiGoalBase*>& NewGoals) { Goals = NewGoals; }
 
-	FORCEINLINE void SetActions(TArray<URpaiActionBase*> NewActions) { Actions = NewActions; }
+   FORCEINLINE void SetActions(TArray<URpaiActionBase*> NewActions) { Actions = NewActions; }
 };

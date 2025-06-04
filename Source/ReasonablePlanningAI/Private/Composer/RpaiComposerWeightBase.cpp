@@ -5,10 +5,10 @@
 
 float URpaiComposerWeightBase::ExecutionWeight(const URpaiState* GivenState) const
 {
-	return ReceiveExecutionWeight(GivenState);
+   return ReceiveExecutionWeight(GivenState);
 }
 
 float URpaiComposerWeightBase::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
-	return 0.f;
+   return 0.f;
 }

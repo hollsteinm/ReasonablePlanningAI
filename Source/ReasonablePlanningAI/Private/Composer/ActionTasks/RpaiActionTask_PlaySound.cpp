@@ -7,18 +7,18 @@
 #include "Sound/SoundCue.h"
 
 URpaiActionTask_PlaySound::URpaiActionTask_PlaySound()
-	: SoundToPlay(nullptr)
+   : SoundToPlay(nullptr)
 {
 
 }
 
 void URpaiActionTask_PlaySound::ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld)
 {
-	if (SoundToPlay != nullptr)
-	{
-		if (const APawn* AIPawn = ActionInstigator->GetPawn())
-		{
-			UGameplayStatics::SpawnSoundAttached(SoundToPlay, AIPawn->GetRootComponent());
-		}
-	}
+   if (SoundToPlay != nullptr)
+   {
+      if (const APawn* AIPawn = ActionInstigator->GetPawn())
+      {
+         UGameplayStatics::SpawnSoundAttached(SoundToPlay, AIPawn->GetRootComponent());
+      }
+   }
 }

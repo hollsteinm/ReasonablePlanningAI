@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAIEDITOR_API UComposerBehaviorFactory : public UFactory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 public:
     UComposerBehaviorFactory();
 

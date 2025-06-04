@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_AddFloat : public URpaiStateMutator_AddValue
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
     
 protected:
     /**
@@ -26,5 +26,5 @@ protected:
     
 public:
     FORCEINLINE void SetFloatValueToAdd(float NewFloatValueToAdd) { ValueToAdd = NewFloatValueToAdd; }
-	
+   
 };

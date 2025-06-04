@@ -2,6 +2,7 @@
 
 
 #include "Composer/Distances/RpaiDistance_State.h"
+#include "GameFramework/Actor.h"
 #include "Core/RpaiState.h"
 
 //Return distance as the difference between the left hand property and the right hand property.

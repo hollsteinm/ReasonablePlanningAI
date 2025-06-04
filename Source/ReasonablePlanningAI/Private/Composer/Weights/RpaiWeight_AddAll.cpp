@@ -5,10 +5,10 @@
 
 float URpaiWeight_AddAll::ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const
 {
-	float Result = 0.f;
-	for (const auto Weight : SubWeights)
-	{
-		Result += Weight->ExecutionWeight(GivenState);
-	}
-	return Result;
+   float Result = 0.f;
+   for (const auto Weight : SubWeights)
+   {
+      Result += Weight->ExecutionWeight(GivenState);
+   }
+   return Result;
 }

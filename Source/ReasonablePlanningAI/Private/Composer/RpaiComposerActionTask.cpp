@@ -8,7 +8,7 @@
 #include "AITypes.h"
 
 URpaiComposerActionTask::URpaiComposerActionTask()
-	: ActionTaskStateKeyValueReference()
+   : ActionTaskStateKeyValueReference()
 {
 
 }

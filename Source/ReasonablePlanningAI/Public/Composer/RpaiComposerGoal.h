@@ -17,8 +17,8 @@ class URpaiComposerStateQuery;
 UCLASS(BlueprintType, Blueprintable)
 class REASONABLEPLANNINGAI_API URpaiComposerGoal : public URpaiGoalBase
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
 
     /** Begin ReasonablePlanningGoalBase*/

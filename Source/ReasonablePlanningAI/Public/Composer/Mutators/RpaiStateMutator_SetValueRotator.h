@@ -12,8 +12,8 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_SetValueRotator : public URpaiStateMutator_SetValue
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
     UPROPERTY(EditAnywhere, Category = "Rpai")
     FRotator ValueToSet;

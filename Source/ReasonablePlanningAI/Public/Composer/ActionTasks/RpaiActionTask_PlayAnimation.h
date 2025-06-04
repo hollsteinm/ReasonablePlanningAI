@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Composer/RpaiComposerActionTaskBase.h"
 #include "RpaiActionTask_PlayAnimation.generated.h"
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FActionTaskPlayAnimationMemory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	FActionTaskPlayAnimationMemory();
+   FActionTaskPlayAnimationMemory();
 
-	FTimerHandle AnimationTimerHandle;
-	EAnimationMode::Type PreviousAnimationMode;
-	USkeletalMeshComponent* CachedMesh;
+   FTimerHandle AnimationTimerHandle;
+   EAnimationMode::Type PreviousAnimationMode;
+   USkeletalMeshComponent* CachedMesh;
 };
 
 /**
@@ -24,24 +25,24 @@ struct REASONABLEPLANNINGAI_API FActionTaskPlayAnimationMemory
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_PlayAnimation : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_PlayAnimation();
+   URpaiActionTask_PlayAnimation();
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	UAnimationAsset* AnimationToPlay;
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   UAnimationAsset* AnimationToPlay;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bLooping;
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bLooping;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bPersistOnComplete;
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bPersistOnComplete;
 
 private:
-	void OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh);
+   void OnAnimationEnd(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor, UWorld* ActionWorld, USkeletalMeshComponent* Mesh);
 };

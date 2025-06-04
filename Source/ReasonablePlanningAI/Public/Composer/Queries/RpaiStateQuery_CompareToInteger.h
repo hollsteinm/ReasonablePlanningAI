@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareToInteger : public URpaiStateQuery_CompareTo
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
-	virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
-	
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	int32 ValueToCompare;
+   virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
+   
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   int32 ValueToCompare;
 
 public:
-	FORCEINLINE void SetComparisonValue(int32 NewValueToCompare) { ValueToCompare = NewValueToCompare; }
+   FORCEINLINE void SetComparisonValue(int32 NewValueToCompare) { ValueToCompare = NewValueToCompare; }
 };

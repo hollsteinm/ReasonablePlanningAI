@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_SetValueName : public URpaiStateMutator_SetValue
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     UPROPERTY(EditAnywhere, Category = "Rpai")

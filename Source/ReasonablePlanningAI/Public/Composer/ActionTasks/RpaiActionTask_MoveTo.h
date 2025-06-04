@@ -16,7 +16,7 @@
 **/
 FORCEINLINE uint32 GetTypeHash(const FAIRequestID& AIRequestID)
 {
-	return AIRequestID.GetID();
+   return AIRequestID.GetID();
 }
 
 /**
@@ -26,59 +26,59 @@ FORCEINLINE uint32 GetTypeHash(const FAIRequestID& AIRequestID)
 UCLASS(config = Game)
 class REASONABLEPLANNINGAI_API URpaiActionTask_MoveTo : public URpaiComposerActionTask
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_MoveTo();
+   URpaiActionTask_MoveTo();
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
 
-	/** Fixed distance to determine if destination is reached */
-	UPROPERTY(config, Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
-	float AcceptableRadius;
+   /** Fixed distance to determine if destination is reached */
+   UPROPERTY(config, Category = "Rpai", EditAnywhere, meta = (ClampMin = "0.0", UIMin = "0.0"))
+   float AcceptableRadius;
 
-	/** "None" will result in default filter being used */
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	TSubclassOf<UNavigationQueryFilter> FilterClass;
+   /** "None" will result in default filter being used */
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   TSubclassOf<UNavigationQueryFilter> FilterClass;
 
-	/** Allow left-right movement with different facing */
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bAllowStrafe;
+   /** Allow left-right movement with different facing */
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bAllowStrafe;
 
-	/** Move somewhere close enough if the destination is unreachable */
-	UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
-	bool bAllowPartialPath;
+   /** Move somewhere close enough if the destination is unreachable */
+   UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
+   bool bAllowPartialPath;
 
-	/** Will update pathing with moving target */
-	UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
-	bool bTrackMovingGoal;
+   /** Will update pathing with moving target */
+   UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
+   bool bTrackMovingGoal;
 
-	/** Location will be projected to navmesh */
-	UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
-	bool bProjectGoalLocation;
+   /** Location will be projected to navmesh */
+   UPROPERTY(Category = "Rpai", EditAnywhere, AdvancedDisplay)
+   bool bProjectGoalLocation;
 
-	/** AI bounds will be included to detect reaching of destination */
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bReachTestIncludesAgentRadius;
+   /** AI bounds will be included to detect reaching of destination */
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bReachTestIncludesAgentRadius;
 
-	/** Goal location capsule will be used to deteact reaching of destination */
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bReachTestIncludesGoalRadius;
+   /** Goal location capsule will be used to deteact reaching of destination */
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bReachTestIncludesGoalRadius;
 
-	/** Use more direct movement to reach destination */
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	bool bUsePathfinding;
+   /** Use more direct movement to reach destination */
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   bool bUsePathfinding;
 
-	UPROPERTY()
-	bool bStopOnOverlapNeedsUpdate;
+   UPROPERTY()
+   bool bStopOnOverlapNeedsUpdate;
 
 private:
-	void StartMoveActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
-	void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+   void StartMoveActionTask(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+   void OnAIMessage(UBrainComponent* BrainComp, const FAIMessage& Message, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
 
-	TMap<FAIRequestID, FAIMessageObserverHandle> MoveFinishedHandles;
-	TMap<FAIRequestID, FAIMessageObserverHandle> RepathFailedHandles;
+   TMap<FAIRequestID, FAIMessageObserverHandle> MoveFinishedHandles;
+   TMap<FAIRequestID, FAIMessageObserverHandle> RepathFailedHandles;
 };

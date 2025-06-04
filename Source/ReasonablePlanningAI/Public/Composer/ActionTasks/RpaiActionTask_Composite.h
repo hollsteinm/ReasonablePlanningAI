@@ -9,34 +9,34 @@
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FActionTaskCompositeMemory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	FActionTaskCompositeMemory();
+   FActionTaskCompositeMemory();
 
-	TArray<FRpaiMemoryStruct> CompositeActionTaskSlices;
-	TArray<FRpaiCompositeActionTaskEntry> ActionActionTasks;
-	TSet<int32> FlushActionIndices;
-	bool bDoDefferedCancellationNextTick;
+   TArray<FRpaiMemoryStruct> CompositeActionTaskSlices;
+   TArray<FRpaiCompositeActionTaskEntry> ActionActionTasks;
+   TSet<int32> FlushActionIndices;
+   bool bDoDefferedCancellationNextTick;
 };
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FRpaiCompositeActionTaskEntry
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Instanced, Category = "Rpai")
-	URpaiComposerActionTaskBase* Action;
+   UPROPERTY(EditAnywhere, Instanced, Category = "Rpai")
+   URpaiComposerActionTaskBase* Action;
 
-	/* If true, this action does not matter in the execution of all the actions to determine if the composite action is completed.*/
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	bool bIgnoredForCompositeCompletion;
+   /* If true, this action does not matter in the execution of all the actions to determine if the composite action is completed.*/
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   bool bIgnoredForCompositeCompletion;
 
-	/* If true, and if `bIgnoredForCompositeCompletion` is true, Cancel will be called on the action task instead of complete upon composite action task completion.*/
-	UPROPERTY(EditAnywhere, Category = "Rpai", meta = (EditCondition="bIgnoredForCompositeCompletion"))
-	bool bPreferCancelOnCompositeCompletion;
+   /* If true, and if `bIgnoredForCompositeCompletion` is true, Cancel will be called on the action task instead of complete upon composite action task completion.*/
+   UPROPERTY(EditAnywhere, Category = "Rpai", meta = (EditCondition="bIgnoredForCompositeCompletion"))
+   bool bPreferCancelOnCompositeCompletion;
 
-	FRpaiCompositeActionTaskEntry();
-	FRpaiCompositeActionTaskEntry(const FRpaiCompositeActionTaskEntry& Other);
+   FRpaiCompositeActionTaskEntry();
+   FRpaiCompositeActionTaskEntry(const FRpaiCompositeActionTaskEntry& Other);
 };
 
 /**
@@ -46,42 +46,42 @@ public:
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_Composite : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_Composite();
+   URpaiActionTask_Composite();
 
-	/**
-	* Adds an action task to this composite of actions. Not safe to call during execution.
-	**/
-	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void AddActionTaskToComposite(FRpaiCompositeActionTaskEntry NewEntry);
+   /**
+   * Adds an action task to this composite of actions. Not safe to call during execution.
+   **/
+   UFUNCTION(BlueprintCallable, Category = "Rpai")
+   void AddActionTaskToComposite(FRpaiCompositeActionTaskEntry NewEntry);
 
-	/**
-	* Removes all occurences of an action task configuration to this sequence of actions. Not safe to call during execution.
-	**/
-	UFUNCTION(BlueprintCallable, Category = "Rpai")
-	void RemoveActionTaskFromComposite(FRpaiCompositeActionTaskEntry MatchingEntryToRemove);
+   /**
+   * Removes all occurences of an action task configuration to this sequence of actions. Not safe to call during execution.
+   **/
+   UFUNCTION(BlueprintCallable, Category = "Rpai")
+   void RemoveActionTaskFromComposite(FRpaiCompositeActionTaskEntry MatchingEntryToRemove);
 
-	UFUNCTION(BlueprintPure, Category = "Rpai")
-	const URpaiComposerActionTaskBase* ViewTaskFromComposite(int32 Index) const;
+   UFUNCTION(BlueprintPure, Category = "Rpai")
+   const URpaiComposerActionTaskBase* ViewTaskFromComposite(int32 Index) const;
 
 protected:
-	/**
-	* A list of actions to execute in a batch. All will start at the same time and will complete when all actions have been completed or cancelled unless indicated otherwhise in 'IgnoreIndicesForCompletion'.
-	**/
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	TArray<FRpaiCompositeActionTaskEntry> ActionEntries;
+   /**
+   * A list of actions to execute in a batch. All will start at the same time and will complete when all actions have been completed or cancelled unless indicated otherwhise in 'IgnoreIndicesForCompletion'.
+   **/
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   TArray<FRpaiCompositeActionTaskEntry> ActionEntries;
 
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
-	virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveUpdateActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, float DeltaSeconds, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
+   virtual void ReceiveCompleteActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
 private:
-	void OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
-	void OnCompositeActionTaskCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory);
-	void Flush(FRpaiMemoryStruct ActionMemory);
+   void OnActionTaskCompletedOrCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory);
+   void OnCompositeActionTaskCancelled(URpaiComposerActionTaskBase* ActionTask, AAIController* ActionInstigator, URpaiState* CurrentState, bool bCancelShouldExitPlan, FRpaiMemoryStruct ActionMemory);
+   void Flush(FRpaiMemoryStruct ActionMemory);
 
-	FRpaiMemory CompositeMemoryPool;
+   FRpaiMemory CompositeMemoryPool;
 };

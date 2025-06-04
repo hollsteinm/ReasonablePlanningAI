@@ -10,38 +10,38 @@
 UCLASS(MinimalAPI)
 class UK2Node_RpaiReadMemory : public UK2Node
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 private:
-	FNodeTextCache CachedTitle;
+   FNodeTextCache CachedTitle;
 
 protected:
-	UPROPERTY()
-	UScriptStruct* StructType;
+   UPROPERTY()
+   UScriptStruct* StructType;
 
 public:
-	static FName MemoryStructInputPin;
+   static FName MemoryStructInputPin;
 
-	FORCEINLINE UScriptStruct* GetStructType() const { return StructType; }
+   FORCEINLINE UScriptStruct* GetStructType() const { return StructType; }
 
-	//~ Begin UObject Interface
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
-	//~ End UObject Interface
+   //~ Begin UObject Interface
+   virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+   //~ End UObject Interface
 
-	//~ Begin UEdGraphNode Interface
-	virtual void AllocateDefaultPins() override;
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
-	//~ End UEdGraphNode Interface
+   //~ Begin UEdGraphNode Interface
+   virtual void AllocateDefaultPins() override;
+   virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+   //~ End UEdGraphNode Interface
 
-	//~ Begin UK2Node Interface
-	virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
-	virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
-	virtual void PreloadRequiredAssets() override;
+   //~ Begin UK2Node Interface
+   virtual void ExpandNode(class FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
+   virtual void GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const override;
+   virtual void PreloadRequiredAssets() override;
 
-	virtual bool IsNodePure() const override { return true; }
-	//~ End UK2Node Interface
+   virtual bool IsNodePure() const override { return true; }
+   //~ End UK2Node Interface
 
-	UEdGraphPin* GetMemoryStructInputPin() const;
-	UEdGraphPin* GetThenOutputPin() const;
-	UEdGraphPin* GetInvalidOutputPin() const;
+   UEdGraphPin* GetMemoryStructInputPin() const;
+   UEdGraphPin* GetThenOutputPin() const;
+   UEdGraphPin* GetInvalidOutputPin() const;
 };

@@ -14,7 +14,7 @@ class URpaiComposerDistance;
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiWeight_Distance : public URpaiComposerWeightBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
     
 protected:
     UPROPERTY(EditAnywhere, Category="Rpai")
@@ -24,5 +24,5 @@ protected:
     
 public:
     FORCEINLINE void SetDistance(URpaiComposerDistance* NewDistance) { Distance = NewDistance; }
-	
+   
 };

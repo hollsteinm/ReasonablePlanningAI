@@ -14,14 +14,14 @@
 UCLASS(Blueprintable, BlueprintType, Abstract)
 class REASONABLEPLANNINGAI_API URpaiComposerActionTask : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	FStateKeyValueReference ActionTaskStateKeyValueReference;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   FStateKeyValueReference ActionTaskStateKeyValueReference;
 
 public:
-	URpaiComposerActionTask();
+   URpaiComposerActionTask();
 
-	FORCEINLINE void SetStateKeyValueReference(const FStateKeyValueReference& Reference) { ActionTaskStateKeyValueReference = Reference; }
+   FORCEINLINE void SetStateKeyValueReference(const FStateKeyValueReference& Reference) { ActionTaskStateKeyValueReference = Reference; }
 };

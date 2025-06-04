@@ -12,12 +12,12 @@ class UAITask;
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FActionTaskGameplayTaskBaseMemory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	FActionTaskGameplayTaskBaseMemory();
+   FActionTaskGameplayTaskBaseMemory();
 
-	UAITask* AITask;
-	URpaiState* State;
+   UAITask* AITask;
+   URpaiState* State;
 };
 
 /**
@@ -28,31 +28,31 @@ struct REASONABLEPLANNINGAI_API FActionTaskGameplayTaskBaseMemory
 UCLASS(Abstract)
 class REASONABLEPLANNINGAI_API URpaiActionTask_GameplayTaskBase : public URpaiComposerActionTaskBase, public IGameplayTaskOwnerInterface
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_GameplayTaskBase();
+   URpaiActionTask_GameplayTaskBase();
 
-	// BEGIN IGameplayTaskOwnerInterface
-	virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
-	virtual AActor* GetGameplayTaskOwner(const UGameplayTask* Task) const override;
-	virtual AActor* GetGameplayTaskAvatar(const UGameplayTask* Task) const override;
-	virtual uint8 GetGameplayTaskDefaultPriority() const override;
-	virtual void OnGameplayTaskInitialized(UGameplayTask& Task) override;
-	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
-	// END IGameplayTaskOwnerInterface
+   // BEGIN IGameplayTaskOwnerInterface
+   virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
+   virtual AActor* GetGameplayTaskOwner(const UGameplayTask* Task) const override;
+   virtual AActor* GetGameplayTaskAvatar(const UGameplayTask* Task) const override;
+   virtual uint8 GetGameplayTaskDefaultPriority() const override;
+   virtual void OnGameplayTaskInitialized(UGameplayTask& Task) override;
+   virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+   // END IGameplayTaskOwnerInterface
 
 protected:
-	virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
+   virtual void ReceiveCancelActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr, bool bCancelShouldExitPlan = true) override;
 
-	UFUNCTION(BlueprintCallable, Category=Rpai)
-	void StartTask(URpaiState* CurrentState, UAITask* TaskToStart, FRpaiMemoryStruct ActionMemory);
+   UFUNCTION(BlueprintCallable, Category=Rpai)
+   void StartTask(URpaiState* CurrentState, UAITask* TaskToStart, FRpaiMemoryStruct ActionMemory);
 
-	// Gets the Rpai Memory associated to a controller. This should be rarely used, but may be required by child classes. Returns true if memory found, false otherwise.
-	UFUNCTION(BlueprintCallable, Category = Rpai)
-	bool GetMemoryForController(AAIController* ControllerToQuery, FRpaiMemoryStruct& OutMemoryStruct);
+   // Gets the Rpai Memory associated to a controller. This should be rarely used, but may be required by child classes. Returns true if memory found, false otherwise.
+   UFUNCTION(BlueprintCallable, Category = Rpai)
+   bool GetMemoryForController(AAIController* ControllerToQuery, FRpaiMemoryStruct& OutMemoryStruct);
 
 private:
-	// Find Rpai Memory associated with a given task.
-	TMap<AAIController*, FRpaiMemoryStruct> ControllerToMemory;
+   // Find Rpai Memory associated with a given task.
+   TMap<AAIController*, FRpaiMemoryStruct> ControllerToMemory;
 };

@@ -12,5 +12,5 @@
 UCLASS(Abstract)
 class REASONABLEPLANNINGAI_API URpaiStateMutator_MultiplyValue : public URpaiComposerStateMutator
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 };

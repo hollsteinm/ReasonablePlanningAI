@@ -12,15 +12,15 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_CopyState : public URpaiComposerStateMutator
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	FStateKeyValueReference StatePropertyToCopy;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   FStateKeyValueReference StatePropertyToCopy;
 
-	virtual void ReceiveMutate_Implementation(URpaiState* StateToChange) const override;
-	virtual bool CanApply_Implementation(const URpaiState* StateToChange) const override;
+   virtual void ReceiveMutate_Implementation(URpaiState* StateToChange) const override;
+   virtual bool CanApply_Implementation(const URpaiState* StateToChange) const override;
 
 public:
-	FORCEINLINE void SetCopiedFromStateValue(FName StateKeyName, EStatePropertyType ExpectedValueType) { StatePropertyToCopy.StateKeyName = StateKeyName; StatePropertyToCopy.ExpectedValueType = ExpectedValueType; }
+   FORCEINLINE void SetCopiedFromStateValue(FName StateKeyName, EStatePropertyType ExpectedValueType) { StatePropertyToCopy.StateKeyName = StateKeyName; StatePropertyToCopy.ExpectedValueType = ExpectedValueType; }
 };

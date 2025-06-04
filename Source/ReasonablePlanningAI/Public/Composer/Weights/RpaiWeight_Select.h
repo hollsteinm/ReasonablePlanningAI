@@ -11,14 +11,14 @@ class URpaiComposerStateQuery;
 USTRUCT(BlueprintType)
 struct FWeightSelectStateQueryPair
 {
-	GENERATED_USTRUCT_BODY()
+   GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Instanced, Category = Rpai)
-	URpaiComposerStateQuery* SelectionQuery;
+   UPROPERTY(EditAnywhere, Instanced, Category = Rpai)
+   URpaiComposerStateQuery* SelectionQuery;
 
-	UPROPERTY(EditAnywhere, Instanced, Category=Rpai)
-	URpaiComposerWeightBase* SelectionWeight;
+   UPROPERTY(EditAnywhere, Instanced, Category=Rpai)
+   URpaiComposerWeightBase* SelectionWeight;
 };
 
 /**
@@ -28,19 +28,19 @@ public:
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiWeight_Select : public URpaiComposerWeightBase
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
-	UPROPERTY(EditAnywhere, Category = Rpai)
-	URpaiComposerWeightBase* Default;
+   UPROPERTY(EditAnywhere, Category = Rpai)
+   URpaiComposerWeightBase* Default;
 
-	UPROPERTY(EditAnywhere, Category = Rpai)
-	TArray<FWeightSelectStateQueryPair> Selections;
+   UPROPERTY(EditAnywhere, Category = Rpai)
+   TArray<FWeightSelectStateQueryPair> Selections;
 
-	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
+   virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 
 public:
-	FORCEINLINE void SetSelections(TArray<FWeightSelectStateQueryPair>&& NewSelections) { Selections = NewSelections; }
+   FORCEINLINE void SetSelections(TArray<FWeightSelectStateQueryPair>&& NewSelections) { Selections = NewSelections; }
 
-	FORCEINLINE void SetDefault(URpaiComposerWeightBase* NewDefault) { Default = NewDefault; }
+   FORCEINLINE void SetDefault(URpaiComposerWeightBase* NewDefault) { Default = NewDefault; }
 };

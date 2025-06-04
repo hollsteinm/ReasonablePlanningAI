@@ -6,10 +6,10 @@
 
 void URpaiStateMutator_SetValueVector::ReceiveMutate_Implementation(URpaiState* StateToMutate) const
 {
-	StateToMutate->SetVector(StatePropertyToMutate.StateKeyName, ValueToSet);
+   StateToMutate->SetVector(StatePropertyToMutate.StateKeyName, ValueToSet);
 }
 
 bool URpaiStateMutator_SetValueVector::CanApply_Implementation(const URpaiState* StateToMutate) const
 {
-	return StatePropertyToMutate.ExpectedValueType == EStatePropertyType::Vector && StateToMutate->HasVector(StatePropertyToMutate.StateKeyName);
+   return StatePropertyToMutate.ExpectedValueType == EStatePropertyType::Vector && StateToMutate->HasVector(StatePropertyToMutate.StateKeyName);
 }

@@ -8,24 +8,24 @@
 UCLASS()
 class URpaiBTTask_DetermineNextGoal : public UBTTask_BlackboardBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	class URpaiReasonerBase* Reasoner;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   class URpaiReasonerBase* Reasoner;
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	TArray<class URpaiGoalBase*> Goals;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   TArray<class URpaiGoalBase*> Goals;
 
 public:
-	URpaiBTTask_DetermineNextGoal();
+   URpaiBTTask_DetermineNextGoal();
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+   virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	virtual void DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const override;
-	virtual FString GetStaticDescription() const override;
+   virtual void DescribeRuntimeValues(const UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTDescriptionVerbosity::Type Verbosity, TArray<FString>& Values) const override;
+   virtual FString GetStaticDescription() const override;
 
 #if WITH_EDITOR
-	virtual FName GetNodeIconName() const override;
+   virtual FName GetNodeIconName() const override;
 #endif // WITH_EDITOR
 };

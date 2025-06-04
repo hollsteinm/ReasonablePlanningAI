@@ -22,8 +22,8 @@ enum class EStateQueryResult : uint8
 UCLASS(Abstract, BlueprintType, Blueprintable, EditInlineNew, DefaultToInstanced)
 class REASONABLEPLANNINGAI_API URpaiComposerStateQuery : public UObject
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 public:
     /**
      * Implement this function to define your query operation. Return EStateQueryResult::Succeeded to indicate the query conditions

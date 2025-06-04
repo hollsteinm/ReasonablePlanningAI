@@ -12,16 +12,16 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiWeight_CurveFloat : public URpaiComposerWeight
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
-	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
+   virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	UCurveFloat* WeightFloatCurve;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   class UCurveFloat* WeightFloatCurve;
 
 public:
-	//Not UFUNCTION because this is for C++ setup and we want to keep the data above focused on game design editability.
-	FORCEINLINE void SetCurve(UCurveFloat* NewCurve) { WeightFloatCurve = NewCurve; }
-	FORCEINLINE UCurveFloat* GetCurve() const { return WeightFloatCurve; }
+   //Not UFUNCTION because this is for C++ setup and we want to keep the data above focused on game design editability.
+   FORCEINLINE void SetCurve(UCurveFloat* NewCurve) { WeightFloatCurve = NewCurve; }
+   FORCEINLINE UCurveFloat* GetCurve() const { return WeightFloatCurve; }
 };

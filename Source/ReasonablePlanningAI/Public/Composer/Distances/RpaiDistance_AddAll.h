@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiDistance_AddAll : public URpaiComposerDistance
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
-	UPROPERTY(EditAnywhere, Category = "Rpai", Instanced)
-	TArray<URpaiComposerDistance*> SubDistances;
+   UPROPERTY(EditAnywhere, Category = "Rpai", Instanced)
+   TArray<URpaiComposerDistance*> SubDistances;
 
-	virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const override;
+   virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const override;
 
 public:
-	FORCEINLINE void SetSubDistances(TArray<URpaiComposerDistance*>&& NewSetSubDistances) { SubDistances = NewSetSubDistances; }
+   FORCEINLINE void SetSubDistances(TArray<URpaiComposerDistance*>&& NewSetSubDistances) { SubDistances = NewSetSubDistances; }
 };
