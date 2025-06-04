@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "Core/RpaiSubsystem.h"
 #include "Core/RpaiPlannerBase.h"
 

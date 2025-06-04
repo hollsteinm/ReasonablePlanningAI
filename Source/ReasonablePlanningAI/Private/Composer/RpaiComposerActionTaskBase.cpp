@@ -1,4 +1,4 @@
-// Radaway Software LLC. 2025. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "Composer/RpaiComposerActionTaskBase.h"

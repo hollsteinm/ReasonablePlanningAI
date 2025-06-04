@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "Misc/AutomationTest.h"
 #include "ReasonablePlanningAITestTypes.h"
 #include "Core/RpaiResourceCollection.h"

@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "ReasonablePlanningAITestTypes.h"
 
 FName UTestPlanningState::NAME_TheBoolValue = "TheBoolValue";

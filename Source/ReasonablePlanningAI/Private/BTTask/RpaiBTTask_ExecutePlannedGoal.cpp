@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "BTTask/RpaiBTTask_ExecutePlannedGoal.h"
 #include "Composer/RpaiComposerBehavior.h"
 #include "Core/RpaiGoalBase.h"

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 

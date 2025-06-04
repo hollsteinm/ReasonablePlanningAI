@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "States/RpaiState_BlackboardComponentAdapter.h"
 #include "BehaviorTree/BlackboardComponent.h"
 

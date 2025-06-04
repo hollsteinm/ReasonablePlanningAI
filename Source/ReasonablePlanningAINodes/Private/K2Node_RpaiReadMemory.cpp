@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "K2Node_RpaiReadMemory.h"
