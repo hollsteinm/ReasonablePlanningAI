@@ -171,8 +171,8 @@ void URpaiActionTask_Composite::Flush(FRpaiMemoryStruct ActionMemory)
       Memory->FlushActionIndices.Sort(SetSorter);
       for (const auto RemoveIdx : Memory->FlushActionIndices)
       {
-         Memory->ActionActionTasks.RemoveAt(RemoveIdx, 1, false);
-         Memory->CompositeActionTaskSlices.RemoveAt(RemoveIdx, 1, false);
+         Memory->ActionActionTasks.RemoveAt(RemoveIdx, 1, EAllowShrinking::No);
+         Memory->CompositeActionTaskSlices.RemoveAt(RemoveIdx, 1, EAllowShrinking::No);
       }
       Memory->FlushActionIndices.Empty();
    }

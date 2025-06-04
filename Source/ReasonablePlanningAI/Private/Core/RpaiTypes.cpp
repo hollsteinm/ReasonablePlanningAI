@@ -299,7 +299,7 @@ void FRpaiStateTypePropertyMultiBind::RemoveBinding(int32 BindingHandle)
 {
    if (BoundProperties.IsValidIndex(BindingHandle))
    {
-      BoundProperties.RemoveAt(BindingHandle, 1, false);
+      BoundProperties.RemoveAt(BindingHandle, 1, EAllowShrinking::No);
    }
 }
 
@@ -362,15 +362,15 @@ void FRpaiStateBinding::RemoveBinding(const FStateBindingHandle& Handle)
 
       if (SourceBindings[Handle.StateSourceTypeHandle.Handle].BoundProperties.IsEmpty())
       {
-         SourceBindings.RemoveAt(Handle.StateSourceTypeHandle.Handle, 1, false);
+         SourceBindings.RemoveAt(Handle.StateSourceTypeHandle.Handle, 1, EAllowShrinking::No);
       }
 
       if (TargetBindings[Handle.StateTargetTypeHandle.Handle].BoundProperties.IsEmpty())
       {
-         TargetBindings.RemoveAt(Handle.StateTargetTypeHandle.Handle, 1, false);
+         TargetBindings.RemoveAt(Handle.StateTargetTypeHandle.Handle, 1, EAllowShrinking::No);
       }
 
-      BindingHandles.RemoveAt(Handle.Handle, 1, false);
+      BindingHandles.RemoveAt(Handle.Handle, 1, EAllowShrinking::No);
    }
 }
 

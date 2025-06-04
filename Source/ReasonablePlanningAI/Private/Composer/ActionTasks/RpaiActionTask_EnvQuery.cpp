@@ -50,7 +50,7 @@ void URpaiActionTask_EnvQuery::ReceiveStartActionTask_Implementation(AAIControll
          {
             if (ObserverCache.Num() <= Memory->RequestId)
             {
-               ObserverCache.SetNum(Memory->RequestId + 8 /*Arbitrarily grow by this amount*/, false);
+               ObserverCache.SetNum(Memory->RequestId + 8 /*Arbitrarily grow by this amount*/, EAllowShrinking::No);
             }
             ObserverCache[Memory->RequestId] = FAIMessageObserver::Create(AIBrain, UBrainComponent::AIMessage_QueryFinished, Memory->RequestId, FOnAIMessage::CreateUObject(this, &URpaiActionTask_EnvQuery::OnAIMessage, ActionInstigator, CurrentState, ActionMemory));
          }

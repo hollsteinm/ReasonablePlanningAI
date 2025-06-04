@@ -66,7 +66,7 @@ URpaiGoalBase* URpaiReasoner_DualUtility::ReceiveReasonNextGoal_Implementation(c
    {
       if (GoalDistribution[Idx].CategoryScore > First.CategoryScore)
       {
-         GoalDistribution.RemoveAt(Idx, Total - Idx, false);
+         GoalDistribution.RemoveAt(Idx, Total - Idx, EAllowShrinking::No);
          break;
       }
 
@@ -84,7 +84,7 @@ URpaiGoalBase* URpaiReasoner_DualUtility::ReceiveReasonNextGoal_Implementation(c
    //Trim away fat and remove low scoring options within best category
    for (const auto IndexToRemove : ZeroScoresToRemove)
    {
-      GoalDistribution.RemoveAt(IndexToRemove, 1, false);
+      GoalDistribution.RemoveAt(IndexToRemove, 1, EAllowShrinking::No);
    }
 
    GoalDistribution.Shrink();
