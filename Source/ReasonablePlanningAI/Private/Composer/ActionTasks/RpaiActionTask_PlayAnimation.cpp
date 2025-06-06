@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #include "Composer/ActionTasks/RpaiActionTask_PlayAnimation.h"
+#include "Engine/World.h"
 #include "TimerManager.h"
 #include "AIController.h"
 #include "Core/RpaiTypes.h"
