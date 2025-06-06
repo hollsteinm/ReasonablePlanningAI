@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_Every : public URpaiComposerStateQuery
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Rpai", Instanced)
-	TArray<URpaiComposerStateQuery*> SubQueries;
-	
-	virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
+   UPROPERTY(EditAnywhere, Category = "Rpai", Instanced)
+   TArray<URpaiComposerStateQuery*> SubQueries;
+   
+   virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
 
 public:
-	FORCEINLINE void SetSubQueries(TArray<URpaiComposerStateQuery*>&& NewSubQueries) { SubQueries = NewSubQueries; }
+   FORCEINLINE void SetSubQueries(TArray<URpaiComposerStateQuery*>&& NewSubQueries) { SubQueries = NewSubQueries; }
 };

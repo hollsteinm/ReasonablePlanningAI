@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_MakeNoise : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_MakeNoise();
+   URpaiActionTask_MakeNoise();
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "1", UIMin = "0", UIMax = "1"), Category = "Rpai")
-	float Loudness;
+   UPROPERTY(EditAnywhere, meta = (ClampMin = "0", ClampMax = "1", UIMin = "0", UIMax = "1"), Category = "Rpai")
+   float Loudness;
 };

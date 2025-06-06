@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareToFloat : public URpaiStateQuery_CompareTo
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
+   virtual EStateQueryResult ReceiveQuery_Implementation(const URpaiState* StateToQuery) const override;
 
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	float ValueToCompare;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   float ValueToCompare;
 
 public:
-	FORCEINLINE void SetComparisonValue(float NewValueToCompare) { ValueToCompare = NewValueToCompare; }
+   FORCEINLINE void SetComparisonValue(float NewValueToCompare) { ValueToCompare = NewValueToCompare; }
 };

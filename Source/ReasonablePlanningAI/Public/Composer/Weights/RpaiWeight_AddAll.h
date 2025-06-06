@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,14 +12,14 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiWeight_AddAll : public URpaiComposerWeightBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere,Category="Rpai",Instanced)
-	TArray<URpaiComposerWeightBase*> SubWeights;
+   UPROPERTY(EditAnywhere,Category="Rpai",Instanced)
+   TArray<URpaiComposerWeightBase*> SubWeights;
 
-	virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
+   virtual float ReceiveExecutionWeight_Implementation(const URpaiState* GivenState) const override;
 
 public:
-	FORCEINLINE void SetSubWeights(TArray<URpaiComposerWeightBase*>&& NewSubWeights) { SubWeights = NewSubWeights; }
+   FORCEINLINE void SetSubWeights(TArray<URpaiComposerWeightBase*>&& NewSubWeights) { SubWeights = NewSubWeights; }
 };

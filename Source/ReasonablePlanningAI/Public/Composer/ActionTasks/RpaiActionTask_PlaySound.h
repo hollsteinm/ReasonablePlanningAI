@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -14,15 +14,15 @@ class USoundCue;
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiActionTask_PlaySound : public URpaiComposerActionTaskBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiActionTask_PlaySound();
+   URpaiActionTask_PlaySound();
 
 protected:
-	virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
+   virtual void ReceiveStartActionTask_Implementation(AAIController* ActionInstigator, URpaiState* CurrentState, FRpaiMemoryStruct ActionMemory, AActor* ActionTargetActor = nullptr, UWorld* ActionWorld = nullptr) override;
 
-	UPROPERTY(Category = "Rpai", EditAnywhere)
-	USoundCue* SoundToPlay;
-	
+   UPROPERTY(Category = "Rpai", EditAnywhere)
+   USoundCue* SoundToPlay;
+   
 };

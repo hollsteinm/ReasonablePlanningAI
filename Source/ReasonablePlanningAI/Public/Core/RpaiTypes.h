@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -16,17 +16,17 @@ DECLARE_LOG_CATEGORY_EXTERN(LogRpai, Log, All);
 UENUM(BlueprintType, Category = "Rpai")
 enum class EStatePropertyType : uint8
 {
-	Invalid = 0,
-	Bool,
-	Class,
-	Enum,
-	Float,
-	Int,
-	Name,
-	Object,
-	Rotator,
-	String,
-	Vector
+   Invalid = 0,
+   Bool,
+   Class,
+   Enum,
+   Float,
+   Int,
+   Name,
+   Object,
+   Rotator,
+   String,
+   Vector
 };
 
 /**
@@ -35,13 +35,13 @@ enum class EStatePropertyType : uint8
 USTRUCT(BlueprintType, Category = "Rpai")
 struct REASONABLEPLANNINGAI_API FStateKeyValueReference
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rpai")
-	FName StateKeyName;
+   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rpai")
+   FName StateKeyName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rpai")
-	EStatePropertyType ExpectedValueType;
+   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Rpai")
+   EStatePropertyType ExpectedValueType;
 };
 
 /**
@@ -60,44 +60,44 @@ struct REASONABLEPLANNINGAI_API FStateKeyValueReference
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FRpaiMemory
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	using StorageType = TArray<uint8>;
+   using StorageType = TArray<uint8>;
     using MemorySizeType = StorageType::SizeType;
 private:
-	struct Block
-	{
-	private:
-		StorageType AllocatedMemory;
-		TArray<TTuple<uint8*, MemorySizeType>> FreeList;
-		uint8* Next;
+   struct Block
+   {
+   private:
+      StorageType AllocatedMemory;
+      TArray<TTuple<uint8*, MemorySizeType>> FreeList;
+      uint8* Next;
 
-	public:
-		Block(MemorySizeType Size);
+   public:
+      Block(MemorySizeType Size);
 
-		/**
-		* Returns nullptr on failure to allocate
-		**/
-		uint8* Allocate(MemorySizeType SizeInBytes, MemorySizeType Alignment);
-		void Free(uint8* Memory, MemorySizeType SizeInBytes, MemorySizeType Alignment);
-		bool Contains(uint8* Memory) const;
-		FORCEINLINE MemorySizeType TotalBytes() const { return AllocatedMemory.Num(); }
-	};
+      /**
+      * Returns nullptr on failure to allocate
+      **/
+      uint8* Allocate(MemorySizeType SizeInBytes, MemorySizeType Alignment);
+      void Free(uint8* Memory, MemorySizeType SizeInBytes, MemorySizeType Alignment);
+      bool Contains(uint8* Memory) const;
+      FORCEINLINE MemorySizeType TotalBytes() const { return AllocatedMemory.Num(); }
+   };
 
-	TArray<Block> AllocatedBlocks;
-	MemorySizeType SizeOfBlock;
+   TArray<Block> AllocatedBlocks;
+   MemorySizeType SizeOfBlock;
 
 public:
-	FRpaiMemory();
-	FRpaiMemory(MemorySizeType BlockSize);
+   FRpaiMemory();
+   FRpaiMemory(MemorySizeType BlockSize);
 
-	uint8* Allocate(MemorySizeType SizeInBytes, MemorySizeType Alignment);
+   uint8* Allocate(MemorySizeType SizeInBytes, MemorySizeType Alignment);
 
-	void Free(uint8* Memory, MemorySizeType SizeInBytes, MemorySizeType Alignment);
+   void Free(uint8* Memory, MemorySizeType SizeInBytes, MemorySizeType Alignment);
 
-	FORCEINLINE MemorySizeType GetBlockNum() const { return AllocatedBlocks.Num(); }
+   FORCEINLINE MemorySizeType GetBlockNum() const { return AllocatedBlocks.Num(); }
 
-	MemorySizeType GetTotalBytesAvailable() const;
+   MemorySizeType GetTotalBytesAvailable() const;
 };
 
 /**
@@ -106,166 +106,166 @@ public:
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FRpaiMemoryStruct
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	typedef typename FRpaiMemory::MemorySizeType MemorySizeType;
+   typedef typename FRpaiMemory::MemorySizeType MemorySizeType;
 
 private:
-	/**
-	* This MUST be first.
-	* Allows the following to be equivalent:
-	* FRpaiMemoryStruct Instance;
-	* void* Container = &Instance;
-	* void* ContainerByFirstProperty = &(Instance.MemoryStart)
-	* assert(Container == ContainerByFirstProperty
-	* 
-	* Allows us to abuse pointers to "just hook into" K2Node struct casting using mechanisms similar to the enum casting.
-	**/
-	uint8* MemoryStart;
+   /**
+   * This MUST be first.
+   * Allows the following to be equivalent:
+   * FRpaiMemoryStruct Instance;
+   * void* Container = &Instance;
+   * void* ContainerByFirstProperty = &(Instance.MemoryStart)
+   * assert(Container == ContainerByFirstProperty
+   * 
+   * Allows us to abuse pointers to "just hook into" K2Node struct casting using mechanisms similar to the enum casting.
+   **/
+   uint8* MemoryStart;
 
-	UScriptStruct* Type;
+   UScriptStruct* Type;
 
-	FRpaiMemory* Source;
-	uint32* Refs;
+   FRpaiMemory* Source;
+   uint32* Refs;
 
 public:
-	void AddRef();
-	uint32 Release();
+   void AddRef();
+   uint32 Release();
 
-	FRpaiMemoryStruct(const FRpaiMemoryStruct&& OtherView) = delete;
+   FRpaiMemoryStruct(const FRpaiMemoryStruct&& OtherView) = delete;
 
-	FRpaiMemoryStruct();
-	FRpaiMemoryStruct(const FRpaiMemoryStruct& OtherSlice);
-	FRpaiMemoryStruct(FRpaiMemoryStruct&& OtherSlice);
-	FRpaiMemoryStruct& operator=(const FRpaiMemoryStruct& OtherSlice);
-	FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType);
+   FRpaiMemoryStruct();
+   FRpaiMemoryStruct(const FRpaiMemoryStruct& OtherSlice);
+   FRpaiMemoryStruct(FRpaiMemoryStruct&& OtherSlice);
+   FRpaiMemoryStruct& operator=(const FRpaiMemoryStruct& OtherSlice);
+   FRpaiMemoryStruct(FRpaiMemory* FromMemory, UScriptStruct* FromStructType);
 
-	~FRpaiMemoryStruct();
+   ~FRpaiMemoryStruct();
 
-	bool IsCompatibleType(const UScriptStruct* TestType) const;
+   bool IsCompatibleType(const UScriptStruct* TestType) const;
 
-	FORCEINLINE bool IsValid() const { return Refs != nullptr && MemoryStart != nullptr; }
+   FORCEINLINE bool IsValid() const { return Refs != nullptr && MemoryStart != nullptr; }
 
-	template<typename TScriptStructType>
-	FORCEINLINE bool IsCompatibleTypeOf() const { return IsCompatibleType(TScriptStructType::StaticStruct()); }
+   template<typename TScriptStructType>
+   FORCEINLINE bool IsCompatibleTypeOf() const { return IsCompatibleType(TScriptStructType::StaticStruct()); }
 
-	template<typename TScriptStructType>
-	static FRpaiMemoryStruct ForType(FRpaiMemory* FromMemory) { return FRpaiMemoryStruct(FromMemory, TScriptStructType::StaticStruct()); }
+   template<typename TScriptStructType>
+   static FRpaiMemoryStruct ForType(FRpaiMemory* FromMemory) { return FRpaiMemoryStruct(FromMemory, TScriptStructType::StaticStruct()); }
 
-	template<typename T>
-	const T* Get() const
-	{
-		check(IsValid());
-		check(T::StaticStruct() == Type);
-		return reinterpret_cast<T*>(MemoryStart);
-	}
+   template<typename T>
+   const T* Get() const
+   {
+      check(IsValid());
+      check(T::StaticStruct() == Type);
+      return reinterpret_cast<T*>(MemoryStart);
+   }
 
-	template<typename T>
-	T* Get()
-	{
-		check(IsValid());
-		check(T::StaticStruct() == Type);
-		return reinterpret_cast<T*>(MemoryStart);
-	}
+   template<typename T>
+   T* Get()
+   {
+      check(IsValid());
+      check(T::StaticStruct() == Type);
+      return reinterpret_cast<T*>(MemoryStart);
+   }
 
-	FORCEINLINE const uint8* GetRaw() const { return MemoryStart; }
-	FORCEINLINE uint8* GetRaw() { return MemoryStart; }
+   FORCEINLINE const uint8* GetRaw() const { return MemoryStart; }
+   FORCEINLINE uint8* GetRaw() { return MemoryStart; }
 
-	FORCEINLINE UScriptStruct* GetType() const { return Type; }
+   FORCEINLINE UScriptStruct* GetType() const { return Type; }
 
-	template<typename T>
-	void Set(T NewValue)
-	{
-		check(T::StaticStruct() == Type);
-		FMemory::Memcpy(static_cast<void*>(MemoryStart), static_cast<const void*>(&NewValue), Type->GetStructureSize());
-	}
+   template<typename T>
+   void Set(T NewValue)
+   {
+      check(T::StaticStruct() == Type);
+      FMemory::Memcpy(static_cast<void*>(MemoryStart), static_cast<const void*>(&NewValue), Type->GetStructureSize());
+   }
 };
 
 UENUM(BlueprintType)
 enum class ERpaiPlannerResult : uint8
 {
-	CompletedFailure,
-	CompletedCancelled,
-	CompletedSuccess,
-	RequiresTick,
-	Invalid
+   CompletedFailure,
+   CompletedCancelled,
+   CompletedSuccess,
+   RequiresTick,
+   Invalid
 };
 
 // V2
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FStateSourcePropertyHandle
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY()
-	int32 Handle;
+   UPROPERTY()
+   int32 Handle;
 
-	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+   FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
 };
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FStateSourceTypeHandle
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY()
-	int32 Handle;
+   UPROPERTY()
+   int32 Handle;
 
-	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+   FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
 };
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FStateTargetPropertyHandle
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY()
-	int32 Handle;
+   UPROPERTY()
+   int32 Handle;
 
-	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+   FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
 };
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FStateTargetTypeHandle
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY()
-	int32 Handle;
+   UPROPERTY()
+   int32 Handle;
 
-	FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
+   FORCEINLINE bool IsValid() const { return Handle != INDEX_NONE; }
 };
 
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FStateBindingHandle
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY()
-	FStateSourceTypeHandle StateSourceTypeHandle;
+   UPROPERTY()
+   FStateSourceTypeHandle StateSourceTypeHandle;
 
-	UPROPERTY()
-	FStateSourcePropertyHandle StateSourcePropertyHandle;
+   UPROPERTY()
+   FStateSourcePropertyHandle StateSourcePropertyHandle;
 
-	UPROPERTY()
-	FStateTargetTypeHandle StateTargetTypeHandle;
+   UPROPERTY()
+   FStateTargetTypeHandle StateTargetTypeHandle;
 
-	UPROPERTY()
-	FStateTargetPropertyHandle StateTargetPropertyHandle;
+   UPROPERTY()
+   FStateTargetPropertyHandle StateTargetPropertyHandle;
 
-	UPROPERTY()
-	int32 Handle;
+   UPROPERTY()
+   int32 Handle;
 
-	FORCEINLINE bool IsValid() const {
-		return
-			Handle != INDEX_NONE &&
-			StateSourceTypeHandle.IsValid() &&
-			StateSourcePropertyHandle.IsValid() &&
-			StateTargetTypeHandle.IsValid() &&
-			StateTargetPropertyHandle.IsValid();
-	}
+   FORCEINLINE bool IsValid() const {
+      return
+         Handle != INDEX_NONE &&
+         StateSourceTypeHandle.IsValid() &&
+         StateSourcePropertyHandle.IsValid() &&
+         StateTargetTypeHandle.IsValid() &&
+         StateTargetPropertyHandle.IsValid();
+   }
 
-	// TODO: Add C++ notification callbacks for rebinds and resorts
+   // TODO: Add C++ notification callbacks for rebinds and resorts
 };
 
 USTRUCT(BlueprintType)
@@ -284,17 +284,17 @@ struct FRpaiCachedPropertyPath : public FCachedPropertyPath
 USTRUCT(BlueprintType)
 struct REASONABLEPLANNINGAI_API FRpaiStateTypePropertyMultiBind
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, Category=Rpai)
-	TObjectPtr<UStruct> TargetBindingClass;
+   UPROPERTY(EditAnywhere, Category=Rpai)
+   TObjectPtr<UStruct> TargetBindingClass;
 
     UPROPERTY(EditAnywhere, Category=Rpai)
-	TArray<FRpaiCachedPropertyPath> BoundProperties;
+   TArray<FRpaiCachedPropertyPath> BoundProperties;
 
-	int32 AddBinding(const FString& PropertyName);
+   int32 AddBinding(const FString& PropertyName);
 
-	void RemoveBinding(int32 BindingHandle);
+   void RemoveBinding(int32 BindingHandle);
 };
 
 USTRUCT(BlueprintType)
@@ -309,21 +309,21 @@ USTRUCT(BlueprintType)
 **/
 struct REASONABLEPLANNINGAI_API FRpaiStateBinding
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, Category=Rpai)
-	TArray<FRpaiStateTypePropertyMultiBind> SourceBindings;
+   TArray<FRpaiStateTypePropertyMultiBind> SourceBindings;
     
     UPROPERTY(EditAnywhere, Category=Rpai)
-	TArray<FRpaiStateTypePropertyMultiBind> TargetBindings;
+   TArray<FRpaiStateTypePropertyMultiBind> TargetBindings;
 
-	UPROPERTY(EditAnywhere, Category=Rpai)
-	TArray<FStateBindingHandle> BindingHandles;
+   UPROPERTY(EditAnywhere, Category=Rpai)
+   TArray<FStateBindingHandle> BindingHandles;
 
-	FStateBindingHandle AddBinding(TObjectPtr<UStruct> SourceType, const FString& SourcePropertyName, TObjectPtr<UStruct> TargetType, const FString& TargetPropertyName);
-	void RemoveBinding(const FStateBindingHandle& Handle);
-	
-	bool Transfer(const UObject* Source, FRpaiMemoryStruct& Target) const;
+   FStateBindingHandle AddBinding(TObjectPtr<UStruct> SourceType, const FString& SourcePropertyName, TObjectPtr<UStruct> TargetType, const FString& TargetPropertyName);
+   void RemoveBinding(const FStateBindingHandle& Handle);
+   
+   bool Transfer(const UObject* Source, FRpaiMemoryStruct& Target) const;
     bool Transfer(const UObject* Source, uint8* TargetData, UScriptStruct* TargetStructType) const;
     bool Transfer(const UObject* Source, UObject* Target) const;
     bool Transfer(const AActor* Source, UObject* Target) const;

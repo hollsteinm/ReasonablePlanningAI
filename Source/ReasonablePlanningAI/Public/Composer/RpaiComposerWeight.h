@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -13,21 +13,21 @@
 UCLASS(Abstract)
 class REASONABLEPLANNINGAI_API URpaiComposerWeight : public URpaiComposerWeightBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 public:
-	URpaiComposerWeight();
+   URpaiComposerWeight();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Rpai")
-	FStateKeyValueReference WeightStateKeyValueReference;
+   UPROPERTY(EditAnywhere, Category = "Rpai")
+   FStateKeyValueReference WeightStateKeyValueReference;
 
 public:
-	
-	FORCEINLINE void SetWeightStateKeyAndType(FName KeyName, EStatePropertyType ExpectedValueType)
-	{
-		WeightStateKeyValueReference.StateKeyName = KeyName;
-		WeightStateKeyValueReference.ExpectedValueType = ExpectedValueType;
-	}
-	
+   
+   FORCEINLINE void SetWeightStateKeyAndType(FName KeyName, EStatePropertyType ExpectedValueType)
+   {
+      WeightStateKeyValueReference.StateKeyName = KeyName;
+      WeightStateKeyValueReference.ExpectedValueType = ExpectedValueType;
+   }
+   
 };

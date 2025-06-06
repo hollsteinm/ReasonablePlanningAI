@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -14,9 +14,9 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiReasoner_DualUtility : public URpaiReasonerBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	virtual URpaiGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const override;
-	
+   virtual URpaiGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const override;
+   
 };

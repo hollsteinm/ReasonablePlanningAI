@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "Composer/Queries/RpaiStateQuery_CompareToBool.h"
@@ -6,15 +6,15 @@
 
 EStateQueryResult URpaiStateQuery_CompareToBool::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
-	if (QueriedState.ExpectedValueType != EStatePropertyType::Bool)
-	{
-		return EStateQueryResult::Invalid;
-	}
+   if (QueriedState.ExpectedValueType != EStatePropertyType::Bool)
+   {
+      return EStateQueryResult::Invalid;
+   }
 
-	bool bValue;
-	if (!StateToQuery->GetBool(QueriedState.StateKeyName, bValue))
-	{
-		return EStateQueryResult::Invalid;
-	}
-	return DoCompare(ComparisonOperation, bValue, bValueToCompare);
+   bool bValue;
+   if (!StateToQuery->GetBool(QueriedState.StateKeyName, bValue))
+   {
+      return EStateQueryResult::Invalid;
+   }
+   return DoCompare(ComparisonOperation, bValue, bValueToCompare);
 }

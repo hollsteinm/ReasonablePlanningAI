@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "Composer/RpaiComposerStateQuery.h"
@@ -8,12 +8,12 @@ DECLARE_CYCLE_STAT(TEXT("Query State"), STAT_QueryState, STATGROUP_Rpai);
 
 EStateQueryResult URpaiComposerStateQuery::Query(const URpaiState* StateToQuery) const
 {
-	check(StateToQuery != nullptr)
-	SCOPE_CYCLE_COUNTER(STAT_QueryState);
-	return ReceiveQuery(StateToQuery);
+   check(StateToQuery != nullptr)
+   SCOPE_CYCLE_COUNTER(STAT_QueryState);
+   return ReceiveQuery(StateToQuery);
 }
 
 EStateQueryResult URpaiComposerStateQuery::ReceiveQuery_Implementation(const URpaiState* StateToQuery) const
 {
-	return EStateQueryResult::Invalid;
+   return EStateQueryResult::Invalid;
 }

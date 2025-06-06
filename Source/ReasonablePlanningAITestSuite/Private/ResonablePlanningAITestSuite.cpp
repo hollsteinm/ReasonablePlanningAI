@@ -1,4 +1,4 @@
-// Copyright Troll Purse. All Rights Reserved.
+// Copyright Radaway Software LLC. 2025. All rights reserved.
 
 #include "ReasonablePlanningAITestSuite.h"
 

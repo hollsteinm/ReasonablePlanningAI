@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -13,15 +13,15 @@
 UCLASS( ClassGroup=(Rpai), meta=(BlueprintSpawnableComponent) )
 class REASONABLEPLANNINGAI_API URpaiStateBlackboardComponent : public UActorComponent
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "Rpai")
-	class URpaiState_BlackboardComponentAdapter* StateAdapter;
+   UPROPERTY(EditAnywhere, BlueprintReadOnly, Instanced, Category = "Rpai")
+   class URpaiState_BlackboardComponentAdapter* StateAdapter;
 
-public:	
-	// Sets default values for this component's properties
-	URpaiStateBlackboardComponent();
+public:   
+   // Sets default values for this component's properties
+   URpaiStateBlackboardComponent();
 
-	FORCEINLINE URpaiState_BlackboardComponentAdapter* GetStateAdapter() const { return StateAdapter; }
+   FORCEINLINE URpaiState_BlackboardComponentAdapter* GetStateAdapter() const { return StateAdapter; }
 };

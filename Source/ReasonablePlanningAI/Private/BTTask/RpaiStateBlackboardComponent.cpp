@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "BTTask/RpaiStateBlackboardComponent.h"
@@ -6,7 +6,7 @@
 
 // Sets default values for this component's properties
 URpaiStateBlackboardComponent::URpaiStateBlackboardComponent()
-	: StateAdapter(nullptr)
+   : StateAdapter(nullptr)
 {
-	PrimaryComponentTick.bCanEverTick = false;
+   PrimaryComponentTick.bCanEverTick = false;
 }

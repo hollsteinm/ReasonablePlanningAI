@@ -1,7 +1,8 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "Composer/Distances/RpaiDistance_State.h"
+#include "GameFramework/Actor.h"
 #include "Core/RpaiState.h"
 
 //Return distance as the difference between the left hand property and the right hand property.

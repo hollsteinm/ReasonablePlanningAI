@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 
 #include "ComposerStateQueryCustom.h"
@@ -11,7 +11,7 @@ TMap<FName, TSharedRef<IPropertyTypeCustomization>> ComposerStateQueryCustom::Cu
 
 TSharedRef<IPropertyTypeCustomization> ComposerStateQueryCustom::MakeInstance()
 {
-	return MakeShareable(new ComposerStateQueryCustom());
+   return MakeShareable(new ComposerStateQueryCustom());
 }
 
 void ComposerStateQueryCustom::AddChildCustomization(const FName Name, TSharedRef<IPropertyTypeCustomization> Customization)

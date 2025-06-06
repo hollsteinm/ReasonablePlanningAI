@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -13,7 +13,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateQuery_CompareToStateValue : public URpaiStateQuery_CompareTo
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
     
 protected:
     UPROPERTY(EditAnywhere, Category = "Rpai")
@@ -23,5 +23,5 @@ protected:
 public:
 
     FORCEINLINE void SetComparedToState(FName Key, EStatePropertyType ExpectedType) { ComparedToState.StateKeyName = Key; ComparedToState.ExpectedValueType = ExpectedType; }
-	
+   
 };

@@ -1,7 +1,8 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
+#include "Engine/World.h"
 #include "Subsystems/WorldSubsystem.h"
 #include "RpaiSubsystem.generated.h"
 

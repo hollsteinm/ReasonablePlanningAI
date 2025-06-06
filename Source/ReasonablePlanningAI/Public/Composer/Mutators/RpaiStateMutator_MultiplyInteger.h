@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiStateMutator_MultiplyInteger : public URpaiStateMutator_MultiplyValue
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     /**

@@ -1,33 +1,33 @@
-// Copyright Troll Purse, Inc. All Rights Reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 namespace UnrealBuildTool.Rules
 {
-	public class ReasonablePlanningAIEditor : ModuleRules
-	{
-		public ReasonablePlanningAIEditor(ReadOnlyTargetRules Target) : base(Target)
-		{
-			PublicDependencyModuleNames.AddRange(
-				new[] {
-					"Core",
-					"Engine",
-					"AIModule",
-					"ReasonablePlanningAI",
-					"InputCore"
-				}
-			);
+   public class ReasonablePlanningAIEditor : ModuleRules
+   {
+      public ReasonablePlanningAIEditor(ReadOnlyTargetRules Target) : base(Target)
+      {
+         PublicDependencyModuleNames.AddRange(
+            new[] {
+               "Core",
+               "Engine",
+               "AIModule",
+               "ReasonablePlanningAI",
+               "InputCore"
+            }
+         );
 
-			PrivateDependencyModuleNames.AddRange(
-				new[] {
-					"CoreUObject",
-					"Engine",
-					"Slate",
-					"SlateCore",
-					"UnrealEd",
-					"PropertyEditor",
-					"EditorStyle",
-					"PropertyPath"
-				}
-			);
-		}
-	}
+         PrivateDependencyModuleNames.AddRange(
+            new[] {
+               "CoreUObject",
+               "Engine",
+               "Slate",
+               "SlateCore",
+               "UnrealEd",
+               "PropertyEditor",
+               "EditorStyle",
+               "PropertyPath"
+            }
+         );
+      }
+   }
 }

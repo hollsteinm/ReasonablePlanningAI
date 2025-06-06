@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -17,8 +17,8 @@ class URpaiComposerStateQuery;
 UCLASS(BlueprintType, Blueprintable)
 class REASONABLEPLANNINGAI_API URpaiComposerGoal : public URpaiGoalBase
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 protected:
 
     /** Begin ReasonablePlanningGoalBase*/

@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -14,18 +14,18 @@ class REASONABLEPLANNINGAIEDITOR_API StateQueryComparisonCustom : public IDetail
 
 {
 public:
-	StateQueryComparisonCustom(FName RHSFieldName);
+   StateQueryComparisonCustom(FName RHSFieldName);
 
-	/** IDetailCustomization **/
-	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
+   /** IDetailCustomization **/
+   virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override;
 
-	/** IPropertyTypeCustomization **/
-	virtual void CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
-	virtual void CustomizeHeader(TSharedRef<IPropertyHandle> StructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
+   /** IPropertyTypeCustomization **/
+   virtual void CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
+   virtual void CustomizeHeader(TSharedRef<IPropertyHandle> StructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
 
     static TSharedRef<IDetailCustomization> MakeInstance(FName RHSFieldName);
-	static TSharedRef<IPropertyTypeCustomization> MakePropertyInstance(FName RHSFieldName);
+   static TSharedRef<IPropertyTypeCustomization> MakePropertyInstance(FName RHSFieldName);
 
 private:
-	FName RHSFieldName;
+   FName RHSFieldName;
 };

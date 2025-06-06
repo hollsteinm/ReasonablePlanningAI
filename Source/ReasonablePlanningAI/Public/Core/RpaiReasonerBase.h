@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -15,22 +15,22 @@ class URpaiState;
 UCLASS(BlueprintType, Blueprintable, Abstract, EditInlineNew, DefaultToInstanced)
 class REASONABLEPLANNINGAI_API URpaiReasonerBase : public UObject
 {
-	GENERATED_BODY()
-	
+   GENERATED_BODY()
+   
 public:
 
-	/**
-	* Accepts a list of goals and will return the goal with the most dual utility.
-	*/
-	UFUNCTION(BlueprintPure, Category = "Rpai")
-	URpaiGoalBase* ReasonNextGoal(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
+   /**
+   * Accepts a list of goals and will return the goal with the most dual utility.
+   */
+   UFUNCTION(BlueprintPure, Category = "Rpai")
+   URpaiGoalBase* ReasonNextGoal(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
 
 protected:
 
-	/**
-	* Override this to implement ReasonNextGoal
-	*/
-	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Rpai")
-	URpaiGoalBase* ReceiveReasonNextGoal(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
-	virtual URpaiGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
+   /**
+   * Override this to implement ReasonNextGoal
+   */
+   UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "Rpai")
+   URpaiGoalBase* ReceiveReasonNextGoal(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
+   virtual URpaiGoalBase* ReceiveReasonNextGoal_Implementation(const TArray<URpaiGoalBase*>& Goals, const URpaiState* CurrentState) const;
 };

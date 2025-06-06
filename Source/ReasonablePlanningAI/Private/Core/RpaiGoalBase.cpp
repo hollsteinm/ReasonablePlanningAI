@@ -1,51 +1,51 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #include "Core/RpaiGoalBase.h"
 
 URpaiGoalBase::URpaiGoalBase()
-	: Category(0)
+   : Category(0)
 {
 
 }
 
 bool URpaiGoalBase::IsInDesiredState(const URpaiState* GivenState) const
 {
-	return ReceiveIsInDesiredState(GivenState);
+   return ReceiveIsInDesiredState(GivenState);
 }
 
 float URpaiGoalBase::GetDistanceToDesiredState(const URpaiState* GivenState) const
 {
-	return ReceiveGetDistanceToDesiredState(GivenState);
+   return ReceiveGetDistanceToDesiredState(GivenState);
 }
 
 bool URpaiGoalBase::IsApplicable(const URpaiState* GivenState) const
 {
-	return IsValid(this) && ReceiveIsApplicable(GivenState);
+   return IsValid(this) && ReceiveIsApplicable(GivenState);
 }
 
 float URpaiGoalBase::GetWeight(const URpaiState* GivenState) const
 {
-	return ReceiveGetWeight(GivenState);
+   return ReceiveGetWeight(GivenState);
 }
 
 bool URpaiGoalBase::ReceiveIsInDesiredState_Implementation(const URpaiState* GivenState) const
 {
-	return false;
+   return false;
 }
 
 float URpaiGoalBase::ReceiveGetDistanceToDesiredState_Implementation(const URpaiState* GivenState) const
 {
-	return 0.f;
+   return 0.f;
 }
 
 bool URpaiGoalBase::ReceiveIsApplicable_Implementation(const URpaiState* GivenState) const
 {
-	return false;
+   return false;
 }
 
 float URpaiGoalBase::ReceiveGetWeight_Implementation(const URpaiState* GivenState) const
 {
-	return 0.f;
+   return 0.f;
 }
 
 FString URpaiGoalBase::GetGoalName() const

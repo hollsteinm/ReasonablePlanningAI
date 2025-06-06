@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -14,17 +14,17 @@
 UCLASS(BlueprintType, Blueprintable, EditInlineNew, DefaultToInstanced)
 class REASONABLEPLANNINGAI_API URpaiComposerDistance : public URpaiComposerDistanceBase
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
 
-	/**
-	* Left hand state key reference to use
-	*/
-	UPROPERTY(EditAnywhere, Category = "Rpai", meta=(DisplayName="Left Hand Side State Reference Key"))
-	FStateKeyValueReference LHS;
+   /**
+   * Left hand state key reference to use
+   */
+   UPROPERTY(EditAnywhere, Category = "Rpai", meta=(DisplayName="Left Hand Side State Reference Key"))
+   FStateKeyValueReference LHS;
 
 public:
-	FORCEINLINE void SetLHS(FName Key, EStatePropertyType ExpectedType) { LHS.StateKeyName = Key; LHS.ExpectedValueType = ExpectedType; }
-	
+   FORCEINLINE void SetLHS(FName Key, EStatePropertyType ExpectedType) { LHS.StateKeyName = Key; LHS.ExpectedValueType = ExpectedType; }
+   
 };

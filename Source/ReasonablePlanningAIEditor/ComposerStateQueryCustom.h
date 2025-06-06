@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,17 +12,17 @@ class REASONABLEPLANNINGAIEDITOR_API ComposerStateQueryCustom : public IProperty
 {
 public:
 
-	/** IPropertyTypeCustomization **/
-	virtual void CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
-	virtual void CustomizeHeader(TSharedRef<IPropertyHandle> StructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
+   /** IPropertyTypeCustomization **/
+   virtual void CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
+   virtual void CustomizeHeader(TSharedRef<IPropertyHandle> StructPropertyHandle, FDetailWidgetRow& HeaderRow, IPropertyTypeCustomizationUtils& StructCustomizationUtils) override;
 
-	static TSharedRef<IPropertyTypeCustomization> MakeInstance();
+   static TSharedRef<IPropertyTypeCustomization> MakeInstance();
 
-	/**
-	* Cannot utilize property module becuase the necessary methods are not exported.
-	**/
-	static void AddChildCustomization(const FName Name, TSharedRef<IPropertyTypeCustomization> Customization);
+   /**
+   * Cannot utilize property module becuase the necessary methods are not exported.
+   **/
+   static void AddChildCustomization(const FName Name, TSharedRef<IPropertyTypeCustomization> Customization);
 
 private:
-	static TMap<FName, TSharedRef<IPropertyTypeCustomization>> Customizations;
+   static TMap<FName, TSharedRef<IPropertyTypeCustomization>> Customizations;
 };

@@ -1,3 +1,5 @@
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
+
 #include "Functional/FunctionalComposerActionTaskTests.h"
 #include "AIController.h"
 #include "GameFramework/Character.h"

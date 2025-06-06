@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,5 +12,5 @@
 UCLASS(Abstract)
 class REASONABLEPLANNINGAI_API URpaiStateMutator_AddValue : public URpaiComposerStateMutator
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 };

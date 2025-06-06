@@ -1,4 +1,4 @@
-// Troll Purse. All rights reserved.
+// Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 UCLASS()
 class REASONABLEPLANNINGAI_API URpaiDistance_Bool : public URpaiComposerDistance
 {
-	GENERATED_BODY()
+   GENERATED_BODY()
 
 protected:
     virtual float ReceiveCalculateDistance_Implementation(const URpaiState* GivenState) const override;
