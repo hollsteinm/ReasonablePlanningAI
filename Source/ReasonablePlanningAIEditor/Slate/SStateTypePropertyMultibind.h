@@ -19,6 +19,8 @@ public:
 
    virtual void Construct(const FArguments& InArgs);
 
+   static FString GetBoundPropertyName (TSharedPtr<IPropertyHandle> Element);
+
 private:
    // Slate bound
    TArray<TObjectPtr<UClass>> AllowedClasses;
