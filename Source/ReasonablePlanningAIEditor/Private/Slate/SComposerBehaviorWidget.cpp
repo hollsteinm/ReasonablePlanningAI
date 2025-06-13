@@ -1,6 +1,6 @@
 // Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
-#include "SComposerBehaviorWidget.h"
+#include "Slate/SComposerBehaviorWidget.h"
 #include "ISinglePropertyView.h"
 #include "Editor.h"
 #include "Widgets/SBoxPanel.h"

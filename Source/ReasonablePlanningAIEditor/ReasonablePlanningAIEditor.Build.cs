@@ -6,7 +6,12 @@ namespace UnrealBuildTool.Rules
    {
       public ReasonablePlanningAIEditor(ReadOnlyTargetRules Target) : base(Target)
       {
-         PublicDependencyModuleNames.AddRange(
+			PrivateIncludePaths.AddRange(
+		   new[] {
+			   "ReasonablePlanningAIEditor/Private"
+		   }
+		);
+			PublicDependencyModuleNames.AddRange(
             new[] {
                "Core",
                "Engine",

@@ -1,6 +1,6 @@
 // Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
-#include "SCachedPropertyPathStructPropertyPicker.h"
+#include "Slate/SCachedPropertyPathStructPropertyPicker.h"
 #include "ISinglePropertyView.h"
 #include "PropertyPathHelpers.h"
 #include "Editor.h"

@@ -1,6 +1,6 @@
 // Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
-#include "SStateTypePropertyMultibind.h"
+#include "Slate/SStateTypePropertyMultibind.h"
 #include "PropertyEditing.h"
 #include "ClassViewerFilter.h"
 #include "ClassViewerModule.h"
