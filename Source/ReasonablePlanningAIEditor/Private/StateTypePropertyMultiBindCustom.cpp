@@ -53,17 +53,6 @@ void StateTypePropertyMultiBindCustom::CustomizeHeader(TSharedRef<IPropertyHandl
       ];
 }
 
-static FString GetBoundPropertyName (TSharedPtr<IPropertyHandle> Element)
-{
-   void* OutValue = nullptr;
-   if (Element->GetValueData (OutValue) == FPropertyAccess::Success)
-   {
-      FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
-      return PropertyPath->ToString ();
-   }
-   return FString ();
-}
-
 void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHandle> StructPropertyHandle, IDetailChildrenBuilder& StructBuilder, IPropertyTypeCustomizationUtils& StructCustomizationUtils)
 {
    TSharedPtr<IPropertyHandle> BoundProps = StructPropertyHandle->GetChildHandle(GET_MEMBER_NAME_CHECKED(FRpaiStateTypePropertyMultiBind, BoundProperties));
@@ -87,7 +76,7 @@ void StateTypePropertyMultiBindCustom::CustomizeChildren(TSharedRef<IPropertyHan
                   [
                      SNew(SCachedPropertyPathStructPropertyPicker)
                         .PickerClass((*static_cast<TObjectPtr<UStruct>*>(ContainerAddress)).Get())
-                        .InitialPath(GetBoundPropertyName(Element))
+                        .InitialPath(SStateTypePropertyMultibind::GetBoundPropertyName(Element))
                         .OnPropertyPathPicked_Lambda([Element](const FString& PropertyPath) -> void {
                            if (Element.IsValid())
                            {

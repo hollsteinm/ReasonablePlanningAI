@@ -1,6 +1,6 @@
 // Copyright (C) 2025 Radaway Software LLC. All Rights Reserved.
 
-#include "SStateTypePropertyMultibind.h"
+#include "Slate/SStateTypePropertyMultibind.h"
 #include "PropertyEditing.h"
 #include "ClassViewerFilter.h"
 #include "ClassViewerModule.h"
@@ -78,15 +78,15 @@ public:
    //~ End IStructViewerFilter
 };
 
-static FString GetBoundPropertyName(TSharedPtr<IPropertyHandle> Element)
+FString SStateTypePropertyMultibind::GetBoundPropertyName (TSharedPtr<IPropertyHandle> Element)
 {
-   void* OutValue = nullptr;
-   if (Element->GetValueData(OutValue) == FPropertyAccess::Success)
-   {
-      FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
-      return PropertyPath->ToString();
-   }
-   return FString();
+    void* OutValue = nullptr;
+    if (Element->GetValueData (OutValue) == FPropertyAccess::Success)
+    {
+        FCachedPropertyPath* PropertyPath = static_cast<FCachedPropertyPath*>(OutValue);
+        return PropertyPath->ToString ();
+    }
+    return FString ();
 }
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
