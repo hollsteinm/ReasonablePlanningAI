@@ -1,5 +1,7 @@
 # Reasonable Planning AI
 
+[🚀 WE LAUNCHED!](https://www.fab.com/listings/dd0fadd5-172c-4938-ae9c-be527eab8b09)
+
 Discuss the future of this project with us in real time on our [Discord](https://discord.gg/fKFhN2NwjC)
 
 ![Icon](./Resources/Icon128.png)
