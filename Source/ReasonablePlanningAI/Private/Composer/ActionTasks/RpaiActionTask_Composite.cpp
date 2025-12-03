@@ -3,6 +3,7 @@
 
 #include "Composer/ActionTasks/RpaiActionTask_Composite.h"
 #include "Algo/AllOf.h"
+#include "Templates/Greater.h"
 
 FActionTaskCompositeMemory::FActionTaskCompositeMemory()
    : bDoDefferedCancellationNextTick(false)

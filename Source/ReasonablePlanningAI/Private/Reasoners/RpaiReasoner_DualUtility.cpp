@@ -4,6 +4,7 @@
 #include "Reasoners/RpaiReasoner_DualUtility.h"
 #include "Core/RpaiState.h"
 #include "Core/RpaiGoalBase.h"
+#include "Templates/Greater.h"
 
 struct FScoringContainer
 {
